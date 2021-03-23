@@ -47,16 +47,16 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
     }
 
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        if (hasFocus && (scHeight < 0 || scWidth < 0)) {
-            scHeight = this.window.decorView.rootView.measuredHeight
-            scWidth = this.window.decorView.rootView.measuredWidth
-            Log.d("MainActivity.onWindowFocusChanged", "scHeight=${scHeight}, scWidth=${scWidth}")
-            // -TODO: DEBUG
-            ScreenCap.shotScreen(this@MainActivity)
-        }
-    }
+//    override fun onWindowFocusChanged(hasFocus: Boolean) {
+//        super.onWindowFocusChanged(hasFocus)
+//        if (hasFocus && (scHeight < 0 || scWidth < 0)) {
+//            scHeight = this.window.decorView.rootView.measuredHeight
+//            scWidth = this.window.decorView.rootView.measuredWidth
+//            Log.d("MainActivity.onWindowFocusChanged", "scHeight=${scHeight}, scWidth=${scWidth}")
+//            // -TODO: DEBUG
+//            ScreenCap.shotScreen(this@MainActivity)
+//        }
+//    }
 
     private fun loadModules() {
         loadNotificationModule()
