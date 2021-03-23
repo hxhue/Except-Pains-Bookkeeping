@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="edit_message">快来编辑我</string>
+    <string name="button_message">发送我！</string>
+    <string name="always_on_channel">常驻操作</string>
+    <string name="always_on_channel_description">这是通知栏便捷操作的频道。</string>
+    <string name="alert_channel">一般通知</string>
+    <string name="alert_channel_description">这是一般通知的频道。</string>
+    <string name="always_on_group">常驻操作通知组</string>
+    <string name="alert_group">一般通知组</string>
+</resources>
