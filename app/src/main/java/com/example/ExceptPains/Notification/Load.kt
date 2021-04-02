@@ -5,15 +5,15 @@ import android.app.NotificationChannelGroup
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import com.example.ExceptPains.Utils.Store
 import com.example.ExceptPains.R
-import com.example.ExceptPains.getMainContext
 
 /**
  * 注册通知组。包含快速操作通知组和通用通知组。
  */
 private fun registerNotificationGroups() {
     // The id of the group.
-    val ctx = getMainContext()
+    val ctx = Store.shared.getAppContext()
     // The user-visible name of the group.
     val notificationManager = ctx.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     notificationManager.createNotificationChannelGroup(
@@ -34,7 +34,7 @@ private fun registerNotificationGroups() {
  */
 private fun createQuickActionChannel() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val ctx = getMainContext()
+        val ctx = Store.shared.getAppContext()
         val name = ctx.getString(R.string.always_on_channel)
         val descriptionText = ctx.getString(R.string.always_on_channel_description)
         val importance = NotificationManager.IMPORTANCE_DEFAULT
@@ -55,7 +55,7 @@ private fun createQuickActionChannel() {
  */
 private fun createAlertChannel() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val ctx = getMainContext()
+        val ctx = Store.shared.getAppContext()
         val name = ctx.getString(R.string.alert_channel)
         val descriptionText = ctx.getString(R.string.alert_channel_description)
         val importance = NotificationManager.IMPORTANCE_DEFAULT
@@ -78,22 +78,13 @@ private fun createNotificationChannels() {
     createAlertChannel()
 }
 
-private val notifier = Notifier()
-
-/**
- * 返回通知器。这是Load模块能够向外提供的接口之一。
- */
-public fun getNotifier(): Notifier {
-    return notifier
-}
-
 /**
  * 每个模块都提供一个载入的接口。
  * 如果该模块不需载入就能够使用，则提供一个空的实现。
- * 下面的方法用来加载通知模块。是Load模块向外提供的接口之二。
+ * 下面的方法用来加载通知模块。
  */
 public fun loadNotificationModule() {
     registerNotificationGroups()
     createNotificationChannels()
-    getNotifier().displayAlwaysOnActions()
+    NotificationUtils.displayAlwaysOnActions()
 }

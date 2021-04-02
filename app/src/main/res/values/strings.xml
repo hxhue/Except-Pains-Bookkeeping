@@ -12,4 +12,11 @@
     <string name="always_on_group">Always-on Notification Group</string>
     <string name="alert_group">Alert Notification Group</string>
     <string name="alert_group_id" translatable="false">com.example.ExceptPains.ALERT_GROUP</string>
+
+    <string name="act_popup_newrec_title">New Item</string>
+    <string name="act_home_title">Home</string>
+
+    <string name="edit_message" translatable="false">快来编辑我</string>
+    <string name="screenshot_fgservice_title">Screenshot Service</string>
+    <string name="screenshot_fgservice_content">Foreground screenshot service running right now.</string>
 </resources>
