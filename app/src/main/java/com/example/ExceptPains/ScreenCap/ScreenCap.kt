@@ -5,27 +5,20 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
-import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.ImageFormat
-import android.hardware.display.DisplayManager
 import android.media.Image
-import android.media.ImageReader
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
-import android.os.Handler
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.example.ExceptPains.getMainContext
-import com.example.ExceptPains.getScreenHeight
-import com.example.ExceptPains.getScreenWidth
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import androidx.core.content.ContextCompat
+import com.example.ExceptPains.Notification.NotificationUtils
+import com.example.ExceptPains.Utils.Store
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -33,55 +26,31 @@ import java.io.OutputStream
 
 const val SCREENSHOT_REQ_CODE = 1029;
 
-class ScreenCap : AppCompatActivity() {
-    /**
-     * 2020.3.23: 只有满足条件的服务才能启动此功能。全屏截图暂无法使用。
-     * **此功能没有完成，不应使用**。
-     */
-    fun processActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        val ctx = getMainContext()
-        if (requestCode != SCREENSHOT_REQ_CODE) {
-            Log.d("ScreenCap.ScreenCap.onActivityResult", "requestCode (${requestCode}) is not processable by ScreenCap.ScreenCap")
-            return
-        }
-        // 检查是否是截图相关的结果
-        if (data == null) {
-            Log.d("ScreenCap.ScreenCap.onActivityResult", "data is null")
-            return
-        }
-        if (resultCode != -1) {
-            Log.d("ScreenCap.ScreenCap.onActivityResult", "resultCode (${resultCode}) is wrong")
-            return
-        }
-
-        val proj = (getMainContext().getSystemService(Context.MEDIA_PROJECTION_SERVICE)
-                as MediaProjectionManager).getMediaProjection(Activity.RESULT_OK, data)
-        val mImageReader: ImageReader = ImageReader.newInstance(
-            getScreenWidth(),
-            getScreenHeight(),
-            ImageFormat.FLEX_RGBA_8888, 1
-        )
-
-        val vDisplay = proj.createVirtualDisplay("screen-mirror",
-            getScreenWidth(),
-            getScreenHeight(),
-            Resources.getSystem().getDisplayMetrics().densityDpi,
-            DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
-            mImageReader.getSurface(), null, null)
-
-        GlobalScope.launch {
-            val image: Image = mImageReader.acquireLatestImage()
-            //-TODO: 处理image
-        }
-
-//        val handler = Handler()
-//        handler.
-//
-//        vDisplay.release()
-    }
-
+class ScreenCap {
     companion object {
-        val shared = ScreenCap()
+        /**
+         * 处理权限申请结果。
+         * 在申请者的onActivityResult中调用。
+         */
+        fun processPermissionAskingResult(requestCode: Int, resultCode: Int, data: Intent?) : Boolean {
+            val ctx = Store.shared.appContext
+            if (requestCode != SCREENSHOT_REQ_CODE) {
+                Log.d("ScreenCap.ScreenCap.onActivityResult", "requestCode (${requestCode}) is not processable by ScreenCap.ScreenCap")
+                return false
+            }
+            // 检查是否是截图相关的结果
+            if (data == null) {
+                Log.d("ScreenCap.ScreenCap.onActivityResult", "data is null")
+                return false
+            }
+            if (resultCode != Activity.RESULT_OK) {
+                Log.d("ScreenCap.ScreenCap.onActivityResult", "resultCode (${resultCode}) is wrong")
+                return false
+            }
+
+            Store.shared.setMediaProjectionIntent(data)
+            return true
+        }
 
         /**
          * 截取传来的View的图片，返回一个Bitmap图像。该图像可以用一些手段显示或存储。
@@ -101,14 +70,43 @@ class ScreenCap : AppCompatActivity() {
         }
 
         /**
-         * 以一个activity为基础来启动新的activity，并等待获取结果。
-         * 这个activity必须在对应的onActivityResult中调用ScreenCap.shared.processActivityResult来完成剩余步骤。
-         * 因为本模块的onActivityResult中暂未解决错误问题，**本功能无法使用**。
+         * 创建前台服务来获取截图。
+         * 在使用之前必须有截屏的权限。
          */
-        fun shotScreen(act: AppCompatActivity) {
-            val intent = (getMainContext().getSystemService(Context.MEDIA_PROJECTION_SERVICE)
+        fun shotScreen(identity: AppCompatActivity, eid: Long) {
+            val ctx = Store.shared.getAppContext()
+
+            // 检查权限，当权限通过时才启动前台服务
+            var data = Store.shared.getMediaProjectionIntent()
+            if (data == null) {
+                Log.d("ScreenCap.shotScreen", "Have no permission for screen capture!")
+
+                askForScreenshotPermission(identity)
+//                Store.shared.setPendingMediaProjectionTask(identity, eid)
+                return
+            }
+
+            // -TODO: 目前会出现连续拒绝多次之后，即便是再次接受也会认为没有权限的错误
+
+            //-TODO: 有的时候不能够成功截图
+            // 2021年03月29日 现在猜测为应用被清理之后（主Activity），原来的intent即便存在也会失效？
+            // 2021年03月30日 主活动被destroy了没有关系，但是从任务列表划去或者因为内存不足时intent将失效
+            // 或许有必要注册一个后台服务
+
+            // 创建前台服务
+            val fgService = Intent(ctx, CaptureService::class.java)
+            fgService.putExtra("callback", eid)
+            ContextCompat.startForegroundService(ctx, fgService)
+        }
+
+        /**
+         * 请求截图的权限。
+         */
+        fun askForScreenshotPermission(identity: AppCompatActivity) {
+            val ctx = Store.shared.getAppContext()
+            val intent = (ctx.getSystemService(Context.MEDIA_PROJECTION_SERVICE)
                     as MediaProjectionManager).createScreenCaptureIntent()
-            act.startActivityForResult(intent, SCREENSHOT_REQ_CODE)
+            identity.startActivityForResult(intent, SCREENSHOT_REQ_CODE)
         }
 
         //-TODO: 逻辑是不对的，目前只是调试阶段使用
@@ -117,7 +115,8 @@ class ScreenCap : AppCompatActivity() {
          * **暂无法正常使用**
          */
         private fun savePrivately(bmp: Bitmap, nameWithoutExt: String) {
-            val cw = ContextWrapper(getMainContext())
+            val ctx = Store.shared.getAppContext()
+            val cw = ContextWrapper(ctx)
             val directory: File? = cw.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
             val file = File(directory, "$nameWithoutExt.jpg")
             if (file.exists()) {
@@ -148,13 +147,14 @@ class ScreenCap : AppCompatActivity() {
 
         /**
          * 存储Bitmap到相册。nameWithoutExt表示文件名，但不包含末尾的文件类型扩展名。
-         * -TODO: 将约定的最小兼容版本上升到安卓Q，目前暂未在版本更低的设备上测试
+         * -TODO: 暂未在版本比Q更低的设备上测试。
          */
         fun saveToGallery(bmp: Bitmap, nameWithoutExt: String) {
             val filename = "$nameWithoutExt.jpg"
             var fos: OutputStream? = null
+            val ctx = Store.shared.getAppContext()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                getMainContext().contentResolver?.also { resolver ->
+                ctx.contentResolver?.also { resolver ->
                     val contentValues = ContentValues().apply {
                         put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
                         put(MediaStore.MediaColumns.MIME_TYPE, "image/jpg")
@@ -174,6 +174,28 @@ class ScreenCap : AppCompatActivity() {
                 bmp.compress(Bitmap.CompressFormat.JPEG, 100, it)
             }
 
+        }
+
+        /**
+         * 把argb8888格式转换成Bitmap格式返回。
+         * 注意：调用者应该在使用结束后自行关闭Image。
+         */
+        fun argb8888ToBitmap(img: Image): Bitmap {
+            // 因为Image不是用Bitmap编码的，所以需要用特殊的方式去转换成Bitmap
+            val width = img.width
+            val height = img.height
+            val plane = img.planes[0]
+            val buffer = plane.buffer
+            // 每个像素的间距
+            val pixelStride: Int = plane.pixelStride
+            // 总的间距
+            val rowStride: Int = plane.rowStride
+            val rowPadding: Int = rowStride - pixelStride * width
+            val bitmapImage = Bitmap.createBitmap(width + rowPadding / pixelStride, height,
+                    Bitmap.Config.ARGB_8888)
+//            val bitmapImage = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            bitmapImage.copyPixelsFromBuffer(buffer)
+            return bitmapImage
         }
     }
 }
