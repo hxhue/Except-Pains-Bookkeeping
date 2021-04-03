@@ -14,11 +14,23 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ExceptPains">
 
-        <activity android:name="com.example.ExceptPains.MainActivity">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <service android:name=".ScreenCap.CaptureService"
+            android:enabled="true"
+            android:foregroundServiceType="mediaProjection">
+        </service>
+
+        <!-- 使用对话框的样式 -->
+        <activity android:name=".Notification.PopupActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.Dialog.Alert"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance">
         </activity>
 
     </application>
