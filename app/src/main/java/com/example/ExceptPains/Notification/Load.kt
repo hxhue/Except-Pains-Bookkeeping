@@ -5,8 +5,11 @@ import android.app.NotificationChannelGroup
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import android.provider.Settings
 import com.example.ExceptPains.Utils.Store
 import com.example.ExceptPains.R
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * 注册通知组。包含快速操作通知组和通用通知组。

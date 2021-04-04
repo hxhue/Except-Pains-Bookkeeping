@@ -19,4 +19,10 @@
     <string name="edit_message" translatable="false">快来编辑我</string>
     <string name="screenshot_fgservice_title">Screenshot Service</string>
     <string name="screenshot_fgservice_content">Foreground screenshot service running right now.</string>
+    <string name="ok">okay</string>
+    <string name="screenshot_failure">Screenshot Failed</string>
+    <string name="screenshot_failure_description">No screenshot permission. To use this module you need to retry and confirm the permission in the next window.</string>
+    <string name="open">Open</string>
+    <string name="newrec">New Record</string>
+
 </resources>

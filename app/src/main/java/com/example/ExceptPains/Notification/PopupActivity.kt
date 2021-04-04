@@ -2,15 +2,12 @@ package com.example.ExceptPains.Notification
 
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.Point
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.View
-import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.ExceptPains.R
 import com.example.ExceptPains.ScreenCap.ScreenCap
 import com.example.ExceptPains.Utils.PairTask
@@ -22,10 +19,13 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable {
     private var waitingEvent: Long = -1
     private var handler: Handler? = null
     private var shown = false
+    private var noPermissionAlert: AlertDialog? = null
 
     // 和另外一个方法是有区别的，只有这个方法才能正常初始化
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("Notification.PopupActivity", "onCreate()")
+
         // 设置界面
         setContentView(R.layout.activity_popup_newrec)
         setTitle(R.string.act_popup_newrec_title)
@@ -51,10 +51,9 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable {
     // 可以在其他线程中调用。
     private fun show() {
         handler?.post {
-//            this.window.setWindowAnimations(WindowManager.LayoutParams.ALPHA_CHANGED)
             this.window.setDimAmount(0.6f)
             this.window.decorView.rootView.apply {
-                animate().alpha(1.0f)
+                animate().setDuration(100).alpha(1.0f)
             }
             shown = true
         }
@@ -83,7 +82,35 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable {
 
     // 提示没有权限信息
     private fun promptNoPermission() {
-        //-TODO: 给出一个提示框然后结束
-        this.finish()
+        val activity = this
+
+        // 给出一个提示框然后结束
+        val dialog = AlertDialog.Builder(activity)
+                .setTitle(R.string.screenshot_failure)
+                .setMessage(R.string.screenshot_failure_description)
+                .setPositiveButton(R.string.ok) { _, _ -> activity.finish() }
+                .setOnDismissListener { activity.finish() }
+                .create()
+
+        // 展示会话
+        dialog.show()
+
+        // 保存这个会话窗口供检查
+        this.noPermissionAlert = dialog
+    }
+
+    override fun onStop() {
+        super.onStop()
+        /**
+         * 在停止（退出）时马上销毁，防止因为退出按键语义不同导致界面残留
+         * 销毁是通过no_history标志完成的（见清单文件）
+         */
+        this.noPermissionAlert?.dismiss() // dismiss以防止窗口泄露
+        Log.d("PopupActivity", "onStop()")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("PopupActivity", "onDestroy()")
     }
 }

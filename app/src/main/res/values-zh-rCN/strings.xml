@@ -11,4 +11,9 @@
     <string name="act_home_title">主页</string>
     <string name="screenshot_fgservice_title">截屏服务</string>
     <string name="screenshot_fgservice_content">当前正在使用前台截屏服务。</string>
+    <string name="ok">好的</string>
+    <string name="screenshot_failure">截图失败</string>
+    <string name="screenshot_failure_description">没有获取到截图权限。要使用此功能，请重试并在接下来的窗口中选择确认。</string>
+    <string name="open">打开</string>
+    <string name="newrec">新建记录</string>
 </resources>

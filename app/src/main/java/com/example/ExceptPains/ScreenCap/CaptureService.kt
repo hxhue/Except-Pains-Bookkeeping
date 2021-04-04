@@ -16,6 +16,7 @@ import android.os.HandlerThread
 import android.os.IBinder
 import android.os.Process
 import android.util.Log
+import androidx.core.app.NotificationCompat
 import com.example.ExceptPains.Utils.Store
 import com.example.ExceptPains.Notification.NotificationUtils
 import com.example.ExceptPains.Notification.SCREENCAP_NOTIFICATION_ID
@@ -33,9 +34,10 @@ class CaptureService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // 1. 发送通知并注册为前台服务
         val builder = NotificationUtils.getStandardAlertBuilder()
-        // TODO：为前台服务通知创建单独的通知组
+
         val notification = builder.setContentTitle(getString(R.string.screenshot_fgservice_title))
                 .setContentText(getString(R.string.screenshot_fgservice_content))
+                .setPriority(NotificationCompat.PRIORITY_MIN)
                 .build()
         startForeground(SCREENCAP_NOTIFICATION_ID, notification)
 
@@ -97,7 +99,7 @@ class CaptureService : Service() {
         // 注册画面完成时的回调
         mImageReader.setOnImageAvailableListener({ reader ->
             // 稍等一小段时间能够让状态栏收起，图片更加清晰
-            Thread.sleep(250)
+            Thread.sleep(100)
 
             // 处理图像
             val img = mImageReader.acquireLatestImage()
