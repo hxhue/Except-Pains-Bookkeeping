@@ -18,12 +18,12 @@ const val SCREENCAP_NOTIFICATION_ID = 1
  * 一般通知的ID，跳过10以内（即便是在不同的频道也会发生冲突）
  * 10以内预留给特殊用途的通知
  */
-private var alertNotificationId = 0
-private fun newAlertNotificationId(): Int {
-    if (++alertNotificationId <= 10) {
-        alertNotificationId = 11;
+private var alertID = 0
+private fun newAlertNotificationID(): Int {
+    if (++alertID <= 10) {
+        alertID = 11;
     }
-    return alertNotificationId;
+    return alertID;
 }
 
 class NotificationUtils {
@@ -81,10 +81,10 @@ class NotificationUtils {
          * 使用自定义的通知创建器来创建通知。
          * 一般来说，可以通过getStandardAlertBuilder()获取一个alert渠道通知的模板。
          */
-        public fun buildAndSendAlert(builder: NotificationCompat.Builder) {
+        fun buildAndSendAlert(builder: NotificationCompat.Builder) {
             val message = builder.build()
             with(NotificationManagerCompat.from(Store.shared.getAppContext())) {
-                notify(newAlertNotificationId(), message)
+                notify(newAlertNotificationID(), message)
             }
         }
 
@@ -93,7 +93,7 @@ class NotificationUtils {
          * 获取模板之后稍加修改就能够使用buildAndSendAlert发送到alert渠道。
          */
         public fun getStandardAlertBuilder(): NotificationCompat.Builder {
-            val ctx = Store.shared.getAppContext()
+            val ctx = Store.shared.appContext
             val channelId = ctx.getString(R.string.alert_channel_id)
             val pendingIntent = createHomeLaunchIntent()
 
@@ -111,28 +111,25 @@ class NotificationUtils {
          * 返回一个能够打开主界面的intent。该intent保证主界面只会被打开一次。
          */
         private fun createHomeLaunchIntent(): PendingIntent {
-            val ctx = Store.shared.getAppContext()
+            val ctx = Store.shared.appContext
             // 创建进入主界面的Intent
             val mainIntent = Intent(ctx, MainActivity::class.java)
-                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED)
-                    .addCategory(Intent.CATEGORY_LAUNCHER)
-                    .setAction(Intent.ACTION_MAIN)
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED)
+                .setAction(Intent.ACTION_MAIN)
             // 创建pendingIntent
             val pendingIntent = PendingIntent.getActivity(ctx, 0, mainIntent,0);
             return pendingIntent
         }
 
         /**
-         * 返回一个能够打开新记录列表的intent。
+         * 返回一个能够打开新记录卡片的intent。
          */
         private fun createNewRecordCardIntent(): PendingIntent {
-            val ctx = Store.shared.getAppContext()
-            val intent = Intent(ctx, PopupActivity::class.java).setAction(Intent.ACTION_MAIN)
-                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED)
-                    .addCategory(Intent.CATEGORY_LAUNCHER)
-                    .setAction(Intent.ACTION_MAIN)
-            val pendingIntent = PendingIntent.getActivity(ctx, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-            return pendingIntent
+            val ctx = Store.shared.appContext
+            val intent = Intent(ctx, PopupActivity::class.java)
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED)
+                .setAction(Intent.ACTION_MAIN)
+            return PendingIntent.getActivity(ctx, 1, intent, 0)
         }
     }
 }
