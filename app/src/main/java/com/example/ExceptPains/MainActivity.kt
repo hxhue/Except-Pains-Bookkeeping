@@ -10,6 +10,9 @@ import com.example.ExceptPains.Utils.Store
 import com.example.ExceptPains.Notification.NotificationUtils
 import com.example.ExceptPains.ScreenCap.ScreenCap
 import com.example.ExceptPains.Notification.loadNotificationModule
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,14 +22,17 @@ class MainActivity : AppCompatActivity() {
         setTitle(R.string.act_home_title)
         // 其它初始化
         Store.shared.loadFromActivity(this)
-        loadModules()
+        // 载入其它模块
+        CoroutineScope(Dispatchers.Main).launch {
+            loadModules()
+        }
     }
 
-    private fun loadModules() {
+    private suspend fun loadModules() {
         loadNotificationModule()
         // 获取截屏权限
         if (Store.shared.mediaProjectionIntent == null) {
-            ScreenCap.askForScreenshotPermission(this)
+//            ScreenCap.askForScreenshotPermission(this)
         }
     }
 
