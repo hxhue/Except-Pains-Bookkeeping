@@ -55,4 +55,11 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         Log.d("MainActivity", "onDestroy")
     }
+
+    //打开ShowChartActivity
+    fun sendShowChartMessage(view:View){
+        val intent = Intent(this, ShowChartActivity::class.java).apply {
+        }
+        startActivity(intent)
+    }
 }

@@ -14,9 +14,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ExceptPains">
 
+        <activity android:name=".ShowChartActivity"></activity>
         <activity android:name="com.example.epledger.MainActivity">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
