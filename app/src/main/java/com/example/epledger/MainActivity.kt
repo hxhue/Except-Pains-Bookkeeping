@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import com.example.epledger.chart.ShowChartActivity
 import com.example.epledger.util.Store
 import com.example.epledger.util.NotificationUtils
 import com.example.epledger.qaction.screenshot.ScreenshotUtils

@@ -1,4 +1,4 @@
-package com.example.epledger;
+package com.example.epledger.chart;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.widget.RelativeLayout;
 import android.content.Context;
 
+import com.example.epledger.R;
 import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
