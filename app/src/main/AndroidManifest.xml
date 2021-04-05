@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ExceptPains">
 
-        <activity android:name=".ShowChartActivity"></activity>
+        <activity android:name=".chart.ShowChartActivity"></activity>
         <activity android:name="com.example.epledger.MainActivity">
 
             <intent-filter>
