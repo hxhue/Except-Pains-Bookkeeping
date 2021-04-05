@@ -24,5 +24,6 @@
     <string name="screenshot_failure_description">No screenshot permission. To use this module you need to retry and confirm the permission in the next window.</string>
     <string name="open">Open</string>
     <string name="newrec">New Record</string>
+    <string name="tile_service_label">Quick Record</string>
 
 </resources>

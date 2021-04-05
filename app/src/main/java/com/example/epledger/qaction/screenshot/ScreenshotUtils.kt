@@ -1,4 +1,4 @@
-package com.example.ExceptPains.ScreenCap
+package com.example.epledger.qaction.screenshot
 
 import android.app.Activity
 import android.content.ContentValues
@@ -17,8 +17,7 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.example.ExceptPains.Notification.NotificationUtils
-import com.example.ExceptPains.Utils.Store
+import com.example.epledger.util.Store
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -26,7 +25,7 @@ import java.io.OutputStream
 
 const val SCREENSHOT_REQ_CODE = 1029;
 
-class ScreenCap {
+class ScreenshotUtils {
     companion object {
         /**
          * 处理权限申请结果。
@@ -48,7 +47,7 @@ class ScreenCap {
                 return false
             }
 
-            Store.shared.setMediaProjectionIntent(data)
+            Store.shared.mediaProjectionIntent = data
             return true
         }
 
@@ -74,10 +73,10 @@ class ScreenCap {
          * 在使用之前必须有截屏的权限。
          */
         fun shotScreen(identity: AppCompatActivity, eid: Long) {
-            val ctx = Store.shared.getAppContext()
+            val ctx = Store.shared.appContext!!
 
             // 检查权限，当权限通过时才启动前台服务
-            var data = Store.shared.getMediaProjectionIntent()
+            var data = Store.shared.mediaProjectionIntent
             if (data == null) {
                 Log.d("ScreenCap.shotScreen", "Have no permission for screen capture!")
 
@@ -94,7 +93,7 @@ class ScreenCap {
             // 或许有必要注册一个后台服务
 
             // 创建前台服务
-            val fgService = Intent(ctx, CaptureService::class.java)
+            val fgService = Intent(ctx, ScreenshotService::class.java)
             fgService.putExtra("callback", eid)
             ContextCompat.startForegroundService(ctx, fgService)
         }
@@ -103,7 +102,7 @@ class ScreenCap {
          * 请求截图的权限。
          */
         fun askForScreenshotPermission(identity: AppCompatActivity) {
-            val ctx = Store.shared.getAppContext()
+            val ctx = Store.shared.appContext!!
             val intent = (ctx.getSystemService(Context.MEDIA_PROJECTION_SERVICE)
                     as MediaProjectionManager).createScreenCaptureIntent()
             identity.startActivityForResult(intent, SCREENSHOT_REQ_CODE)
@@ -115,7 +114,7 @@ class ScreenCap {
          * **暂无法正常使用**
          */
         private fun savePrivately(bmp: Bitmap, nameWithoutExt: String) {
-            val ctx = Store.shared.getAppContext()
+            val ctx = Store.shared.appContext
             val cw = ContextWrapper(ctx)
             val directory: File? = cw.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
             val file = File(directory, "$nameWithoutExt.jpg")
@@ -152,7 +151,7 @@ class ScreenCap {
         fun saveToGallery(bmp: Bitmap, nameWithoutExt: String) {
             val filename = "$nameWithoutExt.jpg"
             var fos: OutputStream? = null
-            val ctx = Store.shared.getAppContext()
+            val ctx = Store.shared.appContext!!
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 ctx.contentResolver?.also { resolver ->
                     val contentValues = ContentValues().apply {

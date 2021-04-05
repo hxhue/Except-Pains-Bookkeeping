@@ -1,4 +1,4 @@
-package com.example.ExceptPains.ScreenCap
+package com.example.epledger.qaction.screenshot
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -17,14 +17,14 @@ import android.os.IBinder
 import android.os.Process
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.example.ExceptPains.Utils.Store
-import com.example.ExceptPains.Notification.NotificationUtils
-import com.example.ExceptPains.Notification.SCREENCAP_NOTIFICATION_ID
-import com.example.ExceptPains.R
-import com.example.ExceptPains.Utils.PairTask
+import com.example.epledger.util.Store
+import com.example.epledger.util.NotificationUtils
+import com.example.epledger.util.SCREENCAP_NOTIFICATION_ID
+import com.example.epledger.R
+import com.example.epledger.qaction.PairTask
 import java.lang.RuntimeException
 
-class CaptureService : Service() {
+class ScreenshotService : Service() {
     lateinit var vDisplay: VirtualDisplay
     lateinit var mImageReader: ImageReader
     var callbackId: Long = -1;
@@ -72,7 +72,7 @@ class CaptureService : Service() {
 
     override fun onDestroy() {
         // 离开时关闭相应的通知
-        this@CaptureService.stopForeground(true)
+        this@ScreenshotService.stopForeground(true)
         super.onDestroy()
     }
 
@@ -89,21 +89,22 @@ class CaptureService : Service() {
 
     private fun doCapture() {
         // 调用之前必须保证RuntimeContext中的确保存了带有权限的intent
-        val data = Store.shared.getMediaProjectionIntent()
+        val data = Store.shared.mediaProjectionIntent
                 ?: throw RuntimeException("MediaProjectionIntent is null.")
 
-        val manager = (Store.shared.getAppContext().getSystemService(Context.MEDIA_PROJECTION_SERVICE)
+        val manager = (Store.shared.appContext!!.getSystemService(Context.MEDIA_PROJECTION_SERVICE)
                 as MediaProjectionManager)
         val projection = manager.getMediaProjection(Activity.RESULT_OK, data)
 
         // 注册画面完成时的回调
         mImageReader.setOnImageAvailableListener({ reader ->
-            // 稍等一小段时间能够让状态栏收起，图片更加清晰
-            Thread.sleep(100)
+            // 稍等一小段时间能够让状态栏收起
+            // 100还是稍微有点吃紧，如果手机有点卡则截图效果不好
+            Thread.sleep(150)
 
             // 处理图像
             val img = mImageReader.acquireLatestImage()
-            val bitmap = ScreenCap.argb8888ToBitmap(img)
+            val bitmap = ScreenshotUtils.argb8888ToBitmap(img)
             PairTask.finish(callbackId, bitmap)
 
             // 结束服务和释放资源
@@ -114,7 +115,7 @@ class CaptureService : Service() {
              */
             mImageReader.close()
             projection.stop()
-            this@CaptureService.stopSelf()
+            this@ScreenshotService.stopSelf()
         }, getBgHandler())
 
         // 获取屏幕的宽高
