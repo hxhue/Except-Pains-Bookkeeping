@@ -39,9 +39,9 @@
             </intent-filter>
         </activity>
 
-        <!-- TODO: icon和label需要修改 -->
+        <!-- TODO: icon需要修改 -->
         <service
-            android:name=".AwesomeTileService"
+            android:name=".qaction.NewRecordTileService"
             android:icon="@drawable/ic_launcher_foreground"
             android:label="@string/tile_service_label"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
