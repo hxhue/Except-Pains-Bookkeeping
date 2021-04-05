@@ -215,5 +215,6 @@ private fun createNotificationChannels() {
 fun loadNotificationModule() {
     registerNotificationGroups()
     createNotificationChannels()
-    NotificationUtils.displayAlwaysOnActions()
+    //-TODO: 添加偏好功能，根据用户设置来显示或不显示通知
+//    NotificationUtils.displayAlwaysOnActions()
 }
