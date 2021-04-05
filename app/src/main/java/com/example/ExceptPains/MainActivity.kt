@@ -23,6 +23,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
 
+const val EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE" //new
 
 private lateinit var mainContext: Context
 private var scHeight: Int = -1;
@@ -71,5 +72,15 @@ class MainActivity : AppCompatActivity() {
     fun sendMessage(view: View) {
         getNotifier().standardAlert("这是标题", "这是文本👀")
     }
+
+    //打开ShowChartActivity
+    fun sendShowChartMessage(view:View){
+        val intent = Intent(this, ShowChartActivity::class.java).apply {
+        }
+        startActivity(intent)
+    }
+
+
+
 
 }
