@@ -1,4 +1,4 @@
-package com.example.ExceptPains.Notification
+package com.example.epledger.qaction
 
 import android.content.Intent
 import android.graphics.Bitmap
@@ -8,10 +8,9 @@ import android.os.Looper
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.example.ExceptPains.R
-import com.example.ExceptPains.ScreenCap.ScreenCap
-import com.example.ExceptPains.Utils.PairTask
-import com.example.ExceptPains.Utils.Store
+import com.example.epledger.R
+import com.example.epledger.qaction.screenshot.ScreenshotUtils
+import com.example.epledger.util.Store
 
 
 class PopupActivity : AppCompatActivity(), PairTask.Noticeable {
@@ -38,7 +37,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable {
         // 创建等待事件
         waitingEvent = PairTask.observe(this)
         // 开始异步截屏
-        ScreenCap.shotScreen(this, waitingEvent)
+        ScreenshotUtils.shotScreen(this, waitingEvent)
     }
 
     // 不能在其他线程中调用。
@@ -59,22 +58,22 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable {
         }
     }
 
-    override fun onReceiveTaskResult(eid: Long, extra: Any) {
+    override fun onReceiveTaskResult(eid: Long, extra: Any?) {
         if (eid == waitingEvent) {
             show()
             screenshot = extra as Bitmap
             Log.d("Notification.PopupActivity", "onReceive called")
-            ScreenCap.saveToGallery(screenshot!!, "${System.currentTimeMillis()}")
+            ScreenshotUtils.saveToGallery(screenshot!!, "${System.currentTimeMillis()}")
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         // 处理屏幕截取权限的申请结果
-        val hasPermission = ScreenCap.processPermissionAskingResult(requestCode, resultCode, data)
+        val hasPermission = ScreenshotUtils.processPermissionAskingResult(requestCode, resultCode, data)
         // 尝试恢复当前活动
         if (hasPermission) {
-            ScreenCap.shotScreen(this, waitingEvent)
+            ScreenshotUtils.shotScreen(this, waitingEvent)
         } else {
             promptNoPermission()
         }

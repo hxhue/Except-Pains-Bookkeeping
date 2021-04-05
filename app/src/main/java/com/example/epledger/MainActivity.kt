@@ -1,15 +1,14 @@
-package com.example.ExceptPains
+package com.example.epledger
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.example.ExceptPains.Utils.Store
-import com.example.ExceptPains.Notification.NotificationUtils
-import com.example.ExceptPains.ScreenCap.ScreenCap
-import com.example.ExceptPains.Notification.loadNotificationModule
+import com.example.epledger.util.Store
+import com.example.epledger.util.NotificationUtils
+import com.example.epledger.qaction.screenshot.ScreenshotUtils
+import com.example.epledger.util.loadNotificationModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,7 +38,7 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         // 对于申请截屏权限结果的处理
-        ScreenCap.processPermissionAskingResult(requestCode, resultCode, data)
+        ScreenshotUtils.processPermissionAskingResult(requestCode, resultCode, data)
     }
 
     /** Called when the user taps the Send button */

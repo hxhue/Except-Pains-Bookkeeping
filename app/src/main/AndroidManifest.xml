@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.ExceptPains">
+    package="com.example.epledger">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -14,21 +14,21 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ExceptPains">
 
-        <activity android:name=".MainActivity">
+        <activity android:name="com.example.epledger.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <service android:name=".ScreenCap.CaptureService"
+        <service android:name="com.example.epledger.qaction.screenshot.ScreenshotService"
             android:enabled="true"
             android:foregroundServiceType="mediaProjection">
         </service>
 
         <!-- 使用对话框的样式 -->
         <!-- 需要使用taskAffinity标识，标识和主应用属于不同的任务。防止被清理时影响到主应用。 -->
-        <activity android:name=".Notification.PopupActivity"
+        <activity android:name="com.example.epledger.qaction.PopupActivity"
             android:theme="@style/Theme.AppCompat.DayNight.Dialog.Alert"
             android:excludeFromRecents="true"
             android:taskAffinity="com.example.ExceptPains.PopupActivity"
@@ -38,6 +38,18 @@
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
+
+        <!-- TODO: icon和label需要修改 -->
+        <service
+            android:name=".AwesomeTileService"
+            android:icon="@drawable/ic_launcher_foreground"
+            android:label="@string/tile_service_label"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action
+                    android:name="android.service.quicksettings.action.QS_TILE"/>
+            </intent-filter>
+        </service>
 
     </application>
 
