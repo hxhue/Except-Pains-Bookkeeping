@@ -1,16 +1,23 @@
 package com.example.epledger.qaction
 
+import android.app.DatePickerDialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.WindowManager
+import android.widget.Button
+import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import com.example.epledger.R
 import com.example.epledger.qaction.screenshot.ScreenshotUtils
 import com.example.epledger.util.Store
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class PopupActivity : AppCompatActivity(), PairTask.Noticeable {
@@ -20,16 +27,23 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable {
     private var shown = false
     private var noPermissionAlert: AlertDialog? = null
 
+    private var ledgerRecord = LedgerRecord()
+
+    // 日期选择按钮
+    private lateinit var datePickerButton: Button
+    // 日期输入文本框
+    private lateinit var dateText: EditText
+
     // 和另外一个方法是有区别的，只有这个方法才能正常初始化
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d("Notification.PopupActivity", "onCreate()")
 
         // 设置界面
-        setContentView(R.layout.activity_popup_newrec)
-        setTitle(R.string.act_popup_newrec_title)
+        setupViews()
         // 加载环境（重要）
         Store.shared.loadFromActivity(this)
+
         // 隐藏界面
         hide()
         // 保存下来当前线程的handler
@@ -37,7 +51,8 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable {
         // 创建等待事件
         waitingEvent = PairTask.observe(this)
         // 开始异步截屏
-        ScreenshotUtils.shotScreen(this, waitingEvent)
+//        ScreenshotUtils.shotScreen(this, waitingEvent)
+        skipScreenshot() // 测试中，跳过截屏阶段
     }
 
     // 不能在其他线程中调用。
@@ -111,5 +126,57 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable {
     override fun onDestroy() {
         super.onDestroy()
         Log.d("PopupActivity", "onDestroy()")
+    }
+
+    // 跳过截图阶段
+    private fun skipScreenshot() {
+        show()
+    }
+
+    // 设置好界面
+    private fun setupViews() {
+        setContentView(R.layout.activity_popup_newrec)
+        setTitle(R.string.act_popup_newrec_title)
+        // 禁用黑暗模式（配色困难）
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        setupDatePickerWidget()
+    }
+
+    // 设置好日期相关空间
+    private fun setupDatePickerWidget() {
+        // 保存控件引用
+        dateText = findViewById(R.id.qactionDateText)
+        datePickerButton = findViewById(R.id.qactionDatePickerButton)
+
+        // 设置默认日期为今日
+        saveAndDisplayDate(Date())
+
+        // 添加按钮回调
+        val dialog = DatePickerDialog(this, R.style.CustomDatePicker)
+        dialog.setOnDateSetListener { view, year, month, dayOfMonth ->
+            val cal = Calendar.getInstance()
+            cal.set(year, month, dayOfMonth)
+            val date = Date(cal.timeInMillis)
+            saveAndDisplayDate(date)
+        }
+        dialog.setOnShowListener {
+            // 只有show之后才能访问button，才不会报null
+            // 调整button颜色
+            val buttonTextColor = getColor(R.color.design_default_color_primary)
+            dialog.getButton(DatePickerDialog.BUTTON_POSITIVE).setTextColor(buttonTextColor)
+            dialog.getButton(DatePickerDialog.BUTTON_NEGATIVE).setTextColor(buttonTextColor)
+        }
+
+        // -TODO: 有白边
+        datePickerButton.setOnClickListener {
+            dialog.show()
+        }
+    }
+
+    // 保存和显示日期
+    private fun saveAndDisplayDate(date: Date) {
+        val simpleFormat = SimpleDateFormat("yyyy/MM/dd", Locale.US)
+        ledgerRecord.date = date
+        dateText.setText(simpleFormat.format(date))
     }
 }

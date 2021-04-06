@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import com.example.epledger.chart.ShowChartActivity
 import com.example.epledger.util.Store
 import com.example.epledger.util.NotificationUtils
@@ -17,6 +18,8 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // 禁用黑暗模式（配色困难）
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         // 界面初始化
         setContentView(R.layout.activity_main)
         setTitle(R.string.act_home_title)
