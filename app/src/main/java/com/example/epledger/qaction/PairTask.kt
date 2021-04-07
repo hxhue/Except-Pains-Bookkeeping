@@ -9,7 +9,7 @@ object PairTask {
 
     // 注册并返回一个id
     fun observe(identity: Noticeable?): Long {
-        Log.d("Utils.PairTask.observe", "entered.")
+//        Log.d("Utils.PairTask.observe", "entered.")
         var eid: Long = -1
         synchronized(eventMap) {
             while (eid < 0 || eventMap.containsKey(eid)) {
@@ -17,20 +17,20 @@ object PairTask {
             }
             eventMap.put(eid, identity)
         }
-        Log.d("Utils.PairTask.observe", "before returning ($eid)")
+//        Log.d("Utils.PairTask.observe", "before returning ($eid)")
         return eid
     }
 
     // 完成本次任务委托
     fun finish(eid: Long, extra: Any?) {
-        Log.d("Utils.PairTask.finished", "entered. eid is $eid")
+//        Log.d("Utils.PairTask.finished", "entered. eid is $eid")
         var target: Noticeable?
         synchronized(eventMap) {
             target = eventMap[eid]
             eventMap.remove(eid)
         }
         if (target != null) {
-            Log.d("Utils.PairTask.finished", "calling target.onReceive($eid, extra).")
+//            Log.d("Utils.PairTask.finished", "calling target.onReceive($eid, extra).")
             target!!.onReceiveTaskResult(eid, extra)
         }
     }

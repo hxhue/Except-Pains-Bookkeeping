@@ -17,7 +17,7 @@
 
 <!--    Theme_DeviceDefault_Light_Dialog_NoActionBar-->
 <!--    @style/Theme.AppCompat.DayNight.Dialog-->
-    <style name="CustomDatePicker" parent="Theme.AppCompat.DayNight.Dialog">
+    <style name="CustomDatePicker" parent="Theme.MaterialComponents.DayNight.Dialog">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:layout_gravity">center</item>
