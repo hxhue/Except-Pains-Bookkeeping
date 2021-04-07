@@ -5,46 +5,176 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
-        android:text="日期"
-        app:layout_constraintStart_toStartOf="@+id/view"
-        app:layout_constraintTop_toTopOf="@+id/view" />
-
-    <Button
-        android:id="@+id/qactionDatePickerButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:text="选择..."
-        app:layout_constraintBottom_toBottomOf="@+id/qactionDateText"
-        app:layout_constraintEnd_toEndOf="@+id/view" />
-
-    <EditText
-        android:id="@+id/qactionDateText"
-        android:layout_width="140dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:cursorVisible="false"
-        android:ems="10"
-        android:focusable="false"
-        android:inputType="date"
-        android:textIsSelectable="false"
-        app:layout_constraintStart_toEndOf="@+id/textView2"
-        app:layout_constraintTop_toTopOf="@+id/view" />
-
-    <View
-        android:id="@+id/view"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
+    <ScrollView
+        android:id="@+id/qactionScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fadeScrollbars="false"
+            android:scrollbarAlwaysDrawVerticalTrack="true"
+            android:scrollbarFadeDuration="0">
+
+            <TextView
+                android:id="@+id/qactionDateLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="24dp"
+                android:text="日期"
+                app:layout_constraintStart_toStartOf="@+id/qactionDateComponents"
+                app:layout_constraintTop_toTopOf="@+id/qactionDateComponents" />
+
+            <Button
+                android:id="@+id/qactionDatePickerButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
+                android:text="选择..."
+                app:layout_constraintBottom_toBottomOf="@+id/qactionDateText"
+                app:layout_constraintEnd_toEndOf="@+id/qactionDateComponents" />
+
+            <EditText
+                android:id="@+id/qactionDateText"
+                android:layout_width="140dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:cursorVisible="false"
+                android:ems="10"
+                android:focusable="false"
+                android:inputType="date"
+                android:textIsSelectable="false"
+                app:layout_constraintStart_toEndOf="@+id/qactionDateLabel"
+                app:layout_constraintTop_toTopOf="@+id/qactionDateComponents" />
+
+            <View
+                android:id="@+id/qactionDateComponents"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/qactionMoneyLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="24dp"
+                android:text="金额"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/qactionMoneyComponents" />
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="16dp"
+                android:text="时间（暂缓开发）"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/qactionDateComponents" />
+
+            <EditText
+                android:id="@+id/qactionMoneyText"
+                android:layout_width="140dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:ems="10"
+                android:inputType="numberDecimal"
+                app:layout_constraintStart_toEndOf="@+id/qactionMoneyLabel"
+                app:layout_constraintTop_toTopOf="@+id/qactionMoneyComponents" />
+
+            <View
+                android:id="@+id/qactionMoneyComponents"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView6" />
+
+            <View
+                android:id="@+id/qactionNoteComponents"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/qactionMoneyComponents" />
+
+            <TextView
+                android:id="@+id/qactionNoteLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="24dp"
+                android:text="备注"
+                app:layout_constraintStart_toStartOf="@id/qactionNoteComponents"
+                app:layout_constraintTop_toTopOf="@id/qactionNoteComponents"
+                tools:layout_editor_absoluteX="26dp"
+                tools:layout_editor_absoluteY="217dp" />
+
+            <EditText
+                android:id="@+id/qactionNoteText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="11dp"
+                android:layout_marginEnd="24dp"
+                android:ems="10"
+                android:gravity="start|top"
+                android:inputType="textMultiLine"
+                app:layout_constraintEnd_toEndOf="@id/qactionNoteComponents"
+                app:layout_constraintStart_toEndOf="@id/qactionNoteLabel"
+                app:layout_constraintTop_toTopOf="@id/qactionNoteComponents" />
+
+
+            <View
+                android:id="@+id/qactionButtonComponents"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginTop="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/qactionNoteText" />
+
+            <Button
+                android:id="@+id/qactionButttonConfirm"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
+                android:background="#0000"
+                android:minWidth="1dp"
+                android:text="确认"
+                android:textColor="@color/design_default_color_primary"
+                app:layout_constraintEnd_toEndOf="@id/qactionButtonComponents"
+                app:layout_constraintTop_toTopOf="@id/qactionButtonComponents"></Button>
+
+            <Button
+                android:id="@+id/qactionButttonCancel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="#0000"
+                android:minWidth="1dp"
+                android:text="取消"
+                android:textColor="@color/design_default_color_primary"
+                app:layout_constraintEnd_toStartOf="@+id/qactionButttonConfirm"
+                app:layout_constraintTop_toTopOf="@id/qactionButtonComponents"></Button>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

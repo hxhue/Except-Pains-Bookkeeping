@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ScrollView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -29,10 +30,15 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable {
 
     private var ledgerRecord = LedgerRecord()
 
+    // Wondering if we need those references
     // 日期选择按钮
     private lateinit var datePickerButton: Button
     // 日期输入文本框
     private lateinit var dateText: EditText
+    // 取消按钮
+    private lateinit var cancelButton: Button
+    // 确认按钮
+    private lateinit var confirmButton: Button
 
     // 和另外一个方法是有区别的，只有这个方法才能正常初始化
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -139,7 +145,11 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable {
         setTitle(R.string.act_popup_newrec_title)
         // 禁用黑暗模式（配色困难）
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        // Set up ScrollView
+        (this.findViewById(R.id.qactionScrollView) as ScrollView).isScrollbarFadingEnabled = false
+        // Other widgets
         setupDatePickerWidget()
+        setupButtons()
     }
 
     // 设置好日期相关空间
@@ -178,5 +188,27 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable {
         val simpleFormat = SimpleDateFormat("yyyy/MM/dd", Locale.US)
         ledgerRecord.date = date
         dateText.setText(simpleFormat.format(date))
+    }
+
+    // Set up the function of buttons and make dismissal void
+    private fun setupButtons() {
+        // Store reference
+        cancelButton = this.findViewById(R.id.qactionButttonCancel)
+        confirmButton = this.findViewById(R.id.qactionButttonConfirm)
+        // Set up callbacks
+        cancelButton.setOnClickListener {
+            this.finish()
+        }
+        confirmButton.setOnClickListener {
+            commitToStorage()
+            this.finish() // Close right now?
+        }
+        // make dismissal void
+        this.setFinishOnTouchOutside(false)
+    }
+
+    // 提交到存储中
+    private fun commitToStorage() {
+        Log.d("qaction.PopupActivity", "commitToStorage() called. (to be implemented)")
     }
 }
