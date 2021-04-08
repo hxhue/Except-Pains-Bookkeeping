@@ -7,9 +7,10 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.epledger.chart.ShowChartActivity
+import com.example.epledger.qaction.CKForeground
 import com.example.epledger.util.Store
-import com.example.epledger.util.NotificationUtils
 import com.example.epledger.qaction.screenshot.ScreenshotUtils
+import com.example.epledger.util.NotificationUtils
 import com.example.epledger.util.loadNotificationModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -37,6 +38,8 @@ class MainActivity : AppCompatActivity() {
         if (Store.shared.mediaProjectionIntent == null) {
 //            ScreenCap.askForScreenshotPermission(this)
         }
+        // 启动快捷操作
+        CKForeground.launch()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -47,7 +50,8 @@ class MainActivity : AppCompatActivity() {
 
     /** Called when the user taps the Send button */
     fun sendMessage(view: View) {
-        NotificationUtils.standardAlert("这是标题", "这是文本👀")
+        Log.d("MainActivity", "sendMessage() called")
+        Store.trimCache(this.applicationContext)
     }
 
     override fun onStop() {

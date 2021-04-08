@@ -73,7 +73,7 @@ class ScreenshotUtils {
          * 创建前台服务来获取截图。
          * 在使用之前必须有截屏的权限。
          */
-        fun shotScreen(identity: AppCompatActivity, eid: Long) {
+        fun shotScreen(identity: AppCompatActivity, eid: Int) {
             val ctx = Store.shared.appContext!!
 
             // 检查权限，当权限通过时才启动前台服务
@@ -85,13 +85,6 @@ class ScreenshotUtils {
 //                Store.shared.setPendingMediaProjectionTask(identity, eid)
                 return
             }
-
-            // -TODO: 目前会出现连续拒绝多次之后，即便是再次接受也会认为没有权限的错误
-
-            //-TODO: 有的时候不能够成功截图
-            // 2021年03月29日 现在猜测为应用被清理之后（主Activity），原来的intent即便存在也会失效？
-            // 2021年03月30日 主活动被destroy了没有关系，但是从任务列表划去或者因为内存不足时intent将失效
-            // 或许有必要注册一个后台服务
 
             // 创建前台服务
             val fgService = Intent(ctx, ScreenshotService::class.java)

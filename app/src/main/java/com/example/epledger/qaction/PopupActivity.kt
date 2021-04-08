@@ -20,10 +20,11 @@ import com.example.epledger.util.Store
 import java.text.SimpleDateFormat
 import java.util.*
 
+const val MEDIA_PROJECTION_INTENT = "com.example.qaction.PopupActivity.MEDIA_PROJECTION_INTENT"
 
 class PopupActivity : AppCompatActivity(), PairTask.Noticeable {
     private var screenshot: Bitmap? = null
-    private var waitingEvent: Long = -1
+    private var waitingEvent: Int = -1
     private var handler: Handler? = null
     private var shown = false
     private var noPermissionAlert: AlertDialog? = null
@@ -43,7 +44,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable {
     // 和另外一个方法是有区别的，只有这个方法才能正常初始化
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("Notification.PopupActivity", "onCreate()")
+        Log.d("qaction.PopupActivity", "onCreate()")
 
         // 设置界面
         setupViews()
@@ -57,8 +58,8 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable {
         // 创建等待事件
         waitingEvent = PairTask.observe(this)
         // 开始异步截屏
-//        ScreenshotUtils.shotScreen(this, waitingEvent)
-        skipScreenshot() // 测试中，跳过截屏阶段
+        ScreenshotUtils.shotScreen(this, waitingEvent)
+//        skipScreenshot() // 测试中，跳过截屏阶段
     }
 
     // 不能在其他线程中调用。
@@ -79,11 +80,11 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable {
         }
     }
 
-    override fun onReceiveTaskResult(eid: Long, extra: Any?) {
+    override fun onReceiveTaskResult(eid: Int, extra: Any?) {
         if (eid == waitingEvent) {
             show()
             screenshot = extra as Bitmap
-            Log.d("Notification.PopupActivity", "onReceive called")
+            Log.d("qaction.PopupActivity", "onReceive() called")
             ScreenshotUtils.saveToGallery(screenshot!!, "${System.currentTimeMillis()}")
         }
     }
@@ -203,7 +204,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable {
             commitToStorage()
             this.finish() // Close right now?
         }
-        // make dismissal void
+        // Make dismissal void
         this.setFinishOnTouchOutside(false)
     }
 

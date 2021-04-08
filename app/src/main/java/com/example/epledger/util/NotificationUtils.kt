@@ -1,9 +1,6 @@
 package com.example.epledger.util
 
-import android.app.NotificationChannel
-import android.app.NotificationChannelGroup
-import android.app.NotificationManager
-import android.app.PendingIntent
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -16,14 +13,15 @@ import com.example.epledger.R
 
 //-TODO: 若干发送通知的功能中，图标均未设置正确
 
-const val ALWAYS_ON_NOTIFICATION_ID = 0
-const val SCREENCAP_NOTIFICATION_ID = 1
+// 一定不能够为0，0会导致前台服务CRASH
+const val ALWAYS_ON_NOTIFICATION_ID = 1
+const val SCREENCAP_NOTIFICATION_ID = 2
 
 object NotificationUtils {
     /**
-     * 显示常驻通知。此方法在调用本模块的load功能时自动调用。
+     * 构建快捷操作通知。
      */
-    fun displayAlwaysOnActions() {
+    fun createQuickActionNotification(): Notification {
         val ctx = Store.shared.appContext!!
         val channelId = ctx.getString(R.string.always_on_channel_id)
         val builder = NotificationCompat.Builder(ctx, channelId) //-TODO: icon需要调整
@@ -50,8 +48,18 @@ object NotificationUtils {
         builder.setStyle(NotificationCompat.DecoratedCustomViewStyle())
                 .setCustomContentView(remoteViews)
 
+        return builder.build()
+    }
+
+    /**
+     * 显示快捷操作通知。
+     * 现已不在内部此模块内部专门使用。
+     */
+    fun displayQuickActions() {
+        val ctx = Store.shared.appContext!!
+        val notification = createQuickActionNotification()
         with(NotificationManagerCompat.from(ctx)) {
-            notify(ALWAYS_ON_NOTIFICATION_ID, builder.build())
+            notify(ALWAYS_ON_NOTIFICATION_ID, notification)
         }
     }
 
@@ -216,5 +224,5 @@ fun loadNotificationModule() {
     registerNotificationGroups()
     createNotificationChannels()
     //-TODO: 添加偏好功能，根据用户设置来显示或不显示通知
-//    NotificationUtils.displayAlwaysOnActions()
+//    NotificationUtils.displayQuickActions()
 }

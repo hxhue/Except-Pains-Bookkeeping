@@ -27,7 +27,7 @@ import java.lang.RuntimeException
 class ScreenshotService : Service() {
     lateinit var vDisplay: VirtualDisplay
     lateinit var mImageReader: ImageReader
-    var callbackId: Long = -1;
+    var callbackId: Int = -1;
 
     // 消除PixelFormat.RGBA_8888的值警告
     @SuppressLint("WrongConstant")
@@ -42,7 +42,7 @@ class ScreenshotService : Service() {
         startForeground(SCREENCAP_NOTIFICATION_ID, notification)
 
         // 2. 设置回调事件的id
-        callbackId = intent?.getLongExtra("callback", -1)!!
+        callbackId = intent?.getIntExtra("callback", -1)!!
 
         // 3. 初始化缓冲区等
         // 获取屏幕的宽高
