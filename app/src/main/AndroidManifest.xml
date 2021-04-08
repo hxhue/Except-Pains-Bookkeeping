@@ -48,9 +48,14 @@
             android:label="@string/tile_service_label"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
-                <action
-                    android:name="android.service.quicksettings.action.QS_TILE"/>
+                <action android:name="android.service.quicksettings.action.QS_TILE"/>
             </intent-filter>
+        </service>
+
+<!--        -->
+        <service android:name=".qaction.CKForeground"
+            android:process=":background"
+            android:enabled="true">
         </service>
 
     </application>

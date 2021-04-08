@@ -8,7 +8,7 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.example.ExceptPains"
+        applicationId "com.example.epledger"
         minSdkVersion 26
         targetSdkVersion 30
         versionCode 1
