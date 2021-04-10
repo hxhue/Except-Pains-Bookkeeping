@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun loadModules() {
+    private fun loadModules() {
         val ctx = this.applicationContext
         loadNotificationModule(ctx)
         // 获取截屏权限
