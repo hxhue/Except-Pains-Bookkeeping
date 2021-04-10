@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setTitle(R.string.act_home_title)
         // 其它初始化
-        Store.shared.loadFromActivity(this)
+        Store.loadFromActivity(this)
         // 载入其它模块
         CoroutineScope(Dispatchers.Main).launch {
             loadModules()
@@ -33,25 +33,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun loadModules() {
-        loadNotificationModule()
+        val ctx = this.applicationContext
+        loadNotificationModule(ctx)
         // 获取截屏权限
-        if (Store.shared.mediaProjectionIntent == null) {
+        if (Store.mediaProjectionIntent == null) {
 //            ScreenCap.askForScreenshotPermission(this)
         }
         // 启动快捷操作
-        CKForeground.launch()
+        CKForeground.launch(ctx)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         // 对于申请截屏权限结果的处理
-        ScreenshotUtils.processPermissionAskingResult(requestCode, resultCode, data)
+        ScreenshotUtils.processPermissionAskingResult(this, requestCode, resultCode, data)
     }
 
     /** Called when the user taps the Send button */
     fun sendMessage(view: View) {
         Log.d("MainActivity", "sendMessage() called")
-        Store.trimCache(this.applicationContext)
     }
 
     override fun onStop() {

@@ -31,9 +31,9 @@ class ScreenshotService : Service() {
 
     // 消除PixelFormat.RGBA_8888的值警告
     @SuppressLint("WrongConstant")
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         // 1. 发送通知并注册为前台服务
-        val builder = NotificationUtils.getStandardAlertBuilder()
+        val builder = NotificationUtils.getStandardAlertBuilder(this)
 
         val notification = builder.setContentTitle(getString(R.string.screenshot_fgservice_title))
                 .setContentText(getString(R.string.screenshot_fgservice_content))
@@ -42,12 +42,12 @@ class ScreenshotService : Service() {
         startForeground(SCREENCAP_NOTIFICATION_ID, notification)
 
         // 2. 设置回调事件的id
-        callbackId = intent?.getIntExtra("callback", -1)!!
+        callbackId = intent.getIntExtra("callback", -1)
 
         // 3. 初始化缓冲区等
         // 获取屏幕的宽高
-        val w = Store.shared.width
-        val h = Store.shared.height
+        val w = Store.width
+        val h = Store.height
 
         // 检查宽高
         if (w <= 0 || h <= 0) {
@@ -89,10 +89,12 @@ class ScreenshotService : Service() {
 
     private fun doCapture() {
         // 调用之前必须保证RuntimeContext中的确保存了带有权限的intent
-        val data = Store.shared.mediaProjectionIntent
+        val data = Store.mediaProjectionIntent
                 ?: throw RuntimeException("MediaProjectionIntent is null.")
 
-        val manager = (Store.shared.appContext!!.getSystemService(Context.MEDIA_PROJECTION_SERVICE)
+        val ctx = this.applicationContext
+
+        val manager = (ctx.getSystemService(Context.MEDIA_PROJECTION_SERVICE)
                 as MediaProjectionManager)
         val projection = manager.getMediaProjection(Activity.RESULT_OK, data)
 
@@ -119,8 +121,8 @@ class ScreenshotService : Service() {
         }, getBgHandler())
 
         // 获取屏幕的宽高
-        val w = Store.shared.width
-        val h = Store.shared.height
+        val w = Store.width
+        val h = Store.height
 
         // 创建虚拟显示设备
         vDisplay = projection.createVirtualDisplay("screen-mirror",
