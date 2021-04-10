@@ -6,6 +6,8 @@ import java.util.Date
 
 class LedgerRecord {
     var date: Date? = null
+    var hourOfDay: Int? = null
+    var minuteOfHour: Int? = null
     var amount: Double? = 0.0
     var type: String? = null
     var source: String? = null

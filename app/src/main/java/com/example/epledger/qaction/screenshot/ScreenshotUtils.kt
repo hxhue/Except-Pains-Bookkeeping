@@ -17,7 +17,6 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.example.epledger.qaction.PopupActivity
 import com.example.epledger.util.Store
 import java.io.File
 import java.io.FileOutputStream
@@ -32,8 +31,7 @@ class ScreenshotUtils {
          * 处理权限申请结果。
          * 在申请者的onActivityResult中调用。
          */
-        fun processPermissionAskingResult(requestCode: Int, resultCode: Int, data: Intent?) : Boolean {
-            val ctx = Store.shared.appContext
+        fun processPermissionAskingResult(ctx: Context, requestCode: Int, resultCode: Int, data: Intent?) : Boolean {
             if (requestCode != SCREENSHOT_REQ_CODE) {
                 Log.d("ScreenCap.ScreenCap.onActivityResult", "requestCode (${requestCode}) is not processable by ScreenCap.ScreenCap")
                 return false
@@ -48,7 +46,7 @@ class ScreenshotUtils {
                 return false
             }
 
-            Store.shared.mediaProjectionIntent = data
+            Store.mediaProjectionIntent = data
             return true
         }
 
@@ -74,29 +72,26 @@ class ScreenshotUtils {
          * 在使用之前必须有截屏的权限。
          */
         fun shotScreen(identity: AppCompatActivity, eid: Int) {
-            val ctx = Store.shared.appContext!!
 
             // 检查权限，当权限通过时才启动前台服务
-            var data = Store.shared.mediaProjectionIntent
+            var data = Store.mediaProjectionIntent
             if (data == null) {
                 Log.d("ScreenCap.shotScreen", "Have no permission for screen capture!")
-
                 askForScreenshotPermission(identity)
-//                Store.shared.setPendingMediaProjectionTask(identity, eid)
                 return
             }
 
             // 创建前台服务
-            val fgService = Intent(ctx, ScreenshotService::class.java)
+            val fgService = Intent(identity, ScreenshotService::class.java)
             fgService.putExtra("callback", eid)
-            ContextCompat.startForegroundService(ctx, fgService)
+            ContextCompat.startForegroundService(identity, fgService)
         }
 
         /**
          * 请求截图的权限。
          */
         fun askForScreenshotPermission(identity: AppCompatActivity) {
-            val ctx = Store.shared.appContext!!
+            val ctx = identity.applicationContext
             val intent = (ctx.getSystemService(Context.MEDIA_PROJECTION_SERVICE)
                     as MediaProjectionManager).createScreenCaptureIntent()
             identity.startActivityForResult(intent, SCREENSHOT_REQ_CODE)
@@ -107,8 +102,7 @@ class ScreenshotUtils {
          * 存储图片到私有目录。nameWithoutExt表示文件名，但不包含末尾的文件类型扩展名。
          * **暂无法正常使用**
          */
-        private fun savePrivately(bmp: Bitmap, nameWithoutExt: String) {
-            val ctx = Store.shared.appContext
+        private fun savePrivately(ctx: Context, bmp: Bitmap, nameWithoutExt: String) {
             val cw = ContextWrapper(ctx)
             val directory: File? = cw.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
             val file = File(directory, "$nameWithoutExt.jpg")
@@ -142,10 +136,9 @@ class ScreenshotUtils {
          * 存储Bitmap到相册。nameWithoutExt表示文件名，但不包含末尾的文件类型扩展名。
          * -TODO: 暂未在版本比Q更低的设备上测试。
          */
-        fun saveToGallery(bmp: Bitmap, nameWithoutExt: String) {
+        fun saveToGallery(ctx: Context, bmp: Bitmap, nameWithoutExt: String) {
             val filename = "$nameWithoutExt.jpg"
             var fos: OutputStream? = null
-            val ctx = Store.shared.appContext!!
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 ctx.contentResolver?.also { resolver ->
                     val contentValues = ContentValues().apply {
