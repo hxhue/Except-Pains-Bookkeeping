@@ -26,16 +26,16 @@ const val MEDIA_PROJECTION_INTENT = "com.example.qaction.PopupActivity.MEDIA_PRO
 class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnItemSelectedListener {
 //    private var screenshot: Bitmap? = null
     private var waitingEvent: Int = -1
-    private var handler: Handler? = null
+    private lateinit var handler: Handler
     private var shown = false
     private var noPermissionAlert: AlertDialog? = null
 
     private var ledgerRecord = LedgerRecord()
     // 两个用户的偏好设置
     private var cardLiteMode = false
-    private var screenshotAtStart = false
+    private var screenshotAtStart = true
 
-    // Wondering if we really need those references
+    // Wondering if we really need those references...
     // 日期选择按钮
     private lateinit var datePickerButton: Button
     // 日期输入文本框
@@ -103,7 +103,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
 
     // Show the card
     private fun show() {
-        handler?.post {
+        handler.post {
             this.window.setDimAmount(0.6f)
             this.window.decorView.rootView.apply {
                 animate().setDuration(100).alpha(1.0f)
@@ -121,7 +121,9 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
             // Save the screenshot to ledgerRecord
             ledgerRecord.screenshot = screenshot
             // reset the toggle state
-            screenshotToggle.isChecked = true
+            handler.post {
+                screenshotToggle.isChecked = true
+            }
             // TODO: remove the debug section
             // DEBUG-ONLY option
             ScreenshotUtils.saveToGallery(this, screenshot, "${System.currentTimeMillis()}")
@@ -158,7 +160,9 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         // 保存这个会话窗口供检查
         this.noPermissionAlert = dialog
         // Reset state of toggle
-        screenshotToggle.isChecked = false
+        handler.post {
+            screenshotToggle.isChecked = false
+        }
     }
 
     override fun onStop() {

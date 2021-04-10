@@ -31,7 +31,7 @@ class ScreenshotService : Service() {
 
     // 消除PixelFormat.RGBA_8888的值警告
     @SuppressLint("WrongConstant")
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // 1. 发送通知并注册为前台服务
         val builder = NotificationUtils.getStandardAlertBuilder(this)
 
@@ -40,6 +40,15 @@ class ScreenshotService : Service() {
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .build()
         startForeground(SCREENCAP_NOTIFICATION_ID, notification)
+
+        // If intent is null, just stop itself...
+        // But why is service revoked without intent?
+        if (intent == null) {
+            stopSelf()
+            Log.d("qaction.screenshot.ScreenshotService",
+                    "Intent is null somehow. Check the result?")
+            return super.onStartCommand(intent, flags, startId)
+        }
 
         // 2. 设置回调事件的id
         callbackId = intent.getIntExtra("callback", -1)
