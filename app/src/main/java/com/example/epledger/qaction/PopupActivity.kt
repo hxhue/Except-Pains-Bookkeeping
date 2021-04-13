@@ -3,6 +3,7 @@ package com.example.epledger.qaction
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Handler
@@ -14,10 +15,10 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.preference.PreferenceManager
 import com.example.epledger.R
 import com.example.epledger.qaction.screenshot.ScreenshotUtils
 import com.example.epledger.util.Store
-import org.w3c.dom.Text
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -31,9 +32,9 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
     private var noPermissionAlert: AlertDialog? = null
 
     private var ledgerRecord = LedgerRecord()
-    // 两个用户的偏好设置
-    private var cardLiteMode = false
-    private var screenshotAtStart = true
+    // 用户的偏好设置
+    private var briefMode = true
+    private var screenshotAtStart = false
 
     // Wondering if we really need those references...
     // 日期选择按钮
@@ -72,8 +73,13 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         }
     }
 
+    /**
+     * Load user preferences from default shared preferences.
+     */
     private fun loadUserPreference() {
-        // TODO
+        val perf = PreferenceManager.getDefaultSharedPreferences(this)
+        briefMode = perf.getBoolean("qa_brief_mode", true)
+        screenshotAtStart = perf.getBoolean("qa_screenshot_im", false)
     }
 
     /**
@@ -150,7 +156,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         val dialog = AlertDialog.Builder(activity)
                 .setTitle(R.string.screenshot_failure)
                 .setMessage(R.string.screenshot_failure_description)
-//                .setPositiveButton(R.string.ok) { _, _ -> activity.finish() }
+                .setPositiveButton(R.string.ok) { _, _ -> activity.show() }
                 .setOnDismissListener { activity.show() }
                 .create()
 
@@ -195,7 +201,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         (this.findViewById(R.id.qactionScrollView) as ScrollView).isScrollbarFadingEnabled = false
         // Other widgets
         // 创建时读取用户设置，然后根据设置来决定是否启用lite模式
-        if (cardLiteMode) {
+        if (briefMode) {
             discardDatePickerWidget()
             discardTimePickerWidget()
         } else {

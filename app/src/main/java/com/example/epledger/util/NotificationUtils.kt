@@ -7,6 +7,7 @@ import android.os.Build
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.preference.PreferenceManager
 import com.example.epledger.MainActivity
 import com.example.epledger.qaction.PopupActivity
 import com.example.epledger.R
@@ -32,7 +33,7 @@ object NotificationUtils {
                 .setGroup(ctx.getString(R.string.always_on_group_id))
 
         // 指定通知的内容布局
-        val remoteViews = RemoteViews(ctx.packageName, R.layout.view_quick_actions)
+        val remoteViews = RemoteViews(ctx.packageName, R.layout.notification_quick_actions)
 
         // 创建打开主界面的intent
         val launchHomeIntent = createHomeLaunchIntent(ctx)
@@ -208,13 +209,11 @@ private fun createNotificationChannels(ctx: Context) {
 }
 
 /**
- * 每个模块都提供一个载入的接口。
- * 如果该模块不需载入就能够使用，则提供一个空的实现。
- * 下面的方法用来加载通知模块。
+ * Load notification module.
+ * This is essential and must be called when the app is started.
  */
 fun loadNotificationModule(ctx: Context) {
+    // Register groups and channels
     registerNotificationGroups(ctx)
     createNotificationChannels(ctx)
-    //-TODO: 添加偏好功能，根据用户设置来显示或不显示通知
-//    NotificationUtils.displayQuickActions()
 }
