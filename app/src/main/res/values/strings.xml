@@ -25,5 +25,9 @@
     <string name="open">Open</string>
     <string name="newrec">New Record</string>
     <string name="tile_service_label">Quick Record</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_charts">Charts</string>
+    <string name="nav_others">Others</string>
+    <string name="nav_settings">Settings</string>
 
 </resources>
