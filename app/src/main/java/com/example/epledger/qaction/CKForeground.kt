@@ -9,6 +9,7 @@ import android.os.IBinder
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.preference.PreferenceManager
 import com.example.epledger.util.ALWAYS_ON_NOTIFICATION_ID
 import com.example.epledger.util.NotificationUtils
 import com.example.epledger.util.SCREENCAP_NOTIFICATION_ID
@@ -46,5 +47,18 @@ class CKForeground: Service() {
         // 离开时关闭相应的通知
         this@CKForeground.stopForeground(true)
         super.onDestroy()
+    }
+}
+
+/**
+ * Load quick action module according to user preferences.
+ * This is optional and may be called multiple times.
+ */
+fun loadQuickActionModule(ctx: Context) {
+    // Decide whether to turn on quick actions-in-notification-center feature
+    val perf = PreferenceManager.getDefaultSharedPreferences(ctx)
+    val quickActionInNotification = perf.getBoolean("qa_notification", true)
+    if (quickActionInNotification) {
+        CKForeground.launch(ctx)
     }
 }

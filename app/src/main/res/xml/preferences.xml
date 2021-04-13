@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        app:key="quick_actions_category"
+        app:title="Quick Actions">
+
+        <SwitchPreferenceCompat
+            app:key="qa_brief_mode"
+            app:title="Brief mode" />
+
+        <SwitchPreferenceCompat
+            app:key="qa_screenshot_im"
+            app:title="Take screenshot immediately"
+            app:summary="Right after the card is popped up"/>
+
+        <SwitchPreferenceCompat
+            app:key="qa_notification"
+            app:title="Enable actions in notification center"
+            app:summary="Recommended when tile service works poorly"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="data_category"
+        app:title="Data">
+
+        <Preference
+            app:key="data_export_json"
+            app:title="Export as JSON"
+            app:summary="When you want to restore data in the future"/>
+
+        <Preference
+            app:key="data_export_csv"
+            app:title="Export as CSV"
+            app:summary="When you want to view data in your computer"/>
+
+        <Preference
+            app:key="data_import_json"
+            app:title="Import from JSON"
+            app:summary="When you have a backup from this app"/>
+
+        <Preference
+            app:key="data_import_alipay"
+            app:title="Import from CSV(Alipay)"
+            app:summary="When you have data exported from Alipay"/>
+
+        <Preference
+            app:key="data_import_wechat"
+            app:title="Import from CSV(Wechat)"
+            app:summary="When you have data exported from Wechat"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="notification_category"
+        app:title="Notifications">
+
+        <SwitchPreferenceCompat
+            app:key="notification_remind"
+            app:title="Remind me to record expenses" />
+
+        <SwitchPreferenceCompat
+            app:key="notification_badge"
+            app:title="Show unfinished records as badges"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>
