@@ -101,11 +101,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         loadQuickActionModule(ctx)
     }
 
-    /** Called when the user taps the Send button */
-    fun sendMessage(view: View) {
-        Log.d("MainActivity", "sendMessage() called")
-    }
-
     override fun onStop() {
         super.onStop()
         Log.d("MainActivity", "onStop")
@@ -114,13 +109,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     override fun onDestroy() {
         super.onDestroy()
         Log.d("MainActivity", "onDestroy")
-    }
-
-    //打开ShowChartActivity
-    fun sendShowChartMessage(view:View){
-        val intent = Intent(this, ShowChartActivity::class.java).apply {
-        }
-        startActivity(intent)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
