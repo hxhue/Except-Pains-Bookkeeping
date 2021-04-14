@@ -3,7 +3,6 @@ package com.example.epledger.qaction
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Handler
@@ -17,15 +16,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
 import com.example.epledger.R
+import com.example.epledger.qaction.data.LedgerRecord
+import com.example.epledger.qaction.data.PairTask
 import com.example.epledger.qaction.screenshot.ScreenshotUtils
-import com.example.epledger.util.Store
+import com.example.epledger.qaction.data.Store
 import java.text.SimpleDateFormat
 import java.util.*
 
-const val MEDIA_PROJECTION_INTENT = "com.example.qaction.PopupActivity.MEDIA_PROJECTION_INTENT"
-
+/**
+ * This is an activity for the popped-up card when you click our TileService toggle,
+ * or quick actions in the notification center.
+ */
 class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnItemSelectedListener {
-//    private var screenshot: Bitmap? = null
     private var waitingEvent: Int = -1
     private lateinit var handler: Handler
     private var shown = false
@@ -35,16 +37,6 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
     // 用户的偏好设置
     private var briefMode = true
     private var screenshotAtStart = false
-
-    // Wondering if we really need those references...
-    // 日期选择按钮
-    private lateinit var datePickerButton: Button
-    // 日期输入文本框
-    private lateinit var dateText: EditText
-    // 取消按钮
-    private lateinit var cancelButton: Button
-    // 确认按钮
-    private lateinit var confirmButton: Button
 
     // For spinners
     private val sources: Array<String> =  arrayOf("Unspecified", "Alipay", "Wechat", "Cash")
@@ -63,7 +55,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         // 设置界面
         setupViews()
         // May need something from a set up view?
-        Store.loadFromActivity(this)
+        Store.loadScreenSize(this)
 
         handler = Handler(Looper.myLooper()!!)
 
@@ -186,21 +178,16 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         Log.d("PopupActivity", "onDestroy()")
     }
 
-//    // 跳过截图阶段
-//    private fun skipScreenshot() {
-//        show()
-//    }
-
     // 设置好界面
     private fun setupViews() {
         setContentView(R.layout.activity_popup_newrec)
         setTitle(R.string.act_popup_newrec_title)
-        // 禁用黑暗模式（配色困难）
+        // 禁用黑暗模式
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         // Set up ScrollView
         (this.findViewById(R.id.qactionScrollView) as ScrollView).isScrollbarFadingEnabled = false
         // Other widgets
-        // 创建时读取用户设置，然后根据设置来决定是否启用lite模式
+        // 创建时读取用户设置，这里就能够通过配置来选择不同的显示方式
         if (briefMode) {
             discardDatePickerWidget()
             discardTimePickerWidget()
@@ -350,8 +337,8 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
     private fun setupDatePickerWidget() {
         // 保存控件引用
         // Necessary?
-        dateText = findViewById(R.id.qactionDateText)
-        datePickerButton = findViewById(R.id.qactionDatePickerButton)
+        val dateText = findViewById<EditText>(R.id.qactionDateText)
+        val datePickerButton = findViewById<Button>(R.id.qactionDatePickerButton)
 
         // 设置默认日期为今日
         val simpleFormat = SimpleDateFormat("yyyy/MM/dd", Locale.US)
@@ -382,18 +369,11 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         }
     }
 
-    // 保存和显示日期
-//    private fun saveAndDisplayDate(date: Date) {
-//        val simpleFormat = SimpleDateFormat("yyyy/MM/dd", Locale.US)
-//        ledgerRecord.date = date
-//        dateText.setText(simpleFormat.format(date))
-//    }
-
     // Set up the function of buttons and make dismissal void
     private fun setupButtons() {
         // Store reference
-        cancelButton = this.findViewById(R.id.qactionButttonCancel)
-        confirmButton = this.findViewById(R.id.qactionButttonConfirm)
+        val cancelButton = this.findViewById<Button>(R.id.qactionButttonCancel)
+        val confirmButton = this.findViewById<Button>(R.id.qactionButttonConfirm)
         // Set up callbacks
         cancelButton.setOnClickListener {
             this.finish()

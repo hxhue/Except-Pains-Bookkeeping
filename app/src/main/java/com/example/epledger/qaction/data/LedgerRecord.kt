@@ -1,4 +1,4 @@
-package com.example.epledger.qaction
+package com.example.epledger.qaction.data
 
 import android.graphics.Bitmap
 import java.util.Date

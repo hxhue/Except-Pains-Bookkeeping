@@ -1,30 +1,19 @@
 package com.example.epledger
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
-import android.view.View
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.preference.PreferenceManager
 import androidx.viewpager.widget.ViewPager
-import com.example.epledger.chart.ShowChartActivity
 import com.example.epledger.nav.MainPagerAdapter
 import com.example.epledger.nav.MainScreen
 import com.example.epledger.nav.getMainScreenForMenuItem
-import com.example.epledger.qaction.CKForeground
 import com.example.epledger.qaction.loadQuickActionModule
-import com.example.epledger.util.Store
-import com.example.epledger.qaction.screenshot.ScreenshotUtils
-import com.example.epledger.util.NotificationUtils
 import com.example.epledger.util.loadNotificationModule
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomnavigation.LabelVisibilityMode
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
     private lateinit var viewPager: ViewPager
@@ -37,8 +26,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         // 界面初始化
         setupViews()
-        // 其他初始化
-        Store.loadFromActivity(this)
+        // 加载其他模块
         loadModules()
     }
 

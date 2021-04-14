@@ -1,27 +1,32 @@
 package com.example.epledger.qaction
 
-import android.app.Activity
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import com.example.epledger.util.ALWAYS_ON_NOTIFICATION_ID
 import com.example.epledger.util.NotificationUtils
-import com.example.epledger.util.SCREENCAP_NOTIFICATION_ID
-import com.example.epledger.util.Store
 
-private const val CLASS_NAME = "qaction.CKBackgroundActivity"
+private const val CLASS_NAME = "qaction.CKBackground"
 
 class CKForeground: Service() {
     companion object {
+        const val STOP_FOREGROUND = "ACTION_STOP_FOREGROUND_SERVICE"
+
         fun launch(ctx: Context) {
-            Log.d("qaction.CKBackgroundActivity", "launch() called")
+            Log.d(CLASS_NAME, "launch() called")
             val intent = Intent(ctx, CKForeground::class.java)
+            ContextCompat.startForegroundService(ctx, intent)
+        }
+
+        fun stop(ctx: Context) {
+            Log.d(CLASS_NAME, "stop() called")
+            val intent = Intent(ctx, CKForeground::class.java)
+            intent.action = STOP_FOREGROUND
             ContextCompat.startForegroundService(ctx, intent)
         }
     }
@@ -31,16 +36,25 @@ class CKForeground: Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // 设置环境，现在修改配置之后CKForeground会在不同的进程中执行，拿不到主进程的环境
-        // 分成两个进程存粹是为了让应用的统计数据更加好看（其实结果差不多）
-//        if (Store.shared.appContext == null) {
-//            Store.shared.setAppContext(this.applicationContext)
-//        }
+        // 检查intent是否为null
+        if (intent == null) {
+            Log.d(CLASS_NAME, "onStartCommand() received a null intent => ignored")
+            return super.onStartCommand(intent, flags, startId)
+        }
+
         // 启动前台
         val notification = NotificationUtils.createQuickActionNotification(this)
         startForeground(ALWAYS_ON_NOTIFICATION_ID, notification)
-        Log.d("qaction.CKForeground", "onStartCommand() called")
-        return super.onStartCommand(intent, flags, startId)
+
+        // 有结束请求时提前中止
+        if (STOP_FOREGROUND == intent.action) {
+            Log.d(CLASS_NAME, "Stop action received. Bye.")
+            stopForeground(true)
+            stopSelfResult(startId);
+            return super.onStartCommand(intent, flags, startId)
+        }
+
+        return START_STICKY
     }
 
     override fun onDestroy() {
@@ -60,5 +74,8 @@ fun loadQuickActionModule(ctx: Context) {
     val quickActionInNotification = perf.getBoolean("qa_notification", true)
     if (quickActionInNotification) {
         CKForeground.launch(ctx)
+    } else {
+        CKForeground.stop(ctx)
+        Toast.makeText(ctx, "Stopping foreground service. Please be patient.", Toast.LENGTH_SHORT).show()
     }
 }
