@@ -1,5 +1,7 @@
 package com.example.epledger.qaction
 
+import android.annotation.SuppressLint
+import android.app.ActivityManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -24,11 +26,24 @@ class CKForeground: Service() {
         }
 
         fun stop(ctx: Context) {
+            // Stopping is unnecessary when it's not launched.
+            // And a stopping signal will even cause it to become active for a while!
+            if (!ctx.isServiceForegrounded(CKForeground::class.java)) {
+                return
+            }
             Log.d(CLASS_NAME, "stop() called")
             val intent = Intent(ctx, CKForeground::class.java)
             intent.action = STOP_FOREGROUND
             ContextCompat.startForegroundService(ctx, intent)
         }
+
+        @SuppressLint("ServiceCast")
+        @Suppress("DEPRECATION") // Deprecated for third party Services.
+        fun <T> Context.isServiceForegrounded(service: Class<T>) =
+                (getSystemService(ACTIVITY_SERVICE) as? ActivityManager)
+                        ?.getRunningServices(Integer.MAX_VALUE)
+                        ?.find { it.service.className == service.name }
+                        ?.foreground == true
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -71,11 +86,13 @@ class CKForeground: Service() {
 fun loadQuickActionModule(ctx: Context) {
     // Decide whether to turn on quick actions-in-notification-center feature
     val perf = PreferenceManager.getDefaultSharedPreferences(ctx)
-    val quickActionInNotification = perf.getBoolean("qa_notification", true)
+
+    val quickActionInNotification = perf.getBoolean("qa_notification", false)
+
     if (quickActionInNotification) {
         CKForeground.launch(ctx)
     } else {
         CKForeground.stop(ctx)
-        Toast.makeText(ctx, "Stopping foreground service. Please be patient.", Toast.LENGTH_SHORT).show()
+        // There shouldn't be a toast here
     }
 }
