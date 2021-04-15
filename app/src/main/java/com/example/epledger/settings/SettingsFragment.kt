@@ -43,6 +43,11 @@ class SettingsFragment: PreferenceFragmentCompat(), SharedPreferences.OnSharedPr
         // 状态栏功能开关变更
         if (key == "qa_notification") {
             loadQuickActionModule(requireContext())
+            // If the preference is changed to false
+            if (!sharedPreferences.getBoolean("qa_notification", true)) {
+                Toast.makeText(context, "Stopping foreground service. Please be patient.",
+                        Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
