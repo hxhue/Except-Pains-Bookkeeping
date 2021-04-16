@@ -7,7 +7,10 @@ import android.service.quicksettings.TileService
 import android.util.Log
 import java.util.*
 
-
+/**
+ * A TileService will display a toggle in the quick-settings window.
+ * This is a shortcutting to open a window and record your expenses.
+ */
 class NewRecordTileService : TileService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d("qaction.NewRecordTileService", "onStartCommand() called at ${System.currentTimeMillis()}")
@@ -23,9 +26,9 @@ class NewRecordTileService : TileService() {
                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED)
                     .setAction(Intent.ACTION_MAIN)
 
-        // -TODO: fix: take too long!
-        // MainActivity is also slow to start; Nothing to do with my start-up
         // Slow after pressing HOME from any app(even not from mine!)
+        // This is because of Google's concern about app privilege
+        // Nothing to do with my code...
         startActivityAndCollapse(recCardIntent)
     }
 }
