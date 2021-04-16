@@ -16,7 +16,8 @@
 
         <activity android:name=".chart.ShowChartActivity"></activity>
 
-        <activity android:name="com.example.epledger.MainActivity">
+        <activity android:name="com.example.epledger.MainActivity"
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

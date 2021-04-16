@@ -1,6 +1,5 @@
-package com.example.epledger.qaction
+package com.example.epledger.qaction.data
 
-import android.util.Log
 import android.util.SparseArray
 import java.util.*
 
