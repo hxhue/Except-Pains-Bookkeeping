@@ -17,4 +17,18 @@
     <string name="open">打开</string>
     <string name="newrec">新建记录</string>
     <string name="tile_service_label">快速记录</string>
+
+    <!--show chart activity-->
+    <string name="show_chart_page_title">统计图</string>
+    <string name="page_title">统计图表</string>
+    <string name="search">搜索</string>
+    <string name="more">更多</string>
+    <string name="content_description_search">搜索图标描述</string>
+    <string name="content_description_more">更多图标描述</string>
+    <string name="sift">筛选</string>
+    <string name="content_description_sift">筛选图标描述</string>
+    <string name="icons">&#xe68a;</string>
+    <string name="reset">重置</string>
+    <string name="content_description_reset">重置图标描述</string>
+
 </resources>
