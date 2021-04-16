@@ -17,6 +17,10 @@
     <string name="open">打开</string>
     <string name="newrec">新建记录</string>
     <string name="tile_service_label">快速记录</string>
+    <string name="nav_home">主页</string>
+    <string name="nav_charts">图表</string>
+    <string name="nav_others">其他</string>
+    <string name="nav_settings">设置</string>
 
     <!--show chart activity-->
     <string name="show_chart_page_title">统计图</string>
@@ -30,5 +34,4 @@
     <string name="icons">&#xe68a;</string>
     <string name="reset">重置</string>
     <string name="content_description_reset">重置图标描述</string>
-
 </resources>

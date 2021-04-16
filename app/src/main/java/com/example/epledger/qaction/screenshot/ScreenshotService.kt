@@ -17,23 +17,23 @@ import android.os.IBinder
 import android.os.Process
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.example.epledger.util.Store
+import com.example.epledger.qaction.data.Store
 import com.example.epledger.util.NotificationUtils
 import com.example.epledger.util.SCREENCAP_NOTIFICATION_ID
 import com.example.epledger.R
-import com.example.epledger.qaction.PairTask
+import com.example.epledger.qaction.data.PairTask
 import java.lang.RuntimeException
 
 class ScreenshotService : Service() {
     lateinit var vDisplay: VirtualDisplay
     lateinit var mImageReader: ImageReader
-    var callbackId: Long = -1;
+    var callbackId: Int = -1;
 
     // 消除PixelFormat.RGBA_8888的值警告
     @SuppressLint("WrongConstant")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // 1. 发送通知并注册为前台服务
-        val builder = NotificationUtils.getStandardAlertBuilder()
+        val builder = NotificationUtils.getStandardAlertBuilder(this)
 
         val notification = builder.setContentTitle(getString(R.string.screenshot_fgservice_title))
                 .setContentText(getString(R.string.screenshot_fgservice_content))
@@ -41,13 +41,22 @@ class ScreenshotService : Service() {
                 .build()
         startForeground(SCREENCAP_NOTIFICATION_ID, notification)
 
+        // If intent is null, just stop itself...
+        // But why is service revoked without intent?
+        if (intent == null) {
+            stopSelf()
+            Log.d("qaction.screenshot.ScreenshotService",
+                    "Intent is null somehow. Check the result?")
+            return super.onStartCommand(intent, flags, startId)
+        }
+
         // 2. 设置回调事件的id
-        callbackId = intent?.getLongExtra("callback", -1)!!
+        callbackId = intent.getIntExtra("callback", -1)
 
         // 3. 初始化缓冲区等
         // 获取屏幕的宽高
-        val w = Store.shared.width
-        val h = Store.shared.height
+        val w = Store.width
+        val h = Store.height
 
         // 检查宽高
         if (w <= 0 || h <= 0) {
@@ -89,10 +98,12 @@ class ScreenshotService : Service() {
 
     private fun doCapture() {
         // 调用之前必须保证RuntimeContext中的确保存了带有权限的intent
-        val data = Store.shared.mediaProjectionIntent
+        val data = Store.mediaProjectionIntent
                 ?: throw RuntimeException("MediaProjectionIntent is null.")
 
-        val manager = (Store.shared.appContext!!.getSystemService(Context.MEDIA_PROJECTION_SERVICE)
+        val ctx = this.applicationContext
+
+        val manager = (ctx.getSystemService(Context.MEDIA_PROJECTION_SERVICE)
                 as MediaProjectionManager)
         val projection = manager.getMediaProjection(Activity.RESULT_OK, data)
 
@@ -119,8 +130,8 @@ class ScreenshotService : Service() {
         }, getBgHandler())
 
         // 获取屏幕的宽高
-        val w = Store.shared.width
-        val h = Store.shared.height
+        val w = Store.width
+        val h = Store.height
 
         // 创建虚拟显示设备
         vDisplay = projection.createVirtualDisplay("screen-mirror",
