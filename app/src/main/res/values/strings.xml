@@ -4,14 +4,14 @@
     <string name="app_name" translatable="false">Except Pains</string>
     <string name="always_on_channel">Always-on Actions</string>
     <string name="always_on_channel_description">This is a channel for quick actions.</string>
-    <string name="always_on_channel_id" translatable="false">com.example.ExceptPains.ALWAYS_ON_CHANNEL</string>
+    <string name="always_on_channel_id" translatable="false">com.example.epledger.ALWAYS_ON_CHANNEL</string>
     <string name="alert_channel">Alerts</string>
     <string name="alert_channel_description">This is a channel for usual alerts.</string>
-    <string name="alert_channel_id" translatable="false">com.example.ExceptPains.ALERT_CHANNEL</string>
-    <string name="always_on_group_id" translatable="false">com.example.ExceptPains.AlWAYS_ON_GROUP</string>
+    <string name="alert_channel_id" translatable="false">com.example.epledger.ALERT_CHANNEL</string>
+    <string name="always_on_group_id" translatable="false">com.example.epledger.AlWAYS_ON_GROUP</string>
     <string name="always_on_group">Always-on Notification Group</string>
     <string name="alert_group">Alert Notification Group</string>
-    <string name="alert_group_id" translatable="false">com.example.ExceptPains.ALERT_GROUP</string>
+    <string name="alert_group_id" translatable="false">com.example.epledger.ALERT_GROUP</string>
 
     <string name="act_popup_newrec_title">New Item</string>
     <string name="act_home_title">Home</string>
@@ -25,6 +25,10 @@
     <string name="open">Open</string>
     <string name="newrec">New Record</string>
     <string name="tile_service_label">Quick Record</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_charts">Charts</string>
+    <string name="nav_others">Others</string>
+    <string name="nav_settings">Settings</string>
 
     <!--show chart activity-->
     <string name="show_chart_page_title">统计图</string>
