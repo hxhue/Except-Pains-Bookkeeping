@@ -6,7 +6,10 @@
     android:layout_height="match_parent"
     tools:context=".chart.ShowChartActivity">
 
+
+
     <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinatorLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -15,45 +18,282 @@
             android:layout_height="wrap_content"
             app:liftOnScroll="true">
 
+
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/topAppBar"
+                style="@style/Widget.MaterialComponents.Toolbar.Primary"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:title="@string/page_title"
+                android:layout_height="match_parent"
+                app:layout_scrollFlags="scroll|enterAlways|snap"
                 app:menu="@menu/top_app_bar"
                 app:navigationIcon="@drawable/ic_launcher_background"
-                style="@style/Widget.MaterialComponents.Toolbar.Primary"
-                app:layout_scrollFlags="scroll|enterAlways|snap"
-                />
+                app:title="@string/page_title" />
         </com.google.android.material.appbar.AppBarLayout>
 
         <!-- Note: A RecyclerView can also be used -->
         <androidx.core.widget.NestedScrollView
+            android:id="@+id/nestedScrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <!-- Scrollable content -->
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                app:layout_constraintEnd_toStartOf="@+id/guideline3"
-                app:layout_constraintStart_toStartOf="@+id/guideline2"
-                tools:layout_editor_absoluteY="270dp">
+                android:orientation="vertical">
 
+                <RelativeLayout
+                    android:id="@+id/siftLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="400dp"
+                    android:layout_marginTop="-400dp">
+
+                    <TextView
+                        android:id="@+id/accountTextView"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginStart="5dp"
+                        android:gravity="center"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="0dp"
+                        android:text="@string/account" />
+
+                    <HorizontalScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_toEndOf="@id/accountTextView">
+
+                        <com.google.android.material.chip.ChipGroup
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            app:singleLine="true">
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/wechatAccountChip"
+                                style="@style/Widget.MaterialComponents.Chip.Choice"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="true"
+                                android:text="@string/wechat_account_chip" />
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/alipayAccountChip"
+                                style="@style/Widget.MaterialComponents.Chip.Choice"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="true"
+                                android:text="@string/alipay_account_chip" />
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/campusCardAccountChip"
+                                style="@style/Widget.MaterialComponents.Chip.Choice"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="true"
+                                android:text="@string/campus_card_account_chip" />
+
+                        </com.google.android.material.chip.ChipGroup>
+
+
+                    </HorizontalScrollView>
+
+
+                    <!--        支出类型            -->
+                    <TextView
+                        android:id="@+id/expenseTypeTextView"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_below="@id/accountTextView"
+                        android:layout_alignParentStart="true"
+                        android:layout_marginStart="5dp"
+                        android:gravity="center"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="0dp"
+                        android:text="@string/expense_type" />
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/expenseTypeChipGroup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/expenseTypeTextView"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentEnd="true"
+                        app:singleLine="false"
+                        app:singleSelection="true">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/eatTypeChip"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:text="@string/eat_type_chip" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/shoppingTypeChip"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:text="@string/shopping_type_chip" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/transportTypeChip"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:text="@string/transport_type_chip" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/entertainmentTypeChip"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:text="@string/entertainment_type_chip" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/bookTypeChip"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:text="@string/book_type_chip" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/clothesTypeChip"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:text="@string/clothes_type_chip" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/digitalTypeChip"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:text="@string/digital_type_chip" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/studyTypeChip"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:text="@string/study_type_chip" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/dailyNecessityTypeChip"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:text="@string/daily_necessity_type_chip" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/phoneBillTypeChip"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:text="@string/phone_bill_type_chip" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/makeupTypeChip"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:text="@string/makeup_type_chip" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/medicalTypeChip"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:text="@string/medical_type_chip" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/travelTypeChip"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:text="@string/travel_type_chip" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/waterElectricityTypeChip"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:text="@string/water_electricity_type_chip" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/sportTypeChip"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:text="@string/sport_type_chip" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/giftTypeChip"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:text="@string/gift_type_chip" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/redEnvelopeTypeChip"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:text="@string/red_envelope_type_chip" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/donateTypeChip"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:text="@string/donate_type_chip" />
+                    </com.google.android.material.chip.ChipGroup>
+
+                    <Button
+                        android:id="@+id/setDateRangeButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/expenseTypeChipGroup"
+                        android:text="@string/set_date_range_button"
+
+                        />
+                </RelativeLayout>
                 <com.github.mikephil.charting.charts.PieChart
                     android:id="@+id/pieChart"
                     android:layout_width="match_parent"
-                    android:layout_height="349dp" />
+                    android:layout_height="400dp"
+                    android:layout_below="@id/siftLayout"
+                    android:layout_marginTop="5dp"/>
 
                 <com.github.mikephil.charting.charts.LineChart
                     android:id="@+id/lineChart"
                     android:layout_width="match_parent"
-                    android:layout_height="386dp" />
+                    android:layout_height="400dp"
+                    android:layout_below="@id/pieChart"/>
 
-
-            </LinearLayout>
+            </RelativeLayout>
 
 
         </androidx.core.widget.NestedScrollView>
@@ -61,19 +301,4 @@
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 
-
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_begin="33dp" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_begin="384dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>
