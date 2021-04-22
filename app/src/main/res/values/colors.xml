@@ -7,4 +7,14 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="orange">#FFC107</color>
+    <!-- 2020.4.22 新配色 -->
+    <!-- 主色 -->
+    <color name="lightColorPrimary">#009688</color>
+    <color name="lightColorPrimaryVariant">#00796B</color>
+    <color name="lightColorOnPrimary">@color/white</color>
+    <!-- Secondary brand color. -->
+    <color name="lightColorSecondary">#FF4081</color>
+    <color name="lightColorSecondaryVariant">#C2185B</color>
+    <color name="lightColorOnSecondary">@color/black</color>
 </resources>

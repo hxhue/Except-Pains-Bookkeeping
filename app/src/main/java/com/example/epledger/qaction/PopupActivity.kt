@@ -5,23 +5,31 @@ import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.util.TypedValue
+import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.preference.PreferenceManager
+import com.example.epledger.BuildConfig
 import com.example.epledger.R
 import com.example.epledger.qaction.data.LedgerRecord
 import com.example.epledger.qaction.data.PairTask
 import com.example.epledger.qaction.data.Store
 import com.example.epledger.qaction.screenshot.ScreenshotUtils
+import com.example.epledger.util.ThemeColors
 import com.google.android.material.switchmaterial.SwitchMaterial
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -47,16 +55,14 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
     private val sources: Array<String> =  arrayOf("Unspecified", "Alipay", "Wechat", "Cash")
     private val types: Array<String> = arrayOf("Unspecified", "Daily", "Transportation", "Study")
 
-    // TODO
     // References of widgets(to fetch user inputs)
     private lateinit var screenshotSwitch: SwitchMaterial // Screenshot switch
     private lateinit var noteEditText: EditText           // EditText of note
     private lateinit var moneyEditText: EditText          // EditText of amount
+    private lateinit var starToggleButton: ToggleButton
 
-    // 和另外一个方法是有区别的，只有这个方法才能正常初始化
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        Log.d("qaction.PopupActivity", "onCreate()")
 
         // Must be performed before the view's setup
         loadUserPreference()
@@ -185,8 +191,8 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
 
     // 设置好界面
     private fun setupViews() {
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.activity_popup_newrec)
-        setTitle(R.string.act_popup_newrec_title)
 
         // 禁用黑暗模式
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
@@ -212,7 +218,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
     }
 
     private fun setupStarButton() {
-        // Nothing...
+        starToggleButton = findViewById(R.id.qa_star) // Save reference
     }
 
     private fun setupEditText() {
@@ -257,20 +263,18 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         ledgerRecord.date = Date()
 
         // Set the view
-        val noHeightLayout = ViewGroup.LayoutParams(0, 1)
-
         val view = findViewById<View>(R.id.qa_date_compo)
-        view.layoutParams = noHeightLayout
+        view.layoutParams.height = 1
 
         val button = findViewById<Button>(R.id.qa_date_button)
         button.isEnabled = false
-        button.layoutParams = noHeightLayout
+        button.layoutParams.height = 1
 
         val textDisplay = findViewById<EditText>(R.id.qa_date_text)
-        textDisplay.layoutParams = noHeightLayout
+        textDisplay.layoutParams.height = 1
 
         val label = findViewById<TextView>(R.id.qa_date_label)
-        label.layoutParams = noHeightLayout
+        label.layoutParams.height = 1
     }
 
     private fun discardTimePickerWidget() {
@@ -282,20 +286,18 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         ledgerRecord.minuteOfHour = m
 
         // Set the view
-        val noHeightLayout = ViewGroup.LayoutParams(0, 1)
-
         val view = findViewById<View>(R.id.qa_time_compo)
-        view.layoutParams = noHeightLayout
+        view.layoutParams.height = 1
 
         val textDisplay = findViewById<EditText>(R.id.qa_time_text)
-        textDisplay.layoutParams = noHeightLayout
+        textDisplay.layoutParams.height = 1
 
         val button = findViewById<Button>(R.id.qa_time_button)
         button.isEnabled = false
-        button.layoutParams = noHeightLayout
+        button.layoutParams.height = 1
 
         val label = findViewById<TextView>(R.id.qa_time_label)
-        label.layoutParams = noHeightLayout
+        label.layoutParams.height = 1
     }
 
     private fun setupScreenshotOption() {
@@ -343,10 +345,11 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
             val str = String.format(formatString, h, m)
             timeText.setText(str)
         }, hour, minute, true)
+
         dialog.setOnShowListener {
-            val buttonTextColor = getColor(R.color.design_default_color_secondary)
-            dialog.getButton(TimePickerDialog.BUTTON_POSITIVE).setTextColor(buttonTextColor)
-            dialog.getButton(TimePickerDialog.BUTTON_NEGATIVE).setTextColor(buttonTextColor)
+            val color = ThemeColors.getColorSecondary(theme)
+            dialog.getButton(TimePickerDialog.BUTTON_POSITIVE).setTextColor(color)
+            dialog.getButton(TimePickerDialog.BUTTON_NEGATIVE).setTextColor(color)
         }
 
         timePickerButton.setOnClickListener {
@@ -375,12 +378,13 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
             ledgerRecord.date = date
             dateText.setText(simpleFormat.format(date))
         }
+
         dialog.setOnShowListener {
             // 只有show之后才能访问button，才不会报null
             // 调整button颜色
-            val buttonTextColor = getColor(R.color.design_default_color_primary)
-            dialog.getButton(DatePickerDialog.BUTTON_POSITIVE).setTextColor(buttonTextColor)
-            dialog.getButton(DatePickerDialog.BUTTON_NEGATIVE).setTextColor(buttonTextColor)
+            val color = ThemeColors.getColorPrimary(theme)
+            dialog.getButton(DatePickerDialog.BUTTON_POSITIVE).setTextColor(color)
+            dialog.getButton(DatePickerDialog.BUTTON_NEGATIVE).setTextColor(color)
         }
 
         datePickerButton.setOnClickListener {
@@ -408,11 +412,11 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
 
     // 提交到存储中
     private fun commitToStorage() {
-        // TODO: Star widget
         val rec = ledgerRecord
 
         // Get all data from widgets
         rec.note = noteEditText.text.toString()
+        // Money amount
         try {
             rec.amount = moneyEditText.text.toString().toDouble()
             if (rec.amount == 0.0) {
@@ -426,6 +430,8 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         } catch (e: Exception) {
             rec.amount = null
         }
+        // Star status
+        rec.starred = starToggleButton.isChecked
 
         // Print the record to trace and debug the procedure
         Log.d("==> Save record", "$ledgerRecord")
