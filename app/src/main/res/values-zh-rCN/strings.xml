@@ -19,7 +19,7 @@
     <string name="tile_service_label">快速记录</string>
     <string name="nav_home">主页</string>
     <string name="nav_charts">图表</string>
-    <string name="nav_others">其他</string>
+    <string name="nav_notification">通知</string>
     <string name="nav_settings">设置</string>
 
     <!--show chart activity-->
@@ -58,4 +58,45 @@
     <string name="red_envelope_type_chip">红包</string>
     <string name="donate_type_chip">捐赠</string>
     <string name="set_date_range_button">设置日期范围</string>
+    <string name="prefer_cate_qa">快捷操作</string>
+    <string name="prefer_item_brief">简洁模式</string>
+    <string name="prefer_item_shot">立即截屏</string>
+    <string name="prefer_item_shot_sum">在卡片弹出时立即启动截屏</string>
+    <string name="prefer_item_qa_noti">在通知中心显示快捷操作</string>
+    <string name="prefer_item_qa_noti_sum">如果通过瓷砖按钮工作缓慢，建议开启此项功能</string>
+    <string name="prefer_cate_data">数据</string>
+    <string name="prefer_item_export_json">导出为JSON</string>
+    <string name="prefer_item_export_json_sum">如果您希望在未来恢复数据</string>
+    <string name="prefer_item_export_csv">导出为CSV</string>
+    <string name="prefer_item_export_csv_sum">如果您希望在电脑上浏览数据</string>
+    <string name="prefer_item_import_json">从JSON导入</string>
+    <string name="prefer_item_import_json_sum">当您已有从此应用导出的备份时</string>
+    <string name="prefer_item_import_alipay">从CSV（支付宝）导入</string>
+    <string name="prefer_item_import_alipay_sum">当您有从支付宝导出的数据时</string>
+    <string name="prefer_item_import_wechat">从CSV（微信）导入</string>
+    <string name="prefer_item_import_wechat_sum">当您有从微信导出的数据时</string>
+    <string name="specification_msg"><b>1 快捷操作</b>
+        \n快捷操作是一个能够提供便捷输入的小窗口，它能够较快地被打开。<br/>
+        <font size="4">\n\n</font><b>︎︎1.1 简洁模式</b>
+        \n日期和时间将从窗口上隐藏，并设置为当前的时间。如果您很少调整它们，打开此功能会提供一个更干净的视图。
+        <font size="4">\n\n</font><b>1.2 立即截屏</b>
+        \n截图功能被设计用于这样的场景：您没有多少时间记录，因此先截图，之后再根据截图补充相关信息。我们建议您在完成记录后就删除这些截图以节省手机存储空间。如果您经常截图，可以打开此项功能。
+        <font size="4">\n\n</font><b>1.3 在通知中心显示快捷操作</b>
+        \n快捷操作能够在快速设置中以瓷砖按钮打开，也能在通知中心出现（如果您打开此项功能）。由于谷歌的限制，在最新的那些SDK中，在按下<b>主页</b>按键的5秒内，瓷砖服务不能够启动活动。如果您时间匆忙，这会带来不佳的体验。
+        \n同时，这些SDK不允许截屏的永久授权。打开此项功能将允许应用在活动期间始终保持授权。
+        <font size="12">\n\n</font><b>2 数据</b>
+        \n备份或恢复您的数据。
+        <font size="4">\n\n</font><b>2.1 导出为JSON</b>
+        \nJSON是一种计算机程序能够很方便提取数据的灵活格式。把数据导出为JSON将允许未来的数据恢复。
+        <font size="4">\n\n</font><b>2.2 导出为CSV</b>
+        \nCSV就和电子表格一样，但格式更简单。您能够在电脑上浏览此文件。
+        <font size="4">\n\n</font><b>2.3 从JSON导入</b>
+        \n用于数据恢复。
+        <font size="4">\n\n</font><b>2.4 从CSV（支付宝）导入</b>
+        \n您应该遵循支付宝官方网站上的操作流程将您的收支导出为CSV文件。把它放在您手机的存储空间中，并在文件选择窗口弹出时选中它。数据如果格式正确，将会被导入此应用数据库中。
+        <font size="4">\n\n</font><b>2.5 从CSV（微信）导入</b>
+        \n参见2.4。
+    </string>
+    <string name="menu_item_settings_question" translatable="false">说明</string>
+    <string name="specification_title" translatable="false">说明</string>
 </resources>

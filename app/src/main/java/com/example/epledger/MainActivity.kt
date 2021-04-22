@@ -1,6 +1,8 @@
 package com.example.epledger
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.MenuItem
 import androidx.annotation.IdRes
@@ -11,9 +13,11 @@ import com.example.epledger.nav.MainPagerAdapter
 import com.example.epledger.nav.MainScreen
 import com.example.epledger.nav.getMainScreenForMenuItem
 import com.example.epledger.qaction.loadQuickActionModule
+import com.example.epledger.qaction.screenshot.ScreenshotUtils
 import com.example.epledger.util.loadNotificationModule
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomnavigation.LabelVisibilityMode
+import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
     private lateinit var viewPager: ViewPager
@@ -24,8 +28,12 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         super.onCreate(savedInstanceState)
         // 禁用黑暗模式
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
         // 界面初始化
+        // Handler.post may fix the problem of frame skipping?
+        // Not for ChartsFragment though.
         setupViews()
+
         // 加载其他模块
         loadModules()
     }
@@ -37,7 +45,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         mainPagerAdapter = MainPagerAdapter(supportFragmentManager)
 
         // 设置图标的可见度
-        bottomNavigationView.labelVisibilityMode = LabelVisibilityMode.LABEL_VISIBILITY_LABELED
+        bottomNavigationView.labelVisibilityMode = LabelVisibilityMode.LABEL_VISIBILITY_AUTO
 
         // Set items to be displayed
         mainPagerAdapter.setItems(arrayListOf(MainScreen.MAIN, MainScreen.CHARTS,
