@@ -71,11 +71,16 @@ class SettingsFragment: PreferenceFragmentCompat(), SharedPreferences.OnSharedPr
 
     override fun onPause() {
         super.onPause()
+        preferenceManager.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
+    }
+
+    override fun onDestroyView() {
+        // Prevent leak of view
         alertDialog?.let {
             it.dismiss()
             alertDialog = null
         }
-        preferenceManager.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
+        super.onDestroyView()
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {

@@ -84,7 +84,7 @@
     <string name="prefer_item_import_wechat">Import from CSV(Wechat)</string>
     <string name="prefer_item_import_wechat_sum">When you have data exported from Wechat</string>
     <string name="menu_item_settings_question">Specification</string>
-    <string name="specification_title">Specification</string>
+    <string name="specification_title">Specifications</string>
     <string name="specification_msg"><b>1 Quick Action</b>
         \nQuick-Action is a small window which is supposed to be fast so it can offer you a convenient way of recording income and expenditure.
         <font size="4">\n\n</font><b>︎︎1.1 Brief Mode</b>
