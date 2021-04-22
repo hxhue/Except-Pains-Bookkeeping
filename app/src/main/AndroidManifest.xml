@@ -17,6 +17,7 @@
         <activity android:name=".chart.ShowChartActivity" />
         <activity
             android:name=".MainActivity"
+            android:launchMode="singleInstance"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,7 +29,9 @@
         <service
             android:name=".qaction.screenshot.ScreenshotService"
             android:enabled="true"
-            android:foregroundServiceType="mediaProjection"></service> <!-- 使用对话框的样式 -->
+            android:foregroundServiceType="mediaProjection" />
+
+        <!-- 使用对话框的样式 -->
         <!-- 需要使用taskAffinity标识，标识和主应用属于不同的任务。防止被清理时影响到主应用。 -->
         <activity
             android:name=".qaction.PopupActivity"
@@ -40,7 +43,9 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
-        </activity> <!-- TODO: icon需要修改 -->
+        </activity>
+
+        <!-- TODO: icon需要修改 -->
         <service
             android:name=".qaction.NewRecordTileService"
             android:icon="@drawable/ic_launcher_foreground"
@@ -49,11 +54,12 @@
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
-        </service> <!--  -->
+        </service>
+
         <service
             android:name=".qaction.CKForeground"
             android:enabled="true"
-            android:process=":background"></service>
+            android:process=":background" />
     </application>
 
 </manifest>

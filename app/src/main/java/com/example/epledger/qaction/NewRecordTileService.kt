@@ -13,14 +13,14 @@ import java.util.*
  */
 class NewRecordTileService : TileService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d("qaction.NewRecordTileService", "onStartCommand() called at ${System.currentTimeMillis()}")
+        Log.d("NewRecordTileService", "onStartCommand() called at ${System.currentTimeMillis()}")
         return super.onStartCommand(intent, flags, startId)
     }
 
     // 点击启动该卡片
     override fun onClick() {
         super.onClick()
-        Log.d("qaction.NewRecordTileService", "onClicked() called at ${System.currentTimeMillis()}")
+        Log.d("NewRecordTileService", "onClicked() called at ${System.currentTimeMillis()}")
 
         val recCardIntent = Intent(this, PopupActivity::class.java)
                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED)
@@ -29,6 +29,8 @@ class NewRecordTileService : TileService() {
         // Slow after pressing HOME from any app(even not from mine!)
         // This is because of Google's concern about app privilege
         // Nothing to do with my code...
-        startActivityAndCollapse(recCardIntent)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            startActivityAndCollapse(recCardIntent)
+        }
     }
 }
