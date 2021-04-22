@@ -4,16 +4,16 @@
 
     <item
         android:id="@+id/sift"
-        android:icon="@drawable/ic_sift"
-        android:title="@string/sift"
         android:contentDescription="@string/content_description_sift"
+        android:icon="@drawable/ic_outline_filter_alt_24"
+        android:title="@string/sift"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/reset"
-        android:icon="@drawable/ic_reset"
-        android:title="@string/reset"
         android:contentDescription="@string/content_description_reset"
+        android:icon="@drawable/ic_baseline_refresh_24"
+        android:title="@string/reset"
         app:showAsAction="ifRoom" />
 
     <item

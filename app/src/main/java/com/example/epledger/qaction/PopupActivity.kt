@@ -2,6 +2,7 @@ package com.example.epledger.qaction
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -10,6 +11,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -18,8 +20,11 @@ import androidx.preference.PreferenceManager
 import com.example.epledger.R
 import com.example.epledger.qaction.data.LedgerRecord
 import com.example.epledger.qaction.data.PairTask
-import com.example.epledger.qaction.screenshot.ScreenshotUtils
 import com.example.epledger.qaction.data.Store
+import com.example.epledger.qaction.screenshot.ScreenshotUtils
+import com.google.android.material.switchmaterial.SwitchMaterial
+import java.math.RoundingMode
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -42,13 +47,16 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
     private val sources: Array<String> =  arrayOf("Unspecified", "Alipay", "Wechat", "Cash")
     private val types: Array<String> = arrayOf("Unspecified", "Daily", "Transportation", "Study")
 
-    // Screenshot toggle
-    private lateinit var screenshotToggle: ToggleButton
+    // TODO
+    // References of widgets(to fetch user inputs)
+    private lateinit var screenshotSwitch: SwitchMaterial // Screenshot switch
+    private lateinit var noteEditText: EditText           // EditText of note
+    private lateinit var moneyEditText: EditText          // EditText of amount
 
     // 和另外一个方法是有区别的，只有这个方法才能正常初始化
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("qaction.PopupActivity", "onCreate()")
+//        Log.d("qaction.PopupActivity", "onCreate()")
 
         // Must be performed before the view's setup
         loadUserPreference()
@@ -115,16 +123,13 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         if (eid == waitingEvent) {
             show()
             val screenshot = extra as Bitmap
-            Log.d("qaction.PopupActivity", "onReceive() called")
+            Log.d("qaction.PopupActivity", "screenshot received as Bitmap")
             // Save the screenshot to ledgerRecord
             ledgerRecord.screenshot = screenshot
             // reset the toggle state
             handler.post {
-                screenshotToggle.isChecked = true
+                screenshotSwitch.isChecked = true
             }
-            // TODO: remove the debug section
-            // DEBUG-ONLY option
-            ScreenshotUtils.saveToGallery(this, screenshot, "${System.currentTimeMillis()}")
         }
     }
 
@@ -155,11 +160,11 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         // 展示会话
         dialog.show()
 
-        // 保存这个会话窗口供检查
+        // Save reference
         this.noPermissionAlert = dialog
         // Reset state of toggle
         handler.post {
-            screenshotToggle.isChecked = false
+            screenshotSwitch.isChecked = false
         }
     }
 
@@ -182,11 +187,13 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
     private fun setupViews() {
         setContentView(R.layout.activity_popup_newrec)
         setTitle(R.string.act_popup_newrec_title)
+
         // 禁用黑暗模式
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
         // Set up ScrollView
-        (this.findViewById(R.id.qactionScrollView) as ScrollView).isScrollbarFadingEnabled = false
-        // Other widgets
+        (this.findViewById(R.id.qa_scrollview) as ScrollView).isScrollbarFadingEnabled = false
+
         // 创建时读取用户设置，这里就能够通过配置来选择不同的显示方式
         if (briefMode) {
             discardDatePickerWidget()
@@ -195,20 +202,33 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
             setupDatePickerWidget()
             setupTimePickerWidget()
         }
+
         // Essential widgets
         setupSpinners()
         setupButtons()
         setupScreenshotOption()
+        setupEditText()
+        setupStarButton()
+    }
+
+    private fun setupStarButton() {
+        // Nothing...
+    }
+
+    private fun setupEditText() {
+        // Save reference
+        noteEditText = findViewById<EditText>(R.id.qa_note_text)
+        moneyEditText = findViewById<EditText>(R.id.qa_money_text)
     }
 
     private fun setupSpinners() {
         // Set up sourceSpinner
-        val sourceSpinner = findViewById<Spinner>(R.id.qactionSourceSpinner)
+        val sourceSpinner = findViewById<Spinner>(R.id.qa_src_spinner)
         sourceSpinner.adapter = ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_dropdown_item, sources)
         sourceSpinner.onItemSelectedListener = this
         // Set up typeSpinner
-        val typeSpinner = findViewById<Spinner>(R.id.qactionTypeSpinner)
+        val typeSpinner = findViewById<Spinner>(R.id.qa_type_spinner)
         typeSpinner.adapter = ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_dropdown_item, types)
         typeSpinner.onItemSelectedListener = this
@@ -216,11 +236,11 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         require(parent != null)
-        if (parent.id == R.id.qactionSourceSpinner) {
+        if (parent.id == R.id.qa_src_spinner) {
             Log.d("qaction.PopupActivity",
                     "onItemSelected(): sourceSpinner has (${sources[position]}) selected.")
             ledgerRecord.source = sources[position]
-        } else if (parent.id == R.id.qactionTypeSpinner) {
+        } else if (parent.id == R.id.qa_type_spinner) {
             Log.d("qaction.PopupActivity",
                     "onItemSelected(): typeSpinner has (${types[position]}) selected.")
             ledgerRecord.type = types[position]
@@ -239,17 +259,17 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         // Set the view
         val noHeightLayout = ViewGroup.LayoutParams(0, 1)
 
-        val view = findViewById<View>(R.id.qactionDateComponents)
+        val view = findViewById<View>(R.id.qa_date_compo)
         view.layoutParams = noHeightLayout
 
-        val button = findViewById<Button>(R.id.qactionDatePickerButton)
+        val button = findViewById<Button>(R.id.qa_date_button)
         button.isEnabled = false
         button.layoutParams = noHeightLayout
 
-        val textDisplay = findViewById<EditText>(R.id.qactionDateText)
+        val textDisplay = findViewById<EditText>(R.id.qa_date_text)
         textDisplay.layoutParams = noHeightLayout
 
-        val label = findViewById<TextView>(R.id.qactionDateLabel)
+        val label = findViewById<TextView>(R.id.qa_date_label)
         label.layoutParams = noHeightLayout
     }
 
@@ -264,44 +284,45 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         // Set the view
         val noHeightLayout = ViewGroup.LayoutParams(0, 1)
 
-        val view = findViewById<View>(R.id.qactionTimeComponents)
+        val view = findViewById<View>(R.id.qa_time_compo)
         view.layoutParams = noHeightLayout
 
-        val textDisplay = findViewById<EditText>(R.id.qactionTimeText)
+        val textDisplay = findViewById<EditText>(R.id.qa_time_text)
         textDisplay.layoutParams = noHeightLayout
 
-        val button = findViewById<Button>(R.id.qactionTimePickerButton)
+        val button = findViewById<Button>(R.id.qa_time_button)
         button.isEnabled = false
         button.layoutParams = noHeightLayout
 
-        val label = findViewById<TextView>(R.id.qactionTimeLabel)
+        val label = findViewById<TextView>(R.id.qa_time_label)
         label.layoutParams = noHeightLayout
     }
 
     private fun setupScreenshotOption() {
-        val toggleButton = findViewById<ToggleButton>(R.id.qactionScreenshotToggle)
-        // Initial state
-        toggleButton.isChecked = (ledgerRecord.screenshot != null)
-        // Add listener
-        toggleButton.setOnClickListener {
-            val toggle = it as ToggleButton
-            if (!toggle.isChecked) {
-                // Delete screenshot
-//                ledgerRecord.screenshot = null
-                // Do not delete the old screenshot... Multiple services leads to bugs!
-            } else {
-                // Take another screenshot
+        val switch = findViewById<SwitchMaterial>(R.id.qa_screenshot_switch)
+        switch.isChecked = (ledgerRecord.screenshot != null)
+        switch.setOnClickListener {
+            // Dismiss the keyboard
+            this.currentFocus?.let { view ->
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                imm?.hideSoftInputFromWindow(view.windowToken, 0)
+                // view.clearFocus() // Not necessary
+            }
+            // Check state
+            if (switch.isChecked) {
                 performScreenshot()
+            } else {
+                // Nothing? Cause we don't want a record to lose
             }
         }
         // Save reference
-        screenshotToggle = toggleButton
+        screenshotSwitch = switch
     }
 
     // 设置好时间相关控件
     private fun setupTimePickerWidget() {
-        val timeText = findViewById<EditText>(R.id.qactionTimeText)
-        val timePickerButton = findViewById<Button>(R.id.qactionTimePickerButton)
+        val timeText = findViewById<EditText>(R.id.qa_time_text)
+        val timePickerButton = findViewById<Button>(R.id.qa_time_button)
 
         // Display default time
         val cal = Calendar.getInstance()
@@ -336,16 +357,14 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
     // 设置好日期相关控件
     private fun setupDatePickerWidget() {
         // 保存控件引用
-        // Necessary?
-        val dateText = findViewById<EditText>(R.id.qactionDateText)
-        val datePickerButton = findViewById<Button>(R.id.qactionDatePickerButton)
+        val dateText = findViewById<EditText>(R.id.qa_date_text)
+        val datePickerButton = findViewById<Button>(R.id.qa_date_button)
 
         // 设置默认日期为今日
         val simpleFormat = SimpleDateFormat("yyyy/MM/dd", Locale.US)
         val dateOfNow = Date()
         ledgerRecord.date = dateOfNow
         dateText.setText(simpleFormat.format(dateOfNow))
-//        saveAndDisplayDate(Date())
 
         // 添加按钮回调
         val dialog = DatePickerDialog(this, R.style.CustomDatePicker)
@@ -372,15 +391,16 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
     // Set up the function of buttons and make dismissal void
     private fun setupButtons() {
         // Store reference
-        val cancelButton = this.findViewById<Button>(R.id.qactionButttonCancel)
-        val confirmButton = this.findViewById<Button>(R.id.qactionButttonConfirm)
+        val cancelButton = this.findViewById<Button>(R.id.qa_button_cancel)
+        val confirmButton = this.findViewById<Button>(R.id.qa_button_confirm)
         // Set up callbacks
         cancelButton.setOnClickListener {
+            discardFields()
             this.finish()
         }
         confirmButton.setOnClickListener {
             commitToStorage()
-            this.finish() // Close right now?
+            this.finish()
         }
         // Make dismissal void
         this.setFinishOnTouchOutside(false)
@@ -388,6 +408,38 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
 
     // 提交到存储中
     private fun commitToStorage() {
-        Log.d("qaction.PopupActivity", "commitToStorage() called. (to be implemented)")
+        // TODO: Star widget
+        val rec = ledgerRecord
+
+        // Get all data from widgets
+        rec.note = noteEditText.text.toString()
+        try {
+            rec.amount = moneyEditText.text.toString().toDouble()
+            if (rec.amount == 0.0) {
+                rec.amount = null
+            } else {
+                // 格式化金额
+                val format = DecimalFormat("0.##")
+                format.roundingMode = RoundingMode.FLOOR
+                rec.amount = format.format(rec.amount!!).toDouble()
+            }
+        } catch (e: Exception) {
+            rec.amount = null
+        }
+
+        // Print the record to trace and debug the procedure
+        Log.d("==> Save record", "$ledgerRecord")
+
+        rec.screenshot?.let {
+            ScreenshotUtils.saveToSandbox(this, it)
+            rec.screenshot = null
+        }
+    }
+
+    /**
+     * 将卡片上面输入的所有信息丢弃。主要是丢掉截图信息。
+     */
+    private fun discardFields() {
+        ledgerRecord.screenshot = null
     }
 }

@@ -27,7 +27,7 @@
     <string name="tile_service_label">Quick Record</string>
     <string name="nav_home">Home</string>
     <string name="nav_charts">Charts</string>
-    <string name="nav_others">Others</string>
+    <string name="nav_notification">Notifications</string>
     <string name="nav_settings">Settings</string>
 
     <!--show chart activity-->
@@ -66,5 +66,52 @@
     <string name="red_envelope_type_chip">红包</string>
     <string name="donate_type_chip">捐赠</string>
     <string name="set_date_range_button">设置日期范围</string>
+    <string name="prefer_cate_qa">Quick Action</string>
+    <string name="prefer_item_brief">Brief mode</string>
+    <string name="prefer_item_shot">Take screenshot immediately</string>
+    <string name="prefer_item_shot_sum">Right after the card is popped upRight after the card is popped up</string>
+    <string name="prefer_item_qa_noti">Enable actions in notification center</string>
+    <string name="prefer_item_qa_noti_sum">Recommended when tile service works poorly</string>
+    <string name="prefer_cate_data">Data</string>
+    <string name="prefer_item_export_json">Export as JSON</string>
+    <string name="prefer_item_export_json_sum">When you want to restore data in the future</string>
+    <string name="prefer_item_export_csv">Export as CSV</string>
+    <string name="prefer_item_export_csv_sum">When you want to view data in your computer</string>
+    <string name="prefer_item_import_json">Import from JSON</string>
+    <string name="prefer_item_import_json_sum">When you have a backup from this app</string>
+    <string name="prefer_item_import_alipay">Import from CSV(Alipay)</string>
+    <string name="prefer_item_import_alipay_sum">When you have data exported from Alipay</string>
+    <string name="prefer_item_import_wechat">Import from CSV(Wechat)</string>
+    <string name="prefer_item_import_wechat_sum">When you have data exported from Wechat</string>
+    <string name="menu_item_settings_question">Specification</string>
+    <string name="specification_title">Specification</string>
+    <string name="specification_msg"><b>1 Quick Action</b>
+        \nQuick-Action is a small window which is supposed to be fast so it can offer you a convenient way of recording income and expenditure.
+        <font size="4">\n\n</font><b>︎︎1.1 Brief Mode</b>
+        \nDate and time will be hidden in window and set to current time. If you scarcely adjust them, turning on this feature will give you a cleaner view.
+        <font size="4">\n\n</font><b>1.2 Take Screenshot Immediately</b>
+        \nScreenshots are designed for situations where you barely have time to create a record so you want to take a screenshot and enter the details according to it later.
+            We suggest you delete those screenshots to save storage space when you complete a record.
+            If you frequently take screenshots, you can turn this feature on.
+        <font size="4">\n\n</font><b>1.3 Show Quick-Action in Notification Center</b>
+        \nQuick-Actions can be found both in quick settings as a tile button and in notification center(if you turn on this feature).
+            Due to restrictions made by Google, in those latest SDKs, a tile service can not launch an activity in 5s once you press <b>HOME</b> button.
+            This may lead to poor experience when you are really short of time.
+        \nBesides, those SDKs do not allow permanent permission for screenshots. Turning on this feature allows saving a permission as long as the application is alive.
+        <font size="12">\n\n</font><b>2 Data</b>
+        \nBacking up or restoring your data.
+        <font size="4">\n\n</font><b>2.1 Export as JSON</b>
+        \nJSON is a flexible format easy for procedures to extract data. Exporting data as JSON allows future restoring.
+        <font size="4">\n\n</font><b>2.2 Export as CSV</b>
+        \nCSV is just like a spreadsheet but in a simpler format. You can view it in your computer.
+        <font size="4">\n\n</font><b>2.3 Import from JSON</b>
+        \nFor Data restoring.
+        <font size="4">\n\n</font><b>2.4 Import from CSV(Alipay)</b>
+        \nYou should follow the instructions on Alipay official website to export your income and expenditure details as CSV.
+        Put it in storage of your phone and select it in file selecting view that popped up.
+        Then data will be imported to our database if the file is in correct format.
+        <font size="4">\n\n</font><b>2.5 Import from CSV(Wechat)</b>
+        \nSimilar to 2.4.
+    </string>
 
 </resources>
