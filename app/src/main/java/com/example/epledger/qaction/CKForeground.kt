@@ -13,7 +13,7 @@ import androidx.preference.PreferenceManager
 import com.example.epledger.util.ALWAYS_ON_NOTIFICATION_ID
 import com.example.epledger.util.NotificationUtils
 
-private const val CLASS_NAME = "qaction.CKBackground"
+private const val CLASS_NAME = "qaction.CKForeground"
 
 class CKForeground: Service() {
     companion object {
