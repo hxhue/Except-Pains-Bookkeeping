@@ -14,13 +14,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.epledger.R;
 import com.example.epledger.model.Entry;
+import com.example.epledger.model.EntryLab;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.TreeMap;
 
 public class HomeFragment extends Fragment {
     private RecyclerView mRecyclerView;
-    private EntryAdapter mEntryAdapter;
+    private SectionAdapter mSectionAdapter;
 
     @Override
     public View onCreateView(
@@ -35,28 +38,23 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
-        mEntryAdapter = new EntryAdapter(initData());
-        mEntryAdapter.setOnItemClickListener(new EntryAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                Toast.makeText(view.getContext(), "click " + position + " item", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onItemLongClick(View view, int position) {
-                Toast.makeText(view.getContext(), "long click " + position + " item", Toast.LENGTH_SHORT).show();
-            }
-        });
         mRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
-        mRecyclerView.setAdapter(mEntryAdapter);
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        updateUI();
     }
 
-    private List<Entry> initData() {
-        List<Entry> datas = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            datas.add(new Entry(i, i * 4.3, "food", "eat", "支付宝"));
+    private void updateUI() {
+        EntryLab entryLab = EntryLab.get(getContext());
+        List<Entry> entries = entryLab.getEntries();
+        TreeMap<Date, List<Entry>> entryMap = new TreeMap<>();
+        for (Entry entry: entries) {
+            if (!entryMap.containsKey(entry.getDate())) {
+                entryMap.put(entry.getDate(), new ArrayList<>());
+            }
+            entryMap.get(entry.getDate()).add(entry);
         }
-        return datas;
+        mSectionAdapter = new SectionAdapter(entryMap);
+        mRecyclerView.setAdapter(mSectionAdapter);
+
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
     }
 }

@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.SectionIndexer;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -22,6 +23,8 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
         private final TextView infoText;
         private final TextView sourceText;
 
+        private Entry mEntry;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             labelImage = itemView.findViewById(R.id.label_image);
@@ -30,6 +33,16 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
             infoText = itemView.findViewById(R.id.info);
             sourceText = itemView.findViewById(R.id.pay_source);
         }
+
+        public void bind(Entry entry) {
+            mEntry = entry;
+            
+            labelText.setText(mEntry.getLabel());
+            amountText.setText((mEntry.getAmount() >= 0 ? "+" : "-") + "￥"
+                    + String.format("%.2f", Math.abs(mEntry.getAmount())));
+            infoText.setText(mEntry.getInfo());
+            sourceText.setText(mEntry.getSource());
+        }
     }
 
     public interface OnItemClickListener {
@@ -37,12 +50,12 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
         void onItemLongClick(View view, int position);
     }
 
-    private List<Entry> entryList;
+    private List<Entry> mEntryList;
     // 事件回调监听
     private EntryAdapter.OnItemClickListener onItemClickListener;
 
     public EntryAdapter(List<Entry> entryList) {
-        this.entryList = entryList;
+        this.mEntryList = entryList;
     }
 
     @NonNull
@@ -54,11 +67,8 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.labelText.setText(entryList.get(position).getLabel());
-        holder.amountText.setText((entryList.get(position).getAmount() >= 0 ? "+" : "-") + "￥"
-                + entryList.get(position).getAmount());
-        holder.infoText.setText(entryList.get(position).getInfo());
-        holder.sourceText.setText(entryList.get(position).getSource());
+        Entry entry = mEntryList.get(position);
+        holder.bind(entry);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,7 +95,7 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        return entryList.size();
+        return mEntryList.size();
     }
 
     public void setOnItemClickListener(EntryAdapter.OnItemClickListener listener) {
