@@ -19,15 +19,15 @@
     <string name="edit_message" translatable="false">快来编辑我</string>
     <string name="screenshot_fgservice_title">Screenshot Service</string>
     <string name="screenshot_fgservice_content">Foreground screenshot service running right now.</string>
-    <string name="ok">okay</string>
+    <string name="ok">Okay</string>
     <string name="screenshot_failure">Screenshot Failed</string>
     <string name="screenshot_failure_description">No screenshot permission. To use this module you need to retry and confirm the permission in the next window.</string>
     <string name="open">Open</string>
-    <string name="newrec">New Record</string>
+    <string name="newrec">New</string>
     <string name="tile_service_label">Quick Record</string>
     <string name="nav_home">Home</string>
     <string name="nav_charts">Charts</string>
-    <string name="nav_notification">Notifications</string>
+    <string name="nav_inbox">Inbox</string>
     <string name="nav_settings">Settings</string>
 
     <!--show chart activity-->
@@ -83,35 +83,76 @@
     <string name="prefer_item_import_alipay_sum">When you have data exported from Alipay</string>
     <string name="prefer_item_import_wechat">Import from CSV(Wechat)</string>
     <string name="prefer_item_import_wechat_sum">When you have data exported from Wechat</string>
-    <string name="menu_item_settings_question">Specification</string>
     <string name="specification_title">Specifications</string>
     <string name="specification_msg"><b>1 Quick Action</b>
         \nQuick-Action is a small window which is supposed to be fast so it can offer you a convenient way of recording income and expenditure.
-        <font size="4">\n\n</font><b>︎︎1.1 Brief Mode</b>
+        <font size="6">\n\n</font><b>︎︎1.1 Brief Mode</b>
         \nDate and time will be hidden in window and set to current time. If you scarcely adjust them, turning on this feature will give you a cleaner view.
-        <font size="4">\n\n</font><b>1.2 Take Screenshot Immediately</b>
+        <font size="6">\n\n</font><b>1.2 Take Screenshot Immediately</b>
         \nScreenshots are designed for situations where you barely have time to create a record so you want to take a screenshot and enter the details according to it later.
             We suggest you delete those screenshots to save storage space when you complete a record.
             If you frequently take screenshots, you can turn this feature on.
-        <font size="4">\n\n</font><b>1.3 Show Quick-Action in Notification Center</b>
+        <font size="6">\n\n</font><b>1.3 Show Quick-Action in Notification Center</b>
         \nQuick-Actions can be found both in quick settings as a tile button and in notification center(if you turn on this feature).
             Due to restrictions made by Google, in those latest SDKs, a tile service can not launch an activity in 5s once you press <b>HOME</b> button.
             This may lead to poor experience when you are really short of time.
         \nBesides, those SDKs do not allow permanent permission for screenshots. Turning on this feature allows saving a permission as long as the application is alive.
         <font size="12">\n\n</font><b>2 Data</b>
         \nBacking up or restoring your data.
-        <font size="4">\n\n</font><b>2.1 Export as JSON</b>
+        <font size="6">\n\n</font><b>2.1 Export as JSON</b>
         \nJSON is a flexible format easy for procedures to extract data. Exporting data as JSON allows future restoring.
-        <font size="4">\n\n</font><b>2.2 Export as CSV</b>
+        <font size="6">\n\n</font><b>2.2 Export as CSV</b>
         \nCSV is just like a spreadsheet but in a simpler format. You can view it in your computer.
-        <font size="4">\n\n</font><b>2.3 Import from JSON</b>
+        <font size="6">\n\n</font><b>2.3 Import from JSON</b>
         \nFor Data restoring.
-        <font size="4">\n\n</font><b>2.4 Import from CSV(Alipay)</b>
+        <font size="6">\n\n</font><b>2.4 Import from CSV(Alipay)</b>
         \nYou should follow the instructions on Alipay official website to export your income and expenditure details as CSV.
         Put it in storage of your phone and select it in file selecting view that popped up.
         Then data will be imported to our database if the file is in correct format.
-        <font size="4">\n\n</font><b>2.5 Import from CSV(Wechat)</b>
+        <font size="6">\n\n</font><b>2.5 Import from CSV(Wechat)</b>
         \nSimilar to 2.4.
+        <font size="12">\n\n</font><b>3 Inbox</b>
+        <font size="6">\n\n</font><b>3.1 Star</b>
+        \nWhy should you star records sometimes?
+        Cause they are really worth their prices, like a tuxedo for a banquet or a diamond ring for your lovely fiancee?
+        That way you should just create a new tag called Worthwhile and assign it to those records.
+        \nStars are for records that may change in near future.
+        For example, if you lend a few bucks to your friend and he‘ll repay them in a couple of days,
+        you can mark the record as starred.
+        When you want to edit it days later, you can find it quickly.
+        <font size="6">\n\n</font><b>3.2 Badge</b>
+        \nThe badge on Inbox icon is used to indicate how many incomplete records you have.
+        Usually we encourage keeping a few of them because you may just don’t have time, but they are harmful to statistics.
+        When you see a badge with number on Inbox icon, you should complete the records if you have time.
+        <font size="6">\n\n</font><b>3.3 Screenshots</b>
+        \nThose records with screenshots will be listed in the inbox as well.
     </string>
+    <string name="menu_title_inbox_notification">Notification</string>
+    <string name="inbox_label_star">Starred</string>
+    <string name="inbox_label_incomplete">Incomplete</string>
+    <string name="inbox_label_screenshot">Screenshot Included</string>
+    <string name="inbox_dialog_switch_title">Daily Timer</string>
+    <string name="detail_page_title_create">Create Item</string>
+    <string name="detail_page_title_modify">Modify Item</string>
+    <string name="menu_item_title_submit">Submit</string>
+    <string name="menu_item_title_discard">Discard</string>
+    <string name="detail_btn_select">Select</string>
+    <string name="detail_date">Date</string>
+    <string name="detail_time">Time</string>
+    <string name="detail_src">Source</string>
+    <string name="detail_type">Category</string>
+    <string name="detail_money">Money</string>
+    <string name="detail_note">Note</string>
+    <string name="detail_screenshot">Screenshot</string>
+    <string name="detail_screenshot_remove">Remove</string>
+    <string name="detail_screenshot_for_this_record">Screenshot for this Record</string>
+    <string name="empty_prompt">(empty)</string>
+    <string name="menu_item_title_edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="no">No</string>
+    <string name="sure">Sure</string>
+    <string name="rec_del_confirm">Are you sure about deleting this record?</string>
+    <string name="notifications">Notifications</string>
+    <string name="discard_changes">Discard Changes</string>
 
 </resources>

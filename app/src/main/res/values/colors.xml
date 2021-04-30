@@ -16,5 +16,7 @@
     <!-- Secondary brand color. -->
     <color name="lightColorSecondary">#FF4081</color>
     <color name="lightColorSecondaryVariant">#C2185B</color>
-    <color name="lightColorOnSecondary">@color/black</color>
+    <color name="lightColorOnSecondary">@color/white</color>
+    <!-- 其它颜色 -->
+    <color name="silver">#C0c0c0</color>
 </resources>

@@ -1,10 +1,10 @@
-package com.example.epledger.qaction.data
+package com.example.epledger.detail
 
 import android.graphics.Bitmap
 import java.util.Date
 
-
-class LedgerRecord {
+class DetailRecord() {
+    var ID: Long? = null
     var date: Date? = null
     var hourOfDay: Int? = null
     var minuteOfHour: Int? = null
@@ -21,6 +21,22 @@ class LedgerRecord {
         return "LedgerRecord(date=$date, hourOfDay=$hourOfDay, minuteOfHour=$minuteOfHour, amount=$amount, type=$type, source=$source, screenshot=$screenshot, note=$note, starred=$starred)"
     }
 
+    fun getCopy(): DetailRecord {
+        val another = DetailRecord()
+        copyTo(another)
+        return another
+    }
 
-
+    fun copyTo(another: DetailRecord) {
+        another.ID = ID
+        another.date = date
+        another.hourOfDay = hourOfDay
+        another.minuteOfHour = minuteOfHour
+        another.amount = amount
+        another.type = type
+        another.source = source
+        another.screenshot = screenshot
+        another.note = note
+        another.starred = starred
+    }
 }
