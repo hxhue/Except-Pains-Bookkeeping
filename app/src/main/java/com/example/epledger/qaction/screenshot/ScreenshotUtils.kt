@@ -18,7 +18,7 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.example.epledger.qaction.data.Store
+import com.example.epledger.qaction.tool.Store
 import java.io.*
 
 const val SCREENSHOT_REQ_CODE = 1029;

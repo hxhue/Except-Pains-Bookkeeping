@@ -1,8 +1,7 @@
-package com.example.epledger.qaction.data
+package com.example.epledger.qaction.tool
 
 import android.content.Intent
 import android.graphics.Point
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 
 /**

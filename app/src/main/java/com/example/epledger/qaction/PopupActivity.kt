@@ -5,31 +5,25 @@ import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.util.TypedValue
-import android.view.Menu
 import android.view.View
-import android.view.ViewGroup
 import android.view.Window
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.preference.PreferenceManager
-import com.example.epledger.BuildConfig
 import com.example.epledger.R
-import com.example.epledger.qaction.data.LedgerRecord
-import com.example.epledger.qaction.data.PairTask
-import com.example.epledger.qaction.data.Store
+import com.example.epledger.detail.DetailRecord
+import com.example.epledger.qaction.tool.PairTask
+import com.example.epledger.qaction.tool.Store
 import com.example.epledger.qaction.screenshot.ScreenshotUtils
 import com.example.epledger.util.ThemeColors
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.switchmaterial.SwitchMaterial
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -46,7 +40,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
     private var shown = false
     private var noPermissionAlert: AlertDialog? = null
 
-    private var ledgerRecord = LedgerRecord()
+    private var ledgerRecord = DetailRecord()
     // 用户的偏好设置
     private var briefMode = true
     private var screenshotAtStart = false
@@ -116,7 +110,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
     // Show the card
     private fun show() {
         handler.post {
-            this.window.setDimAmount(0.6f)
+            this.window.setDimAmount(0.3f)
             this.window.decorView.rootView.apply {
                 animate().setDuration(100).alpha(1.0f)
             }
@@ -156,7 +150,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         val activity = this
 
         // 给出一个提示框
-        val dialog = AlertDialog.Builder(activity)
+        val dialog = MaterialAlertDialogBuilder(activity)
                 .setTitle(R.string.screenshot_failure)
                 .setMessage(R.string.screenshot_failure_description)
                 .setPositiveButton(R.string.ok) { _, _ -> activity.show() }
@@ -176,15 +170,18 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
 
     override fun onStop() {
         super.onStop()
-        /**
-         * 在停止（退出）时马上销毁，防止因为退出按键语义不同导致界面残留
-         * 销毁是通过no_history标志完成的（见清单文件）
-         */
+        // 在停止（退出）时马上销毁，防止因为退出按键语义不同导致界面残留
+        // 销毁是通过no_history标志完成的（见清单文件）
         this.noPermissionAlert?.dismiss() // dismiss以防止窗口泄露
         Log.d("PopupActivity", "onStop()")
     }
 
     override fun onDestroy() {
+        // Dismiss the keyboard
+        this.currentFocus?.let { view ->
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            imm?.hideSoftInputFromWindow(view.windowToken, 0)
+        }
         super.onDestroy()
         Log.d("PopupActivity", "onDestroy()")
     }
@@ -347,7 +344,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         }, hour, minute, true)
 
         dialog.setOnShowListener {
-            val color = ThemeColors.getColorSecondary(theme)
+            val color = getColor(R.color.lightColorSecondary)
             dialog.getButton(TimePickerDialog.BUTTON_POSITIVE).setTextColor(color)
             dialog.getButton(TimePickerDialog.BUTTON_NEGATIVE).setTextColor(color)
         }
@@ -370,7 +367,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         dateText.setText(simpleFormat.format(dateOfNow))
 
         // 添加按钮回调
-        val dialog = DatePickerDialog(this, R.style.CustomDatePicker)
+        val dialog = DatePickerDialog(this, R.style.Theme_DatePicker_NoWhiteExtraSpace)
         dialog.setOnDateSetListener { view, year, month, dayOfMonth ->
             val cal = Calendar.getInstance()
             cal.set(year, month, dayOfMonth)

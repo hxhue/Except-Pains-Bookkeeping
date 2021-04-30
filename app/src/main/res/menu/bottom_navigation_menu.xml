@@ -3,21 +3,21 @@
     <item
         android:id="@+id/nav_home"
         android:enabled="true"
-        android:icon="@drawable/ic_baseline_view_list_24"
+        android:icon="@drawable/ic_baseline_view_list"
         android:title="@string/nav_home"/>
     <item
         android:id="@+id/nav_charts"
         android:enabled="true"
-        android:icon="@drawable/ic_baseline_show_chart_24"
+        android:icon="@drawable/ic_baseline_show_chart"
         android:title="@string/nav_charts"/>
     <item
-        android:id="@+id/nav_notification"
+        android:id="@+id/nav_inbox"
         android:enabled="true"
-        android:icon="@drawable/ic_baseline_notifications_24"
-        android:title="@string/nav_notification"/>
+        android:icon="@drawable/ic_baseline_inbox"
+        android:title="@string/nav_inbox"/>
     <item
         android:id="@+id/nav_settings"
         android:enabled="true"
-        android:icon="@drawable/ic_baseline_settings_24"
+        android:icon="@drawable/ic_baseline_settings"
         android:title="@string/nav_settings"/>
 </menu>

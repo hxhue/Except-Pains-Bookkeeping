@@ -21,7 +21,7 @@
             app:key="qa_notification"
             app:title="@string/prefer_item_qa_noti"
             app:summary="@string/prefer_item_qa_noti_sum"
-            app:defaultValue="true"/>
+            app:defaultValue="false"/>
     </PreferenceCategory>
 
     <PreferenceCategory

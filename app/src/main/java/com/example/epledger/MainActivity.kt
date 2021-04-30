@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         mainPagerAdapter = MainPagerAdapter(supportFragmentManager)
 
         // 设置图标的可见度
-        bottomNavigationView.labelVisibilityMode = LabelVisibilityMode.LABEL_VISIBILITY_AUTO
+        bottomNavigationView.labelVisibilityMode = LabelVisibilityMode.LABEL_VISIBILITY_UNLABELED
 
         // Set items to be displayed
         mainPagerAdapter.setItems(arrayListOf(MainScreen.MAIN, MainScreen.CHARTS,
@@ -112,5 +112,16 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         return false
     }
 
+    /**
+     * Set badge of InboxFragment in BottomNavigation.
+     * Any number less or equal than 0 will make badge disappear.
+     */
+    fun setInboxBadge(num: Int) {
+        if (num > 0) {
+            bottomNavigationView.getOrCreateBadge(R.id.nav_inbox).number = num
+        } else {
+            bottomNavigationView.removeBadge(R.id.nav_inbox)
+        }
+    }
 }
 
