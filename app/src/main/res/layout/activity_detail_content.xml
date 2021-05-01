@@ -145,16 +145,30 @@
     <EditText
         android:id="@+id/detail_money_text"
         android:layout_width="wrap_content"
-        android:minWidth="100dp"
-        android:maxWidth="210dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/detail_second_left_padding"
-        android:textColor="@drawable/disable_black_text_selector"
-        app:layout_constraintTop_toTopOf="@id/detail_money_label"
         android:layout_marginTop="-13dp"
         android:inputType="numberDecimal|numberSigned"
+        android:minWidth="100dp"
+        android:textColor="@drawable/disable_black_text_selector"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="216dp" />
+        app:layout_constraintTop_toTopOf="@id/detail_money_label" />
+
+    <!-- 标星按钮 -->
+    <ToggleButton
+        android:id="@+id/detail_star"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        android:background="@drawable/ic_star_toggle_bg"
+        android:backgroundTint="@color/disable_star"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:textOff=""
+        android:textOn=""
+        app:layout_constraintBottom_toBottomOf="@id/detail_money_label"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/detail_money_label" />
 
     <!-- 备注一行 -->
     <TextView
