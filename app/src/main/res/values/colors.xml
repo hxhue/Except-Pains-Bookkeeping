@@ -7,6 +7,11 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="imageview_background">#F8F4D3</color>
+    <color name="item_text_background">#E1F5EC</color>
+    <color name="label_text_color">#333</color>
+    <color name="amount_expand_color">#FFFF4444</color>
+    <color name="amount_income_color">#FF99CC00</color
     <color name="orange">#FFC107</color>
     <!-- 2020.4.22 新配色 -->
     <!-- 主色 -->
