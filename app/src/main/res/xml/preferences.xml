@@ -4,64 +4,67 @@
 
     <PreferenceCategory
         app:key="quick_actions_category"
-        app:title="Quick Actions">
+        app:title="@string/prefer_cate_qa">
 
         <SwitchPreferenceCompat
             app:key="qa_brief_mode"
-            app:title="Brief mode" />
+            app:title="@string/prefer_item_brief"
+            app:defaultValue="true"/>
 
         <SwitchPreferenceCompat
             app:key="qa_screenshot_im"
-            app:title="Take screenshot immediately"
-            app:summary="Right after the card is popped up"/>
+            app:title="@string/prefer_item_shot"
+            app:summary="@string/prefer_item_shot_sum"
+            app:defaultValue="false"/>
 
         <SwitchPreferenceCompat
             app:key="qa_notification"
-            app:title="Enable actions in notification center"
-            app:summary="Recommended when tile service works poorly"/>
+            app:title="@string/prefer_item_qa_noti"
+            app:summary="@string/prefer_item_qa_noti_sum"
+            app:defaultValue="false"/>
     </PreferenceCategory>
 
     <PreferenceCategory
         app:key="data_category"
-        app:title="Data">
+        app:title="@string/prefer_cate_data">
 
         <Preference
             app:key="data_export_json"
-            app:title="Export as JSON"
-            app:summary="When you want to restore data in the future"/>
+            app:title="@string/prefer_item_export_json"
+            app:summary="@string/prefer_item_export_json_sum"/>
 
         <Preference
             app:key="data_export_csv"
-            app:title="Export as CSV"
-            app:summary="When you want to view data in your computer"/>
+            app:title="@string/prefer_item_export_csv"
+            app:summary="@string/prefer_item_export_csv_sum"/>
 
         <Preference
             app:key="data_import_json"
-            app:title="Import from JSON"
-            app:summary="When you have a backup from this app"/>
+            app:title="@string/prefer_item_import_json"
+            app:summary="@string/prefer_item_import_json_sum"/>
 
         <Preference
             app:key="data_import_alipay"
-            app:title="Import from CSV(Alipay)"
-            app:summary="When you have data exported from Alipay"/>
+            app:title="@string/prefer_item_import_alipay"
+            app:summary="@string/prefer_item_import_alipay_sum"/>
 
         <Preference
             app:key="data_import_wechat"
-            app:title="Import from CSV(Wechat)"
-            app:summary="When you have data exported from Wechat"/>
+            app:title="@string/prefer_item_import_wechat"
+            app:summary="@string/prefer_item_import_wechat_sum"/>
     </PreferenceCategory>
 
-    <PreferenceCategory
-        app:key="notification_category"
-        app:title="Notifications">
+<!--    <PreferenceCategory-->
+<!--        app:key="notification_category"-->
+<!--        app:title="Notifications">-->
 
-        <SwitchPreferenceCompat
-            app:key="notification_remind"
-            app:title="Remind me to record expenses" />
+<!--        <SwitchPreferenceCompat-->
+<!--            app:key="notification_remind"-->
+<!--            app:title="Remind me to record expenses" />-->
 
-        <SwitchPreferenceCompat
-            app:key="notification_badge"
-            app:title="Show unfinished records as badges"/>
-    </PreferenceCategory>
+<!--        <SwitchPreferenceCompat-->
+<!--            app:key="notification_badge"-->
+<!--            app:title="Show unfinished records as badges"/>-->
+<!--    </PreferenceCategory>-->
 
 </PreferenceScreen>

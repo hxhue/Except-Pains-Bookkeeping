@@ -52,17 +52,6 @@ object NotificationUtils {
     }
 
     /**
-     * 显示快捷操作通知。
-     * 现已不在内部此模块内部专门使用。
-     */
-    fun displayQuickActions(ctx: Context) {
-        val notification = createQuickActionNotification(ctx)
-        with(NotificationManagerCompat.from(ctx)) {
-            notify(ALWAYS_ON_NOTIFICATION_ID, notification)
-        }
-    }
-
-    /**
      * 提供title和text，直接发送通知。
      * 目标是提供最简单的通知，点击这则通知直接进入主应用。
      */

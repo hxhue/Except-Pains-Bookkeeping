@@ -1,30 +1,19 @@
 package com.example.epledger
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
-import android.view.View
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.preference.PreferenceManager
 import androidx.viewpager.widget.ViewPager
-import com.example.epledger.chart.ShowChartActivity
 import com.example.epledger.nav.MainPagerAdapter
 import com.example.epledger.nav.MainScreen
 import com.example.epledger.nav.getMainScreenForMenuItem
-import com.example.epledger.qaction.CKForeground
 import com.example.epledger.qaction.loadQuickActionModule
-import com.example.epledger.util.Store
-import com.example.epledger.qaction.screenshot.ScreenshotUtils
-import com.example.epledger.util.NotificationUtils
 import com.example.epledger.util.loadNotificationModule
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomnavigation.LabelVisibilityMode
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
     private lateinit var viewPager: ViewPager
@@ -35,10 +24,13 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         super.onCreate(savedInstanceState)
         // 禁用黑暗模式
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
         // 界面初始化
+        // Handler.post may fix the problem of frame skipping?
+        // Not for ChartsFragment though.
         setupViews()
-        // 其他初始化
-        Store.loadFromActivity(this)
+
+        // 加载其他模块
         loadModules()
     }
 
@@ -49,7 +41,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         mainPagerAdapter = MainPagerAdapter(supportFragmentManager)
 
         // 设置图标的可见度
-        bottomNavigationView.labelVisibilityMode = LabelVisibilityMode.LABEL_VISIBILITY_LABELED
+        bottomNavigationView.labelVisibilityMode = LabelVisibilityMode.LABEL_VISIBILITY_UNLABELED
 
         // Set items to be displayed
         mainPagerAdapter.setItems(arrayListOf(MainScreen.MAIN, MainScreen.CHARTS,
@@ -118,6 +110,18 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             return true
         }
         return false
+    }
+
+    /**
+     * Set badge of InboxFragment in BottomNavigation.
+     * Any number less or equal than 0 will make badge disappear.
+     */
+    fun setInboxBadge(num: Int) {
+        if (num > 0) {
+            bottomNavigationView.getOrCreateBadge(R.id.nav_inbox).number = num
+        } else {
+            bottomNavigationView.removeBadge(R.id.nav_inbox)
+        }
     }
 }
 
