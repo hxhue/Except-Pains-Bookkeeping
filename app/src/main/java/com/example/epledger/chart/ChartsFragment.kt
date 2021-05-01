@@ -3,9 +3,7 @@ package com.example.epledger.chart
 import android.annotation.SuppressLint
 import android.graphics.Paint
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Button
 import android.widget.RelativeLayout
 import androidx.fragment.app.Fragment
@@ -30,6 +28,7 @@ class ChartsFragment: Fragment() {
     @SuppressLint("ResourceAsColor")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.activity_show_chart, container, false)
+        setHasOptionsMenu(true) // Turn on option menu
         siftLayout=view.findViewById<View>(R.id.siftLayout) as RelativeLayout
 
         //pie chart
@@ -201,9 +200,9 @@ class ChartsFragment: Fragment() {
         return view
     }
 
-
-
-
-
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.top_app_bar, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
 
 }

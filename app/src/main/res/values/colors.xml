@@ -11,7 +11,7 @@
     <color name="item_text_background">#E1F5EC</color>
     <color name="label_text_color">#333</color>
     <color name="amount_expand_color">#FFFF4444</color>
-    <color name="amount_income_color">#FF99CC00</color
+    <color name="amount_income_color">#FF99CC00</color>
     <color name="orange">#FFC107</color>
     <!-- 2020.4.22 新配色 -->
     <!-- 主色 -->
@@ -24,4 +24,7 @@
     <color name="lightColorOnSecondary">@color/white</color>
     <!-- 其它颜色 -->
     <color name="silver">#C0c0c0</color>
+    <color name="starBgTint">@color/disable_star</color>
+    <color name="lighterOrange">#e1bf76</color>
+    <color name="darkerOrange">#FF8600</color>
 </resources>

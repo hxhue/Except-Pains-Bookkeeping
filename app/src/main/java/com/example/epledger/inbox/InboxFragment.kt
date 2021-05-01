@@ -1,14 +1,10 @@
 package com.example.epledger.inbox
 
-import android.os.AsyncTask
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.*
 import android.widget.Button
 import android.widget.TextView
 import android.widget.TimePicker
-import androidx.annotation.UiThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.epledger.MainActivity
@@ -16,7 +12,6 @@ import com.example.epledger.R
 import com.example.epledger.nav.NavigationFragment
 import com.example.epledger.detail.RecordDetailFragment
 import com.example.epledger.detail.DetailRecord
-import com.example.epledger.detail.setScreenshot
 import com.example.epledger.qaction.screenshot.ScreenshotUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -77,13 +72,15 @@ class InboxFragment : Fragment() {
                     rec.source = "Alipay"
                     rec.date = Date()
                     rec.hourOfDay = 12
+                    rec.starred = true
                     rec.minuteOfHour = 13
                     rec.note = "Happy birthday!"
                     rec.screenshot = ScreenshotUtils.loadBitmap(
                         requireContext(),
                         "/storage/emulated/0/Android/data/com.example.epledger/files/Pictures/1619754991133.jpg"
                     )
-                    val newFragment = RecordDetailFragment(rec)
+                    val newFragment = RecordDetailFragment()
+                    newFragment.bindRecord(rec)
                     NavigationFragment.pushToStack(requireActivity() as AppCompatActivity, newFragment)
                 }
             }

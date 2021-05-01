@@ -5,36 +5,55 @@ import android.app.TimePickerDialog
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import com.example.epledger.R
 import com.example.epledger.nav.NavigationFragment
+import com.example.epledger.qaction.screenshot.ScreenshotUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.activity_detail_content.*
 import kotlinx.android.synthetic.main.activity_detail_content.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 
 
-class RecordDetailFragment(val bindingRecord: DetailRecord):
+class RecordDetailFragment:
     NavigationFragment(), AdapterView.OnItemSelectedListener {
     companion object {
         // 没有被注明的来源或种类始终放在0号位
         const val UNSPECIFIED_ITEM_POSITION = 0
     }
 
+    // 创建一个空记录
+    var bindingRecord: DetailRecord? = null
+
     /**
      * 当前的记录是否正在被修改。
      */
-    private var recordBeingEdited = (bindingRecord.ID == null)
+    var editing = false
 
     /**
      * 保存的记录副本，用来恢复。
      */
-    val recordCopy = bindingRecord.getCopy()
+    private var recordCopy: DetailRecord? = null
+
+    /**
+     * 在创建后必须被调用一次。
+     */
+    fun bindRecord(record: DetailRecord) {
+        editing = (record.ID == null)
+        recordCopy = record.getCopy()
+        bindingRecord = record
+    }
 
     // 种类和来源属性需要绑定在滚轮上面
     private val sources: Array<String> =  arrayOf("Unspecified", "Alipay", "Wechat", "Cash")
@@ -42,6 +61,7 @@ class RecordDetailFragment(val bindingRecord: DetailRecord):
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         require(parent != null)
+        val bindingRecord = bindingRecord!!
         when (parent.id) {
             R.id.qa_src_spinner -> {
                 Log.d("RecordDetailFragment",
@@ -60,32 +80,39 @@ class RecordDetailFragment(val bindingRecord: DetailRecord):
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.activity_detail_scrollable_content, container, false)
-
-        // 设置标题和返回箭头
-        val newTitle = if (bindingRecord.ID == null) requireContext().getString(R.string.detail_page_title_create)
-            else requireContext().getString(R.string.detail_page_title_modify)
-        setNavigation(view, newTitle, view.detail_note_text, view.detail_money_text)
-
-        // 设置页面内容
-        setUpDetailView(view)
-        syncViewWithRecord(view)
-
         return view
     }
 
     override fun onResume() {
         super.onResume()
+
+        val bindingRecord = bindingRecord!!
+        val view = requireView()
+
+        // 设置标题
+        val newTitle =  if (bindingRecord.ID == null) requireContext().getString(R.string.detail_page_title_create)
+                        else requireContext().getString(R.string.detail_page_title_modify)
+        setNavigation(view, newTitle, view.detail_note_text, view.detail_money_text)
+
+        // 设置页面内容
+        setUpDetailView(view)
+        syncViewWithRecord(view)
     }
 
     /**
      * 从活动中取得信息。用来布局等。只能够用在界面完成初始化之后。
      */
     fun syncViewWithRecord(view: View) {
+        val bindingRecord = bindingRecord!!
+
         // 更新截图组件显示，由于在更新按钮时要用到这个状态，因此要先更新这里
-        setScreenshot(view, bindingRecord.screenshot)
+        syncScreenshot(view)
 
         // 更新控件可操作性
-        setContentModifiable(view, recordBeingEdited)
+        setContentModifiable(view, editing)
+
+        // 更新标星属性
+        view.detail_star.isChecked = bindingRecord.starred
 
         // 更新日期组件显示
         if (bindingRecord.date == null) {
@@ -205,7 +232,7 @@ class RecordDetailFragment(val bindingRecord: DetailRecord):
         // 设置截图按钮的功能
         val removeButton = view.findViewById<Button>(R.id.detail_screenshot_remove_button)
         removeButton.setOnClickListener {
-            setScreenshot(view, null)
+            clearScreenshot()
         }
     }
 
@@ -214,6 +241,8 @@ class RecordDetailFragment(val bindingRecord: DetailRecord):
      * 注意：应当在setScreenshot至少被调用一次后调用。
      */
     private fun setContentModifiable(view: View, editing: Boolean) {
+        val bindingRecord = bindingRecord!!
+
         val moneyEditText = view.findViewById<EditText>(R.id.detail_money_text)
         val noteEditText = view.findViewById<EditText>(R.id.detail_note_text)
         val screenshotRemovingButton = view.findViewById<Button>(R.id.detail_screenshot_remove_button)
@@ -228,6 +257,7 @@ class RecordDetailFragment(val bindingRecord: DetailRecord):
         dateSelectingButton.isEnabled = editing
         srcSpinner.isEnabled = editing
         typeSpinner.isEnabled = editing
+        view.detail_star.isEnabled = editing
 
         val buttonTextColor = requireContext().getColor(if (editing) R.color.lightColorPrimary else R.color.silver)
         timeSelectingButton.setTextColor(buttonTextColor)
@@ -240,7 +270,7 @@ class RecordDetailFragment(val bindingRecord: DetailRecord):
         }
 
         // 设置moneyEditText获取焦点
-        if (recordBeingEdited) {
+        if (this.editing) {
             moneyEditText.requestFocus()
             val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
             imm?.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0)
@@ -256,7 +286,8 @@ class RecordDetailFragment(val bindingRecord: DetailRecord):
         menu.clear()
 
         // Add new options
-        if (recordBeingEdited) {
+        val bindingRecord = bindingRecord!!
+        if (editing) {
             if (bindingRecord.ID == null) {
                 inflater.inflate(R.menu.detail_menu_creating, menu)
             } else {
@@ -282,14 +313,14 @@ class RecordDetailFragment(val bindingRecord: DetailRecord):
             }
             R.id.menu_item_detail_discard -> {
                 Toast.makeText(context, getString(R.string.discard_changes), Toast.LENGTH_SHORT).show()
-                recordBeingEdited = false
+                editing = false
                 // 复原做出的修改
-                recordCopy.copyTo(bindingRecord)
+                recordCopy!!.copyTo(bindingRecord!!)
                 syncViewWithRecord(requireView())
                 true
             }
             R.id.menu_item_detail_edit -> {
-                recordBeingEdited = true
+                editing = true
                 setContentModifiable(requireView(), true)
                 true
             }
@@ -308,6 +339,30 @@ class RecordDetailFragment(val bindingRecord: DetailRecord):
             else -> false
         }
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        prepareRecord()
+        outState.putBoolean("editing", editing)
+        outState.putParcelable("record", bindingRecord)
+        outState.putParcelable("recordCopy", recordCopy)
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        val fragment = this
+        savedInstanceState?.apply {
+            fragment.editing = getBoolean("editing")
+            val record = getParcelable<DetailRecord>("record")
+            if (record != null) {
+                fragment.bindingRecord = record
+            }
+            val copy = getParcelable<DetailRecord>("recordCopy")
+            if (copy != null) {
+                fragment.recordCopy = copy
+            }
+        }
+    }
 }
 
 /**
@@ -315,6 +370,7 @@ class RecordDetailFragment(val bindingRecord: DetailRecord):
  */
 fun RecordDetailFragment.setTime(view: View, hourOfDay: Int, minuteOfHour: Int) {
     // 保存记录
+    val bindingRecord = bindingRecord!!
     bindingRecord.hourOfDay = hourOfDay
     bindingRecord.minuteOfHour = minuteOfHour
     val str = String.format("%02d:%02d", hourOfDay, minuteOfHour)
@@ -337,6 +393,7 @@ fun RecordDetailFragment.clearDate(view: View) {
  * 设置保存的记录的日期，并更新组件的视图。
  */
 fun RecordDetailFragment.setDate(view: View, year: Int, month: Int, dayOfMonth: Int) {
+    val bindingRecord = bindingRecord!!
     // 生成日期数据
     val cal = Calendar.getInstance()
     cal.set(year, month, dayOfMonth)
@@ -350,31 +407,62 @@ fun RecordDetailFragment.setDate(view: View, year: Int, month: Int, dayOfMonth: 
 }
 
 /**
- * 设置截图和相关组件。必须被调用一次以保证界面的初始化状态合理，无论是空还是有一张截图。
+ * 利用model设置截图和相关组件。必须被调用一次以保证界面的初始化状态合理，无论是空还是有一张截图。
  */
-fun RecordDetailFragment.setScreenshot(view: View, bitmap: Bitmap?) {
+fun RecordDetailFragment.syncScreenshot(view: View) {
     val removeButton = view.findViewById<Button>(R.id.detail_screenshot_remove_button)
     val promptText = view.findViewById<TextView>(R.id.detail_screenshot_empty_prompt)
     val imageView = view.findViewById<ImageView>(R.id.detail_screenshot)
-    bindingRecord.screenshot = bitmap
-    if (bitmap == null) {
-        promptText.setText(R.string.empty_prompt)
-        promptText.setTextColor(requireContext().getColor(R.color.silver))
-        imageView.setImageDrawable(null)
-        removeButton.isEnabled = false
-        removeButton.setTextColor(requireContext().getColor(R.color.silver))
-    } else {
-        imageView.setImageBitmap(bitmap)
-        promptText.setText("")
-        removeButton.isEnabled = true
-        removeButton.setTextColor(requireContext().getColor(R.color.lightColorPrimary))
+
+    var bitmap: Bitmap? = null
+    val record = bindingRecord!!
+
+    GlobalScope.launch {
+        withContext(Dispatchers.IO) {
+            if (record.screenshot != null) {
+                bitmap = record.screenshot
+            } else if (record.screenshotPath != null) {
+                try {
+                    record.screenshot = ScreenshotUtils.loadBitmap(requireContext(),
+                            record.screenshotPath!!)
+                } catch (e: Exception) {
+                    record.screenshot = null
+                } finally {
+                    bitmap = record.screenshot
+                }
+            }
+            Handler(Looper.getMainLooper()).post {
+                bindingRecord!!.screenshot = bitmap
+                if (bitmap == null) {
+                    promptText.setText(R.string.empty_prompt)
+                    promptText.setTextColor(requireContext().getColor(R.color.silver))
+                    removeButton.isEnabled = false
+                    removeButton.setTextColor(requireContext().getColor(R.color.silver))
+                    imageView.setImageDrawable(null)
+                } else {
+                    imageView.setImageBitmap(bitmap)
+                    promptText.setText("")
+                    removeButton.isEnabled = editing
+                    removeButton.setTextColor(  if (editing) requireContext().getColor(R.color.lightColorPrimary)
+                                                else requireContext().getColor(R.color.silver))
+                }
+            }
+        }
     }
+}
+
+fun RecordDetailFragment.clearScreenshot() {
+    val bindingRecord = bindingRecord!!
+    bindingRecord.screenshot = null
+    bindingRecord.screenshotPath = null
+    syncScreenshot(requireView())
 }
 
 /**
  * 从组件上拉取信息构成DetailRecord。
  */
 fun RecordDetailFragment.prepareRecord() {
+    val bindingRecord = bindingRecord!!
     // 拉取金额
     bindingRecord.amount = try {
         detail_money_text.text.toString().toDouble()
@@ -384,4 +472,7 @@ fun RecordDetailFragment.prepareRecord() {
 
     // 拉取附注
     bindingRecord.note = detail_note_text.text.toString()
+
+    // 拉取标星属性
+    bindingRecord.starred = detail_star.isChecked
 }

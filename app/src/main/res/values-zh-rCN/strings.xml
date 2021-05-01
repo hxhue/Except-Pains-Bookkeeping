@@ -122,7 +122,7 @@
     <string name="detail_type">种类</string>
     <string name="detail_money">金额</string>
     <string name="detail_note">附注</string>
-    <string name="detail_screenshot">截屏</string>
+    <string name="detail_screenshot">快照</string>
     <string name="detail_screenshot_remove">移除</string>
     <string name="detail_screenshot_for_this_record">这个记录的截图</string>
     <string name="empty_prompt">（空）</string>
