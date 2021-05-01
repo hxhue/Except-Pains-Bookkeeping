@@ -17,11 +17,11 @@ import android.os.IBinder
 import android.os.Process
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.example.epledger.util.Store
+import com.example.epledger.qaction.tool.Store
 import com.example.epledger.util.NotificationUtils
 import com.example.epledger.util.SCREENCAP_NOTIFICATION_ID
 import com.example.epledger.R
-import com.example.epledger.qaction.PairTask
+import com.example.epledger.qaction.tool.PairTask
 import java.lang.RuntimeException
 
 class ScreenshotService : Service() {
