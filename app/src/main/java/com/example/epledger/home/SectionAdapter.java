@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.SortedList;
 
 import com.example.epledger.R;
 import com.example.epledger.model.Entry;
+import com.example.epledger.model.Section;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -40,29 +41,29 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ViewHold
             ft = new SimpleDateFormat ("yyyy-MM-dd");
         }
 
-        public void bind(Date date, List<Entry> entryList) {
+        public void bind(Date date, List<Entry> entryList, int sectionPosition) {
             textDate.setText(ft.format(date));
 
             EntryAdapter entryAdapter = new EntryAdapter(entryList);
             entryAdapter.setOnItemClickListener(new EntryAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(View view, int position) {
-                    Toast.makeText(view.getContext(), "click " + position + " item", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(view.getContext(), "click " + sectionPosition + " section " + position + " item", Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
                 public void onItemLongClick(View view, int position) {
-                    Toast.makeText(view.getContext(), "long click " + position + " item", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(view.getContext(), "long click " + sectionPosition + " section " + position + " item", Toast.LENGTH_SHORT).show();
                 }
             });
             rv.setAdapter(entryAdapter);
         }
     }
 
-    private TreeMap<Date, List<Entry>> mEntries;
+    private List<Section> mSections;
 
-    public SectionAdapter(TreeMap<Date, List<Entry>> entryList) {
-        this.mEntries = entryList;
+    public SectionAdapter(List<Section> mSections) {
+        this.mSections = mSections;
     }
 
     @NonNull
@@ -73,21 +74,12 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Date date = null;
-        List<Entry> entries = null;
-        int i = 0;
-        for (Date o: mEntries.keySet()) {
-            if (i == position) {
-                date = o;
-                entries = mEntries.get(o);
-            }
-            i++;
-        }
-        holder.bind(date, entries);
+        Section section = mSections.get(position);
+        holder.bind(section.getDate(), section.getEntryList(), position);
     }
 
     @Override
     public int getItemCount() {
-        return mEntries.size();
+        return mSections.size();
     }
 }

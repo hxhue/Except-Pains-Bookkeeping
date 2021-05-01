@@ -1,5 +1,6 @@
 package com.example.epledger.home;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,7 @@ import android.widget.SectionIndexer;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.epledger.R;
@@ -38,8 +40,13 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
             mEntry = entry;
             
             labelText.setText(mEntry.getLabel());
-            amountText.setText((mEntry.getAmount() >= 0 ? "+" : "-") + "￥"
-                    + String.format("%.2f", Math.abs(mEntry.getAmount())));
+            if (mEntry.getAmount() >= 0) {
+                amountText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.amount_income_color));
+                amountText.setText("+￥" + String.format("%.2f", Math.abs(mEntry.getAmount())));
+            } else  {
+                amountText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.amount_expand_color));
+                amountText.setText("-￥" + String.format("%.2f", Math.abs(mEntry.getAmount())));
+            }
             infoText.setText(mEntry.getInfo());
             sourceText.setText(mEntry.getSource());
         }
