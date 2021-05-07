@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <ScrollView
-        android:id="@+id/qactionScrollView"
+        android:id="@+id/qa_scrollview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -23,223 +23,269 @@
             android:scrollbarAlwaysDrawVerticalTrack="true"
             android:scrollbarFadeDuration="0">
 
-            <TextView
-                android:id="@+id/qactionDateLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="24dp"
-                android:text="日期"
-                app:layout_constraintStart_toStartOf="@+id/qactionDateComponents"
-                app:layout_constraintTop_toTopOf="@+id/qactionDateComponents" />
-
-            <Button
-                android:id="@+id/qactionDatePickerButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="24dp"
-                android:text="选择..."
-                app:layout_constraintBottom_toBottomOf="@+id/qactionDateText"
-                app:layout_constraintEnd_toEndOf="@+id/qactionDateComponents" />
-
-            <EditText
-                android:id="@+id/qactionDateText"
-                android:layout_width="110dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="16dp"
-                android:cursorVisible="false"
-                android:ems="10"
-                android:focusable="false"
-                android:inputType="date"
-                android:textIsSelectable="false"
-                app:layout_constraintStart_toEndOf="@+id/qactionDateLabel"
-                app:layout_constraintTop_toTopOf="@+id/qactionDateComponents" />
-
             <View
-                android:id="@+id/qactionDateComponents"
-                android:layout_width="0dp"
-                android:layout_height="50dp"
+                android:id="@+id/qa_title_compo"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/qactionMoneyLabel"
+                android:id="@+id/qa_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="24dp"
-                android:text="金额"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/qactionMoneyAndScreenshotComponents" />
+                android:text="@string/act_popup_newrec_title"
+                android:textColor="#E6000000"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="@id/qa_title_compo"
+                app:layout_constraintStart_toStartOf="@id/qa_title_compo" />
 
             <TextView
-                android:id="@+id/qactionScreenshotLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="@id/qactionMoneyAndScreenshotComponents"
-                android:layout_marginTop="24dp"
-                android:layout_marginEnd="134dp"
-                android:text="截图"
-                app:layout_constraintEnd_toEndOf="@id/qactionMoneyAndScreenshotComponents"/>
-
-            <ToggleButton
-                android:id="@+id/qactionScreenshotToggle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="24dp"
-                app:layout_constraintEnd_toEndOf="@id/qactionMoneyAndScreenshotComponents"
-                app:layout_constraintTop_toTopOf="@id/qactionMoneyAndScreenshotComponents" />
-
-            <TextView
-                android:id="@+id/qactionTimeLabel"
+                android:id="@+id/qa_date_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="24dp"
-                android:text="时间"
-                app:layout_constraintStart_toStartOf="@id/qactionTimeComponents"
-                app:layout_constraintTop_toTopOf="@id/qactionTimeComponents" />
+                android:layout_marginTop="20dp"
+                android:text="日期"
+                app:layout_constraintStart_toStartOf="@+id/qa_date_compo"
+                app:layout_constraintTop_toTopOf="@+id/qa_date_compo" />
 
             <Button
-                android:id="@+id/qactionTimePickerButton"
+                android:id="@+id/qa_date_button"
+                style="?attr/materialButtonOutlinedStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="24dp"
-                android:text="选择..."
-                app:layout_constraintBottom_toBottomOf="@+id/qactionTimeText"
-                app:layout_constraintEnd_toEndOf="@+id/qactionTimeComponents" />
-
-            <View
-                android:id="@+id/qactionTimeComponents"
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/qactionDateComponents" />
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="28dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:text="选择"
+                android:textColor="@color/lightColorPrimary"
+                app:layout_constraintEnd_toEndOf="@+id/qa_date_compo"
+                app:layout_constraintTop_toTopOf="@id/qa_date_compo" />
 
             <EditText
-                android:id="@+id/qactionTimeText"
+                android:id="@+id/qa_date_text"
                 android:layout_width="110dp"
                 android:layout_height="40dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="16dp"
-                android:contextClickable="false"
+                android:layout_marginStart="@dimen/popup_widgets_padding"
+                android:layout_marginTop="9dp"
+                android:background="@null"
                 android:cursorVisible="false"
+                android:ems="10"
                 android:focusable="false"
-                android:focusableInTouchMode="false"
+                android:gravity="center"
+                android:inputType="date"
                 android:textIsSelectable="false"
-                app:layout_constraintStart_toEndOf="@id/qactionTimeLabel"
-                app:layout_constraintTop_toTopOf="@id/qactionTimeComponents" />
+                app:layout_constraintStart_toEndOf="@+id/qa_date_label"
+                app:layout_constraintTop_toTopOf="@+id/qa_date_compo" />
 
             <View
-                android:id="@+id/qactionSpinnerComponents"
+                android:id="@+id/qa_date_compo"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/qactionTimeComponents" />
+                app:layout_constraintTop_toBottomOf="@id/qa_title_compo" />
 
             <TextView
-                android:id="@+id/qactionSourceSpinnerLabel"
+                android:id="@+id/qa_money_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="20dp"
+                android:text="金额"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/qa_money_screenshot_compo" />
+
+            <TextView
+                android:id="@+id/qa_screenshot_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="@id/qa_money_screenshot_compo"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="@dimen/popup_widgets_padding"
+                android:text="截图"
+                app:layout_constraintEnd_toStartOf="@id/qa_screenshot_switch"/>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/qa_screenshot_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="24dp"
+                android:layout_marginTop="6dp"
+                app:layout_constraintEnd_toEndOf="@id/qa_money_screenshot_compo"
+                app:layout_constraintTop_toTopOf="@id/qa_money_screenshot_compo"
+                android:checked="true"/>
+
+            <TextView
+                android:id="@+id/qa_time_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="20dp"
+                android:text="时间"
+                app:layout_constraintStart_toStartOf="@id/qa_time_compo"
+                app:layout_constraintTop_toTopOf="@id/qa_time_compo" />
+
+            <Button
+                android:id="@+id/qa_time_button"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="28dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:text="选择"
+                android:textColor="@color/lightColorPrimary"
+                app:layout_constraintEnd_toEndOf="@+id/qa_time_compo"
+                app:layout_constraintTop_toTopOf="@id/qa_time_compo" />
+
+            <View
+                android:id="@+id/qa_time_compo"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/qa_date_compo" />
+
+            <EditText
+                android:id="@+id/qa_time_text"
+                android:layout_width="110dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="@dimen/popup_widgets_padding"
+                android:layout_marginTop="9dp"
+                android:background="@null"
+                android:contextClickable="false"
+                android:cursorVisible="false"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:gravity="center"
+                android:textIsSelectable="false"
+                app:layout_constraintStart_toEndOf="@id/qa_time_label"
+                app:layout_constraintTop_toTopOf="@id/qa_time_compo" />
+
+            <View
+                android:id="@+id/qa_src_compo"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/qa_time_compo" />
+
+            <TextView
+                android:id="@+id/qa_src_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="20dp"
                 android:text="来源"
-                app:layout_constraintStart_toStartOf="@id/qactionSpinnerComponents"
-                app:layout_constraintTop_toTopOf="@id/qactionSpinnerComponents" />
+                app:layout_constraintStart_toStartOf="@id/qa_src_compo"
+                app:layout_constraintTop_toTopOf="@id/qa_src_compo" />
 
             <Spinner
-                android:id="@+id/qactionSourceSpinner"
-                android:layout_width="110dp"
+                android:id="@+id/qa_src_spinner"
                 android:layout_height="wrap_content"
-                android:background="#FFFFFFFF"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="6dp"
-                app:layout_constraintStart_toEndOf="@id/qactionSourceSpinnerLabel"
-                app:layout_constraintTop_toTopOf="@id/qactionSpinnerComponents" />
+                android:layout_marginStart="@dimen/popup_widgets_padding"
+                android:layout_marginTop="5dp"
+                app:layout_constraintStart_toEndOf="@id/qa_src_label"
+                app:layout_constraintTop_toTopOf="@id/qa_src_compo"
+                android:layout_width="0dp"
+                android:layout_marginEnd="24dp"
+                app:layout_constraintEnd_toEndOf="@id/qa_src_compo"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/qa_src_compo"
+                android:id="@+id/qa_type_compo"
+                />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/qactionTypeSpinnerLabel"
-                app:layout_constraintTop_toTopOf="@id/qactionSpinnerComponents"
+                android:id="@+id/qa_type_label"
+                app:layout_constraintTop_toTopOf="@id/qa_type_compo"
                 android:layout_marginTop="20dp"
-                app:layout_constraintEnd_toStartOf="@id/qactionTypeSpinner"
-                android:layout_marginEnd="8dp"
+                app:layout_constraintStart_toStartOf="@id/qa_type_compo"
+                android:layout_marginStart="24dp"
                 android:text="类型"/>
 
             <Spinner
-                android:id="@+id/qactionTypeSpinner"
-                android:layout_width="110dp"
+                android:id="@+id/qa_type_spinner"
                 android:layout_height="wrap_content"
-                android:background="#FFFFFFFF"
-                android:layout_marginEnd="16dp"
-                app:layout_constraintEnd_toEndOf="@id/qactionSpinnerComponents"
-                android:layout_marginTop="6dp"
-                app:layout_constraintTop_toTopOf="@id/qactionSpinnerComponents" />
+                android:layout_marginTop="5dp"
+                android:layout_width="0dp"
+                app:layout_constraintEnd_toEndOf="@id/qa_type_compo"
+                app:layout_constraintStart_toEndOf="@id/qa_type_label"
+                android:layout_marginStart="@dimen/popup_widgets_padding"
+                android:layout_marginEnd="24dp"
+                app:layout_constraintTop_toTopOf="@id/qa_type_compo" />
 
             <EditText
                 android:layout_width="110dp"
                 android:layout_height="40dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="16dp"
-                android:id="@+id/qactionMoneyText"
+                android:layout_marginStart="@dimen/popup_widgets_padding"
+                android:gravity="center"
+                android:layout_marginTop="12dp"
+                android:id="@+id/qa_money_text"
                 android:ems="10"
-                android:inputType="numberDecimal"
-                app:layout_constraintStart_toEndOf="@+id/qactionMoneyLabel"
-                app:layout_constraintTop_toTopOf="@+id/qactionMoneyAndScreenshotComponents" />
+                android:inputType="numberDecimal|numberSigned"
+                app:layout_constraintStart_toEndOf="@+id/qa_money_label"
+                app:layout_constraintTop_toTopOf="@+id/qa_money_screenshot_compo" />
 
             <View
-                android:id="@+id/qactionMoneyAndScreenshotComponents"
+                android:id="@+id/qa_money_screenshot_compo"
                 android:layout_width="0dp"
-                android:layout_height="50dp"
+                android:layout_height="40dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/qactionSpinnerComponents" />
+                app:layout_constraintTop_toBottomOf="@+id/qa_type_compo" />
 
             <View
-                android:id="@+id/qactionNoteComponents"
+                android:id="@+id/qa_note_compo"
                 android:layout_width="wrap_content"
-                android:layout_height="50dp"
+                android:layout_height="40dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/qactionMoneyAndScreenshotComponents" />
+                app:layout_constraintTop_toBottomOf="@+id/qa_money_screenshot_compo" />
 
             <TextView
-                android:id="@+id/qactionNoteLabel"
+                android:id="@+id/qa_note_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="20dp"
                 android:text="备注"
-                app:layout_constraintStart_toStartOf="@id/qactionNoteComponents"
-                app:layout_constraintTop_toTopOf="@id/qactionNoteComponents" />
+                app:layout_constraintStart_toStartOf="@id/qa_note_compo"
+                app:layout_constraintTop_toTopOf="@id/qa_note_compo" />
 
             <EditText
-                android:id="@+id/qactionNoteText"
+                android:id="@+id/qa_note_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="@dimen/popup_widgets_padding"
                 android:layout_marginTop="7dp"
                 android:layout_marginEnd="24dp"
                 android:ems="10"
                 android:gravity="start|top"
                 android:inputType="textMultiLine"
-                app:layout_constraintEnd_toEndOf="@id/qactionNoteComponents"
-                app:layout_constraintStart_toEndOf="@id/qactionNoteLabel"
-                app:layout_constraintTop_toTopOf="@id/qactionNoteComponents" />
+                app:layout_constraintEnd_toEndOf="@id/qa_note_compo"
+                app:layout_constraintStart_toEndOf="@id/qa_note_label"
+                app:layout_constraintTop_toTopOf="@id/qa_note_compo" />
 
 
             <View
-                android:id="@+id/qactionButtonComponents"
+                android:id="@+id/qa_button_compo"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_marginTop="0dp"
@@ -247,10 +293,10 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/qactionNoteText" />
+                app:layout_constraintTop_toBottomOf="@id/qa_note_text" />
 
             <Button
-                android:id="@+id/qactionButttonConfirm"
+                android:id="@+id/qa_button_confirm"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="24dp"
@@ -259,12 +305,12 @@
                 android:minWidth="64dp"
                 android:paddingEnd="6dp"
                 android:text="确认"
-                android:textColor="@color/design_default_color_primary"
-                app:layout_constraintEnd_toEndOf="@id/qactionButtonComponents"
-                app:layout_constraintTop_toTopOf="@id/qactionButtonComponents" />
+                android:textColor="@color/lightColorPrimary"
+                app:layout_constraintEnd_toEndOf="@id/qa_button_compo"
+                app:layout_constraintTop_toTopOf="@id/qa_button_compo" />
 
             <Button
-                android:id="@+id/qactionButttonCancel"
+                android:id="@+id/qa_button_cancel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:background="#0000"
@@ -272,9 +318,25 @@
                 android:minWidth="64dp"
                 android:paddingEnd="0dp"
                 android:text="取消"
-                android:textColor="@color/design_default_color_primary"
-                app:layout_constraintEnd_toStartOf="@+id/qactionButttonConfirm"
-                app:layout_constraintTop_toTopOf="@id/qactionButtonComponents" />
+                android:textColor="@color/lightColorPrimary"
+                app:layout_constraintEnd_toStartOf="@+id/qa_button_confirm"
+                app:layout_constraintTop_toTopOf="@id/qa_button_compo" />
+
+            <ToggleButton
+                android:id="@+id/qa_star"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="1dp"
+                app:layout_constraintBottom_toBottomOf="@id/qa_title_compo"
+                app:layout_constraintStart_toEndOf="@id/qa_title"
+                android:layout_marginStart="16dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:background="@drawable/ic_star_toggle_bg"
+                android:textOff=""
+                android:textOn=""
+                android:backgroundTint="@color/orange"
+                tools:layout_editor_absoluteX="124dp" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 

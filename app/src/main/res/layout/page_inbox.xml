@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <TextView
+        android:id="@+id/inbox_star_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/inbox_label_star"
+        app:layout_constraintBottom_toBottomOf="@id/inbox_star_icon"
+        app:layout_constraintStart_toEndOf="@id/inbox_star_icon"
+        app:layout_constraintTop_toTopOf="@id/inbox_star_icon" />
+
+    <ImageView
+        android:id="@+id/inbox_star_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:scaleX="0.8"
+        android:scaleY="0.8"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_baseline_star" />
+
+    <View
+        android:id="@+id/inbox_star_fake_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="8dp"
+        android:background="@color/lightColorSecondary"
+        app:layout_constraintHeight="44dp"
+        app:layout_constraintTop_toBottomOf="@id/inbox_star_icon" />
+
+    <TextView
+        android:id="@+id/inbox_incomplete_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/inbox_label_incomplete"
+        app:layout_constraintBottom_toBottomOf="@+id/inbox_incomplete_icon"
+        app:layout_constraintStart_toEndOf="@+id/inbox_incomplete_icon"
+        app:layout_constraintTop_toTopOf="@+id/inbox_incomplete_icon" />
+
+    <ImageView
+        android:id="@+id/inbox_incomplete_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:scaleX="0.8"
+        android:scaleY="0.8"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inbox_star_fake_list"
+        app:srcCompat="@drawable/ic_baseline_not_interested" />
+
+    <View
+        android:id="@+id/inbox_incomplete_fake_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="8dp"
+        android:background="@color/lightColorSecondary"
+        app:layout_constraintHeight="44dp"
+        app:layout_constraintTop_toBottomOf="@id/inbox_incomplete_icon" />
+
+    <ImageView
+        android:id="@+id/inbox_shot_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:scaleX="0.8"
+        android:scaleY="0.8"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/inbox_incomplete_fake_list"
+        app:srcCompat="@drawable/ic_baseline_photo" />
+
+    <TextView
+        android:id="@+id/inbox_shot_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/inbox_label_screenshot"
+        app:layout_constraintBottom_toBottomOf="@+id/inbox_shot_icon"
+        app:layout_constraintStart_toEndOf="@+id/inbox_shot_icon"
+        app:layout_constraintTop_toTopOf="@+id/inbox_shot_icon" />
+
+    <View
+        android:id="@+id/inbox_shot_fake_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="8dp"
+        android:background="@color/lightColorSecondary"
+        app:layout_constraintHeight="44dp"
+        app:layout_constraintTop_toBottomOf="@id/inbox_shot_icon" />
+
+    <Button
+        android:id="@+id/inbox_button_debug_create"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        android:text="Record Detail(DEBUG)"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/inbox_shot_fake_list" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

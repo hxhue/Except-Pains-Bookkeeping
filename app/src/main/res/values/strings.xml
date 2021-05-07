@@ -19,15 +19,140 @@
     <string name="edit_message" translatable="false">快来编辑我</string>
     <string name="screenshot_fgservice_title">Screenshot Service</string>
     <string name="screenshot_fgservice_content">Foreground screenshot service running right now.</string>
-    <string name="ok">okay</string>
+    <string name="ok">Okay</string>
     <string name="screenshot_failure">Screenshot Failed</string>
     <string name="screenshot_failure_description">No screenshot permission. To use this module you need to retry and confirm the permission in the next window.</string>
     <string name="open">Open</string>
-    <string name="newrec">New Record</string>
+    <string name="newrec">New</string>
     <string name="tile_service_label">Quick Record</string>
     <string name="nav_home">Home</string>
     <string name="nav_charts">Charts</string>
-    <string name="nav_others">Others</string>
+    <string name="nav_inbox">Inbox</string>
     <string name="nav_settings">Settings</string>
+
+    <!--show chart activity-->
+    <string name="show_chart_page_title">统计图</string>
+    <string name="page_title">统计图表</string>
+    <string name="search">搜索</string>
+    <string name="more">更多</string>
+    <string name="content_description_search">搜索图标描述</string>
+    <string name="content_description_more">更多图标描述</string>
+    <string name="sift">筛选</string>
+    <string name="content_description_sift">筛选图标描述</string>
+    <string name="icons">&#xe68a;</string>
+    <string name="reset">重置</string>
+    <string name="content_description_reset">重置图标描述</string>
+    <string name="account">账户</string>
+    <string name="wechat_account_chip">微信</string>
+    <string name="alipay_account_chip">支付宝</string>
+    <string name="campus_card_account_chip">校园卡</string>
+    <string name="expense_type">消费类型</string>
+    <string name="eat_type_chip">餐饮</string>
+    <string name="shopping_type_chip">购物</string>
+    <string name="transport_type_chip">交通</string>
+    <string name="entertainment_type_chip">娱乐</string>
+    <string name="book_type_chip">书籍</string>
+    <string name="clothes_type_chip">服装</string>
+    <string name="digital_type_chip">数码</string>
+    <string name="study_type_chip">学习</string>
+    <string name="daily_necessity_type_chip">日用品</string>
+    <string name="phone_bill_type_chip">话费</string>
+    <string name="makeup_type_chip">化妆</string>
+    <string name="medical_type_chip">医疗</string>
+    <string name="travel_type_chip">旅行</string>
+    <string name="water_electricity_type_chip">水电</string>
+    <string name="sport_type_chip">运动</string>
+    <string name="gift_type_chip">礼物</string>
+    <string name="red_envelope_type_chip">红包</string>
+    <string name="donate_type_chip">捐赠</string>
+    <string name="set_date_range_button">设置日期范围</string>
+    <string name="prefer_cate_qa">Quick Action</string>
+    <string name="prefer_item_brief">Brief mode</string>
+    <string name="prefer_item_shot">Take screenshot immediately</string>
+    <string name="prefer_item_shot_sum">Right after the card is popped upRight after the card is popped up</string>
+    <string name="prefer_item_qa_noti">Enable actions in notification center</string>
+    <string name="prefer_item_qa_noti_sum">Recommended when tile service works poorly</string>
+    <string name="prefer_cate_data">Data</string>
+    <string name="prefer_item_export_json">Export as JSON</string>
+    <string name="prefer_item_export_json_sum">When you want to restore data in the future</string>
+    <string name="prefer_item_export_csv">Export as CSV</string>
+    <string name="prefer_item_export_csv_sum">When you want to view data in your computer</string>
+    <string name="prefer_item_import_json">Import from JSON</string>
+    <string name="prefer_item_import_json_sum">When you have a backup from this app</string>
+    <string name="prefer_item_import_alipay">Import from CSV(Alipay)</string>
+    <string name="prefer_item_import_alipay_sum">When you have data exported from Alipay</string>
+    <string name="prefer_item_import_wechat">Import from CSV(Wechat)</string>
+    <string name="prefer_item_import_wechat_sum">When you have data exported from Wechat</string>
+    <string name="specification_title">Specifications</string>
+    <string name="specification_msg"><b>1 Quick Action</b>
+        \nQuick-Action is a small window which is supposed to be fast so it can offer you a convenient way of recording income and expenditure.
+        <font size="6">\n\n</font><b>︎︎1.1 Brief Mode</b>
+        \nDate and time will be hidden in window and set to current time. If you scarcely adjust them, turning on this feature will give you a cleaner view.
+        <font size="6">\n\n</font><b>1.2 Take Screenshot Immediately</b>
+        \nScreenshots are designed for situations where you barely have time to create a record so you want to take a screenshot and enter the details according to it later.
+            We suggest you delete those screenshots to save storage space when you complete a record.
+            If you frequently take screenshots, you can turn this feature on.
+        <font size="6">\n\n</font><b>1.3 Show Quick-Action in Notification Center</b>
+        \nQuick-Actions can be found both in quick settings as a tile button and in notification center(if you turn on this feature).
+            Due to restrictions made by Google, in those latest SDKs, a tile service can not launch an activity in 5s once you press <b>HOME</b> button.
+            This may lead to poor experience when you are really short of time.
+        \nBesides, those SDKs do not allow permanent permission for screenshots. Turning on this feature allows saving a permission as long as the application is alive.
+        <font size="12">\n\n</font><b>2 Data</b>
+        \nBacking up or restoring your data.
+        <font size="6">\n\n</font><b>2.1 Export as JSON</b>
+        \nJSON is a flexible format easy for procedures to extract data. Exporting data as JSON allows future restoring.
+        <font size="6">\n\n</font><b>2.2 Export as CSV</b>
+        \nCSV is just like a spreadsheet but in a simpler format. You can view it in your computer.
+        <font size="6">\n\n</font><b>2.3 Import from JSON</b>
+        \nFor Data restoring.
+        <font size="6">\n\n</font><b>2.4 Import from CSV(Alipay)</b>
+        \nYou should follow the instructions on Alipay official website to export your income and expenditure details as CSV.
+        Put it in storage of your phone and select it in file selecting view that popped up.
+        Then data will be imported to our database if the file is in correct format.
+        <font size="6">\n\n</font><b>2.5 Import from CSV(Wechat)</b>
+        \nSimilar to 2.4.
+        <font size="12">\n\n</font><b>3 Inbox</b>
+        <font size="6">\n\n</font><b>3.1 Star</b>
+        \nWhy should you star records sometimes?
+        Cause they are really worth their prices, like a tuxedo for a banquet or a diamond ring for your lovely fiancee?
+        That way you should just create a new tag called Worthwhile and assign it to those records.
+        \nStars are for records that may change in near future.
+        For example, if you lend a few bucks to your friend and he‘ll repay them in a couple of days,
+        you can mark the record as starred.
+        When you want to edit it days later, you can find it quickly.
+        <font size="6">\n\n</font><b>3.2 Badge</b>
+        \nThe badge on Inbox icon is used to indicate how many incomplete records you have.
+        Usually we encourage keeping a few of them because you may just don’t have time, but they are harmful to statistics.
+        When you see a badge with number on Inbox icon, you should complete the records if you have time.
+        <font size="6">\n\n</font><b>3.3 Screenshots</b>
+        \nThose records with screenshots will be listed in the inbox as well.
+    </string>
+    <string name="menu_title_inbox_notification">Notification</string>
+    <string name="inbox_label_star">Starred</string>
+    <string name="inbox_label_incomplete">Incomplete</string>
+    <string name="inbox_label_screenshot">Screenshot Included</string>
+    <string name="inbox_dialog_switch_title">Daily Timer</string>
+    <string name="detail_page_title_create">Create Item</string>
+    <string name="detail_page_title_modify">Modify Item</string>
+    <string name="menu_item_title_submit">Submit</string>
+    <string name="menu_item_title_discard">Discard</string>
+    <string name="detail_btn_select">Select</string>
+    <string name="detail_date">Date</string>
+    <string name="detail_time">Time</string>
+    <string name="detail_src">Source</string>
+    <string name="detail_type">Category</string>
+    <string name="detail_money">Money</string>
+    <string name="detail_note">Note</string>
+    <string name="detail_screenshot">Snap</string>
+    <string name="detail_screenshot_remove">Remove</string>
+    <string name="detail_screenshot_for_this_record">Screenshot for this Record</string>
+    <string name="empty_prompt">(empty)</string>
+    <string name="menu_item_title_edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="no">No</string>
+    <string name="sure">Sure</string>
+    <string name="rec_del_confirm">Are you sure about deleting this record?</string>
+    <string name="notifications">Notifications</string>
+    <string name="discard_changes">Discard Changes</string>
 
 </resources>

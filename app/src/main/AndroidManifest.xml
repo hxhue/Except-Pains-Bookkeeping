@@ -14,28 +14,30 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ExceptPains">
 
-        <activity android:name=".chart.ShowChartActivity"></activity>
-
-        <activity android:name="com.example.epledger.MainActivity">
+        <activity android:name=".chart.ShowChartActivity" />
+        <activity
+            android:name=".MainActivity"
+            android:launchMode="singleInstance"
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <service android:name="com.example.epledger.qaction.screenshot.ScreenshotService"
+        <service
+            android:name=".qaction.screenshot.ScreenshotService"
             android:enabled="true"
-            android:foregroundServiceType="mediaProjection">
-        </service>
+            android:foregroundServiceType="mediaProjection" />
 
-        <!-- 使用对话框的样式 -->
         <!-- 需要使用taskAffinity标识，标识和主应用属于不同的任务。防止被清理时影响到主应用。 -->
-        <activity android:name="com.example.epledger.qaction.PopupActivity"
-            android:theme="@style/Theme.MaterialComponents.DayNight.Dialog.Alert"
+        <activity
+            android:name=".qaction.PopupActivity"
             android:excludeFromRecents="true"
-            android:taskAffinity="com.example.ExceptPains.PopupActivity"
+            android:launchMode="singleInstance"
             android:noHistory="true"
-            android:launchMode="singleInstance">
+            android:taskAffinity="com.example.ExceptPains.PopupActivity"
+            android:theme="@style/Theme.Dialog.WithOurColors">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
@@ -48,17 +50,17 @@
             android:label="@string/tile_service_label"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE"/>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
         </service>
 
-<!--        -->
-        <service android:name=".qaction.CKForeground"
-            android:process=":background"
-            android:enabled="true">
-        </service>
+        <service
+            android:name=".qaction.CKForeground"
+            android:enabled="true"
+            android:process=":background" />
 
+        <activity android:name=".detail.deprecated.RecordDetailActivity"
+            android:windowSoftInputMode="stateAlwaysHidden"/>
     </application>
-
 
 </manifest>
