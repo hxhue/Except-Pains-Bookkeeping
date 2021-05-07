@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.media.Image
 import android.media.projection.MediaProjectionManager
@@ -17,11 +18,8 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.example.epledger.util.Store
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.OutputStream
+import com.example.epledger.qaction.tool.Store
+import java.io.*
 
 const val SCREENSHOT_REQ_CODE = 1029;
 
@@ -97,44 +95,43 @@ class ScreenshotUtils {
             identity.startActivityForResult(intent, SCREENSHOT_REQ_CODE)
         }
 
-        //-TODO: 逻辑是不对的，目前只是调试阶段使用
         /**
-         * 存储图片到私有目录。nameWithoutExt表示文件名，但不包含末尾的文件类型扩展名。
-         * **暂无法正常使用**
+         * 存储图片到私有目录。存储后返回图片的全路径。
          */
-        private fun savePrivately(ctx: Context, bmp: Bitmap, nameWithoutExt: String) {
+        fun saveToSandbox(ctx: Context, bmp: Bitmap): String {
             val cw = ContextWrapper(ctx)
             val directory: File? = cw.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-            val file = File(directory, "$nameWithoutExt.jpg")
-            if (file.exists()) {
-                Log.d("ScreenCap.ScreenCap.savePrivately", "****Found this unique file.")
-                /**
-                 * -TODO: 一些疑惑。
-                 * 可以确认文件确实存储成功了，但是没有办法方便获取和查看，也不在相册中。
-                 * 另外，如果名字已经被使用了，则应该生成一个新名字，并且返回一个新名字。
-                 * 也不太清楚这个名字是从外面传过来，还是里面随机生成完传出去。
-                 */
-                file.delete()
+
+            // Generate a unique name and bind it to a file
+            var file = File(directory, "${System.currentTimeMillis()}.jpg")
+            while (file.exists()) {
+                file = File(directory, "${System.currentTimeMillis()}.jpg")
             }
-            Log.d("path", file.toString())
-            var fos: FileOutputStream? = null
-            try {
-                fos = FileOutputStream(file)
-                /**
-                 * 约定Log的标签使用子包名.类名.方法名
-                 */
-                Log.d("ScreenCap.ScreenCap.savePrivately", "Trying to save ${file.toString()}.")
-                bmp.compress(Bitmap.CompressFormat.JPEG, 100, fos)
-                fos.flush()
-                fos.close()
-            } catch (e: IOException) {
-                e.printStackTrace()
+
+            Log.d("==> Save Screenshot", "trying to save ${file.absolutePath}")
+
+            // Establish a stream to the file and write it
+            val fos = FileOutputStream(file)
+            fos.use { f ->
+                bmp.compress(Bitmap.CompressFormat.JPEG, 100, f)
             }
+
+            Log.d("==> Save Screenshot", "${file.absolutePath} should've been saved.")
+
+            // Return file node
+            return file.absolutePath
+        }
+
+        /**
+         * 根据文件全路径名加载Bitmap图片并返回，找不到图片时引发异常。
+         */
+        fun loadBitmap(ctx: Context, path: String): Bitmap {
+            return BitmapFactory.decodeFile(path)
         }
 
         /**
          * 存储Bitmap到相册。nameWithoutExt表示文件名，但不包含末尾的文件类型扩展名。
-         * -TODO: 暂未在版本比Q更低的设备上测试。
+         * TODO: 在版本比Q更低的设备上测试。
          */
         fun saveToGallery(ctx: Context, bmp: Bitmap, nameWithoutExt: String) {
             val filename = "$nameWithoutExt.jpg"
@@ -179,7 +176,6 @@ class ScreenshotUtils {
             val rowPadding: Int = rowStride - pixelStride * width
             val bitmapImage = Bitmap.createBitmap(width + rowPadding / pixelStride, height,
                     Bitmap.Config.ARGB_8888)
-//            val bitmapImage = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
             bitmapImage.copyPixelsFromBuffer(buffer)
             return bitmapImage
         }

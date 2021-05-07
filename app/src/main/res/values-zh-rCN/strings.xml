@@ -15,10 +15,122 @@
     <string name="screenshot_failure">截图失败</string>
     <string name="screenshot_failure_description">没有获取到截图权限。要使用此功能，请重试并在接下来的窗口中选择确认。</string>
     <string name="open">打开</string>
-    <string name="newrec">新建记录</string>
+    <string name="newrec">新建</string>
     <string name="tile_service_label">快速记录</string>
     <string name="nav_home">主页</string>
     <string name="nav_charts">图表</string>
-    <string name="nav_others">其他</string>
+    <string name="nav_inbox">收件箱</string>
     <string name="nav_settings">设置</string>
+
+    <!--show chart activity-->
+    <string name="show_chart_page_title">统计图</string>
+    <string name="page_title">统计图表</string>
+    <string name="search">搜索</string>
+    <string name="more">更多</string>
+    <string name="content_description_search">搜索图标描述</string>
+    <string name="content_description_more">更多图标描述</string>
+    <string name="sift">筛选</string>
+    <string name="content_description_sift">筛选图标描述</string>
+    <string name="icons">&#xe68a;</string>
+    <string name="reset">重置</string>
+    <string name="content_description_reset">重置图标描述</string>
+    <string name="account">账户</string>
+    <string name="wechat_account_chip">微信</string>
+    <string name="alipay_account_chip">支付宝</string>
+    <string name="campus_card_account_chip">校园卡</string>
+    <string name="expense_type">消费类型</string>
+    <string name="eat_type_chip">餐饮</string>
+    <string name="shopping_type_chip">购物</string>
+    <string name="transport_type_chip">交通</string>
+    <string name="entertainment_type_chip">娱乐</string>
+    <string name="book_type_chip">书籍</string>
+    <string name="clothes_type_chip">服装</string>
+    <string name="digital_type_chip">数码</string>
+    <string name="study_type_chip">学习</string>
+    <string name="daily_necessity_type_chip">日用品</string>
+    <string name="phone_bill_type_chip">话费</string>
+    <string name="makeup_type_chip">化妆</string>
+    <string name="medical_type_chip">医疗</string>
+    <string name="travel_type_chip">旅行</string>
+    <string name="water_electricity_type_chip">水电</string>
+    <string name="sport_type_chip">运动</string>
+    <string name="gift_type_chip">礼物</string>
+    <string name="red_envelope_type_chip">红包</string>
+    <string name="donate_type_chip">捐赠</string>
+    <string name="set_date_range_button">设置日期范围</string>
+    <string name="prefer_cate_qa">快捷操作</string>
+    <string name="prefer_item_brief">简洁模式</string>
+    <string name="prefer_item_shot">立即截屏</string>
+    <string name="prefer_item_shot_sum">在卡片弹出时立即启动截屏</string>
+    <string name="prefer_item_qa_noti">在通知中心显示快捷操作</string>
+    <string name="prefer_item_qa_noti_sum">如果通过瓷砖按钮工作缓慢，建议开启此项功能</string>
+    <string name="prefer_cate_data">数据</string>
+    <string name="prefer_item_export_json">导出为JSON</string>
+    <string name="prefer_item_export_json_sum">如果您希望在未来恢复数据</string>
+    <string name="prefer_item_export_csv">导出为CSV</string>
+    <string name="prefer_item_export_csv_sum">如果您希望在电脑上浏览数据</string>
+    <string name="prefer_item_import_json">从JSON导入</string>
+    <string name="prefer_item_import_json_sum">当您已有从此应用导出的备份时</string>
+    <string name="prefer_item_import_alipay">从CSV（支付宝）导入</string>
+    <string name="prefer_item_import_alipay_sum">当您有从支付宝导出的数据时</string>
+    <string name="prefer_item_import_wechat">从CSV（微信）导入</string>
+    <string name="prefer_item_import_wechat_sum">当您有从微信导出的数据时</string>
+    <string name="specification_msg"><b>1 快捷操作</b>
+        \n快捷操作是一个能够提供便捷输入的小窗口，它能够较快地被打开。<br/>
+        <font size="4">\n\n</font><b>︎︎1.1 简洁模式</b>
+        \n日期和时间将从窗口上隐藏，并设置为当前的时间。如果您很少调整它们，打开此功能会提供一个更干净的视图。
+        <font size="4">\n\n</font><b>1.2 立即截屏</b>
+        \n截图功能被设计用于这样的场景：您没有多少时间记录，因此先截图，之后再根据截图补充相关信息。我们建议您在完成记录后就删除这些截图以节省手机存储空间。如果您经常截图，可以打开此项功能。
+        <font size="4">\n\n</font><b>1.3 在通知中心显示快捷操作</b>
+        \n快捷操作能够在快速设置中以瓷砖按钮打开，也能在通知中心出现（如果您打开此项功能）。由于谷歌的限制，在最新的那些SDK中，在按下<b>主页</b>按键的5秒内，瓷砖服务不能够启动活动。如果您时间匆忙，这会带来不佳的体验。
+        \n同时，这些SDK不允许截屏的永久授权。打开此项功能将允许应用在活动期间始终保持授权。
+        <font size="10">\n\n</font><b>2 数据</b>
+        \n备份或恢复您的数据。
+        <font size="4">\n\n</font><b>2.1 导出为JSON</b>
+        \nJSON是一种计算机程序能够很方便提取数据的灵活格式。把数据导出为JSON将允许未来的数据恢复。
+        <font size="4">\n\n</font><b>2.2 导出为CSV</b>
+        \nCSV就和电子表格一样，但格式更简单。您能够在电脑上浏览此文件。
+        <font size="4">\n\n</font><b>2.3 从JSON导入</b>
+        \n用于数据恢复。
+        <font size="4">\n\n</font><b>2.4 从CSV（支付宝）导入</b>
+        \n您应该遵循支付宝官方网站上的操作流程将您的收支导出为CSV文件。把它放在您手机的存储空间中，并在文件选择窗口弹出时选中它。数据如果格式正确，将会被导入此应用数据库中。
+        <font size="4">\n\n</font><b>2.5 从CSV（微信）导入</b>
+        \n参见2.4。
+        <font size="10">\n\n</font><b>3 收件箱</b>
+        <font size="4">\n\n</font><b>3.1 标星</b>
+        \n为什么您有时要标星一些记录呢？因为它们真的物超所值，就像为宴会买了一件燕尾服或给您可爱的未婚妻买了一枚钻石戒指？这样，其实您只需创建一个名为“物超所值”的新标签，并将其分配给这些记录。
+        \n标星是为在不久的将来可能会改变的记录准备的。例如，如果您借给您的朋友一些钱，且他会在几天内偿还，您可以标星这个记录。几天后您想编辑时就能很快找到它。
+        <font size="4">\n\n</font><b>3.2 徽章</b>
+        \n收件箱图标上的徽章用于指示您有多少未完成的记录。通常我们鼓励未完成记录，因为您可能的确没有时间，但它们对统计数据是有害的。当您在收件箱图标上看到一个带有数字的徽章时，您应该在空闲时完成记录。
+        <font size="4">\n\n</font><b>3.3 截图</b>
+        \n那些带有截图的记录也会在收件箱中列出。
+    </string>
+    <string name="specification_title" translatable="false">说明</string>
+    <string name="menu_title_inbox_notification">提醒</string>
+    <string name="inbox_label_star">标星</string>
+    <string name="inbox_label_incomplete">不完整</string>
+    <string name="inbox_label_screenshot">含有截图</string>
+    <string name="inbox_dialog_switch_title">每日提醒</string>
+    <string name="detail_page_title_create">创建条目</string>
+    <string name="detail_page_title_modify">修改条目</string>
+    <string name="menu_item_title_discard">舍弃修改</string>
+    <string name="menu_item_title_submit">提交</string>
+    <string name="detail_date">日期</string>
+    <string name="detail_btn_select">选择</string>
+    <string name="detail_time">时间</string>
+    <string name="detail_src">来源</string>
+    <string name="detail_type">种类</string>
+    <string name="detail_money">金额</string>
+    <string name="detail_note">附注</string>
+    <string name="detail_screenshot">快照</string>
+    <string name="detail_screenshot_remove">移除</string>
+    <string name="detail_screenshot_for_this_record">这个记录的截图</string>
+    <string name="empty_prompt">（空）</string>
+    <string name="menu_item_title_edit">编辑</string>
+    <string name="delete">删除</string>
+    <string name="no">不</string>
+    <string name="sure">确定</string>
+    <string name="rec_del_confirm">您确定要删除这条记录吗？</string>
+    <string name="notifications">通知</string>
+    <string name="discard_changes">丢弃修改</string>
 </resources>
