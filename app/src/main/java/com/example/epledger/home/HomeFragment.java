@@ -2,6 +2,8 @@ package com.example.epledger.home;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -27,7 +29,9 @@ public class HomeFragment extends Fragment {
             Bundle savedInstanceState
     ) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.page_home, container, false);
+        View view = inflater.inflate(R.layout.page_home, container, false);
+        setHasOptionsMenu(true);
+        return view;
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
@@ -45,5 +49,11 @@ public class HomeFragment extends Fragment {
         mRecyclerView.setAdapter(mSectionAdapter);
 
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.top_app_bar, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 }
