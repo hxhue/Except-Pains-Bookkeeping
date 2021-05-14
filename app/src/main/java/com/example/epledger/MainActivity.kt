@@ -9,11 +9,13 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.viewpager.widget.ViewPager
 import com.example.epledger.nav.MainPagerAdapter
 import com.example.epledger.nav.MainScreen
+import com.example.epledger.nav.NavigationFragment
 import com.example.epledger.nav.getMainScreenForMenuItem
 import com.example.epledger.qaction.loadQuickActionModule
 import com.example.epledger.util.loadNotificationModule
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomnavigation.LabelVisibilityMode
+
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
     private lateinit var viewPager: ViewPager
@@ -101,6 +103,16 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     override fun onDestroy() {
         super.onDestroy()
         Log.d("MainActivity", "onDestroy")
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+//        try {
+//            val cur = supportFragmentManager.fragments.last()
+//            if (cur is NavigationFragment) {
+//                cur.onBackPressed()
+//            }
+//        } catch (e: Exception) {}
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {

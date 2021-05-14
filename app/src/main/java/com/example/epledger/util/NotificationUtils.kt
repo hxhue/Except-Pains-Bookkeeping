@@ -137,17 +137,19 @@ private fun registerNotificationGroups(ctx: Context) {
     // The id of the group.
     // The user-visible name of the group.
     val notificationManager = ctx.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    notificationManager.createNotificationChannelGroup(
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+        notificationManager.createNotificationChannelGroup(
+                NotificationChannelGroup(
+                        ctx.getString(R.string.always_on_group_id),
+                        ctx.getString(R.string.always_on_group))
+        )
+        notificationManager.createNotificationChannelGroup(
             NotificationChannelGroup(
-                    ctx.getString(R.string.always_on_group_id),
-                    ctx.getString(R.string.always_on_group))
-    )
-    notificationManager.createNotificationChannelGroup(
-            NotificationChannelGroup(
-                    ctx.getString(R.string.alert_group_id),
-                    ctx.getString(R.string.alert_group)
+                ctx.getString(R.string.alert_group_id),
+                ctx.getString(R.string.alert_group)
             )
-    )
+        )
+    }
 }
 
 /**

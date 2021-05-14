@@ -142,7 +142,7 @@ class RecordDetailFragmentD: Fragment(), AdapterView.OnItemSelectedListener,
         // 设置日期选择按钮回调
         val dateButton = view.findViewById<Button>(R.id.detail_date_button)
         dateButton.setOnClickListener {
-            val dialog = DatePickerDialog(requireContext(), R.style.Theme_DatePicker_NoWhiteExtraSpace)
+            val dialog = DatePickerDialog(requireContext())
             dialog.setOnDateSetListener { _, year, month, dayOfMonth ->
                 this.setDate(view, year, month, dayOfMonth)
             }
@@ -161,14 +161,14 @@ class RecordDetailFragmentD: Fragment(), AdapterView.OnItemSelectedListener,
         // 设置时间选择按钮回调
         val timeButton = view.findViewById<Button>(R.id.detail_time_button)
         timeButton.setOnClickListener {
-            val dialog = TimePickerDialog(requireContext(), R.style.Theme_TimePicker, { _, hour, minute ->
+            val dialog = TimePickerDialog(requireContext(), { _, hour, minute ->
                 setTime(view, hour, minute)
             }, h, m, true)
-            dialog.setOnShowListener {
-                val color = requireContext().getColor(R.color.lightColorSecondary)
-                dialog.getButton(TimePickerDialog.BUTTON_POSITIVE).setTextColor(color)
-                dialog.getButton(TimePickerDialog.BUTTON_NEGATIVE).setTextColor(color)
-            }
+//            dialog.setOnShowListener {
+//                val color = requireContext().getColor(R.color.lightColorSecondary)
+//                dialog.getButton(TimePickerDialog.BUTTON_POSITIVE).setTextColor(color)
+//                dialog.getButton(TimePickerDialog.BUTTON_NEGATIVE).setTextColor(color)
+//            }
             dialog.show()
         }
 

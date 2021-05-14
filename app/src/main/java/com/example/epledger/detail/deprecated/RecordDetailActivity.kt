@@ -7,10 +7,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.epledger.R
 import com.example.epledger.detail.DetailRecord
-import com.example.epledger.qaction.screenshot.ScreenshotUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import java.lang.Exception
-import java.lang.RuntimeException
 
 class RecordDetailActivity : AppCompatActivity() {
     /**
@@ -79,22 +76,22 @@ class RecordDetailActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             android.R.id.home -> finish()
-            R.id.menu_item_detail_submit -> {
+            R.id.menu_item_submit -> {
                 Toast.makeText(this, "Submit", Toast.LENGTH_SHORT).show()
                 // TODO
             }
-            R.id.menu_item_detail_discard -> {
+            R.id.menu_item_discard -> {
                 Toast.makeText(this, "Discard", Toast.LENGTH_SHORT).show()
                 recordBeingEdited = false
                 // 复原做出的修改
                 recordCopy.copyTo(bindingRecord)
                 applyChanges()
             }
-            R.id.menu_item_detail_edit -> {
+            R.id.menu_item_edit -> {
                 recordBeingEdited = true
                 applyChanges()
             }
-            R.id.menu_item_detail_delete -> {
+            R.id.menu_item_delete -> {
                 val dialog = MaterialAlertDialogBuilder(this)
                         .setMessage(getString(R.string.rec_del_confirm))
                         .setPositiveButton(getString(R.string.sure)) { _, _ ->

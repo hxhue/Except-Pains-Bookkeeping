@@ -27,4 +27,5 @@
     <color name="starBgTint">@color/disable_star</color>
     <color name="lighterOrange">#e1bf76</color>
     <color name="darkerOrange">#FF8600</color>
+    <color name="title_black">#060001</color>
 </resources>

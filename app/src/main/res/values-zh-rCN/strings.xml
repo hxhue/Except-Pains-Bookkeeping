@@ -60,10 +60,10 @@
     <string name="set_date_range_button">设置日期范围</string>
     <string name="prefer_cate_qa">快捷操作</string>
     <string name="prefer_item_brief">简洁模式</string>
-    <string name="prefer_item_shot">立即截屏</string>
-    <string name="prefer_item_shot_sum">在卡片弹出时立即启动截屏</string>
-    <string name="prefer_item_qa_noti">在通知中心显示快捷操作</string>
-    <string name="prefer_item_qa_noti_sum">如果通过瓷砖按钮工作缓慢，建议开启此项功能</string>
+    <string name="prefer_item_shot">启动时立即截屏</string>
+    <string name="prefer_item_shot_sum">在卡片弹出时立即截屏</string>
+    <string name="prefer_item_qa_noti">在通知中心显示</string>
+    <string name="prefer_item_qa_noti_sum">推荐开启</string>
     <string name="prefer_cate_data">数据</string>
     <string name="prefer_item_export_json">导出为JSON</string>
     <string name="prefer_item_export_json_sum">如果您希望在未来恢复数据</string>
@@ -76,34 +76,34 @@
     <string name="prefer_item_import_wechat">从CSV（微信）导入</string>
     <string name="prefer_item_import_wechat_sum">当您有从微信导出的数据时</string>
     <string name="specification_msg"><b>1 快捷操作</b>
-        \n快捷操作是一个能够提供便捷输入的小窗口，它能够较快地被打开。<br/>
-        <font size="4">\n\n</font><b>︎︎1.1 简洁模式</b>
-        \n日期和时间将从窗口上隐藏，并设置为当前的时间。如果您很少调整它们，打开此功能会提供一个更干净的视图。
-        <font size="4">\n\n</font><b>1.2 立即截屏</b>
-        \n截图功能被设计用于这样的场景：您没有多少时间记录，因此先截图，之后再根据截图补充相关信息。我们建议您在完成记录后就删除这些截图以节省手机存储空间。如果您经常截图，可以打开此项功能。
-        <font size="4">\n\n</font><b>1.3 在通知中心显示快捷操作</b>
-        \n快捷操作能够在快速设置中以瓷砖按钮打开，也能在通知中心出现（如果您打开此项功能）。由于谷歌的限制，在最新的那些SDK中，在按下<b>主页</b>按键的5秒内，瓷砖服务不能够启动活动。如果您时间匆忙，这会带来不佳的体验。
+        <font size="4">\n\n</font>快捷操作是一个能够提供便捷输入的小窗口，它能够较快地被打开。<br/>
+        <font size="6">\n\n</font><b>︎︎1.1 简洁模式</b>
+        <font size="4">\n\n</font>日期和时间将从窗口上隐藏，并设置为当前的时间。如果您很少调整它们，打开此功能会提供一个更干净的视图。
+        <font size="6">\n\n</font><b>1.2 立即截屏</b>
+        <font size="4">\n\n</font>截图功能被设计用于这样的场景：您没有多少时间记录，因此先截图，之后再根据截图补充相关信息。我们建议您在完成记录后就删除这些截图以节省手机存储空间。如果您经常截图，可以打开此项功能。
+        <font size="6">\n\n</font><b>1.3 在通知中心显示快捷操作</b>
+        <font size="4">\n\n</font>快捷操作能够在快速设置中以瓷砖按钮打开，也能在通知中心出现（如果您打开此项功能）。由于谷歌的限制，在最新的那些SDK中，在按下<b>主页</b>按键的5秒内，瓷砖服务不能够启动活动。如果您时间匆忙，这会带来不佳的体验。
         \n同时，这些SDK不允许截屏的永久授权。打开此项功能将允许应用在活动期间始终保持授权。
-        <font size="10">\n\n</font><b>2 数据</b>
-        \n备份或恢复您的数据。
-        <font size="4">\n\n</font><b>2.1 导出为JSON</b>
-        \nJSON是一种计算机程序能够很方便提取数据的灵活格式。把数据导出为JSON将允许未来的数据恢复。
-        <font size="4">\n\n</font><b>2.2 导出为CSV</b>
-        \nCSV就和电子表格一样，但格式更简单。您能够在电脑上浏览此文件。
-        <font size="4">\n\n</font><b>2.3 从JSON导入</b>
-        \n用于数据恢复。
-        <font size="4">\n\n</font><b>2.4 从CSV（支付宝）导入</b>
-        \n您应该遵循支付宝官方网站上的操作流程将您的收支导出为CSV文件。把它放在您手机的存储空间中，并在文件选择窗口弹出时选中它。数据如果格式正确，将会被导入此应用数据库中。
-        <font size="4">\n\n</font><b>2.5 从CSV（微信）导入</b>
-        \n参见2.4。
-        <font size="10">\n\n</font><b>3 收件箱</b>
-        <font size="4">\n\n</font><b>3.1 标星</b>
-        \n为什么您有时要标星一些记录呢？因为它们真的物超所值，就像为宴会买了一件燕尾服或给您可爱的未婚妻买了一枚钻石戒指？这样，其实您只需创建一个名为“物超所值”的新标签，并将其分配给这些记录。
+        <font size="12">\n\n</font><b>2 数据</b>
+        <font size="4">\n\n</font>备份或恢复您的数据。
+        <font size="6">\n\n</font><b>2.1 导出为JSON</b>
+        <font size="4">\n\n</font>JSON是一种计算机程序能够很方便提取数据的灵活格式。把数据导出为JSON将允许未来的数据恢复。
+        <font size="6">\n\n</font><b>2.2 导出为CSV</b>
+        <font size="4">\n\n</font>CSV就和电子表格一样，但格式更简单。您能够在电脑上浏览此文件。
+        <font size="6">\n\n</font><b>2.3 从JSON导入</b>
+        <font size="4">\n\n</font>用于数据恢复。
+        <font size="6">\n\n</font><b>2.4 从CSV（支付宝）导入</b>
+        <font size="4">\n\n</font>您应该遵循支付宝官方网站上的操作流程将您的收支导出为CSV文件。把它放在您手机的存储空间中，并在文件选择窗口弹出时选中它。数据如果格式正确，将会被导入此应用数据库中。
+        <font size="6">\n\n</font><b>2.5 从CSV（微信）导入</b>
+        <font size="4">\n\n</font>参见2.4。
+        <font size="12">\n\n</font><b>3 收件箱</b>
+        <font size="6">\n\n</font><b>3.1 标星</b>
+        <font size="4">\n\n</font>为什么您有时要标星一些记录呢？因为它们真的物超所值，就像为宴会买了一件燕尾服或给您可爱的未婚妻买了一枚钻石戒指？这样，其实您只需创建一个名为“物超所值”的新标签，并将其分配给这些记录。
         \n标星是为在不久的将来可能会改变的记录准备的。例如，如果您借给您的朋友一些钱，且他会在几天内偿还，您可以标星这个记录。几天后您想编辑时就能很快找到它。
-        <font size="4">\n\n</font><b>3.2 徽章</b>
-        \n收件箱图标上的徽章用于指示您有多少未完成的记录。通常我们鼓励未完成记录，因为您可能的确没有时间，但它们对统计数据是有害的。当您在收件箱图标上看到一个带有数字的徽章时，您应该在空闲时完成记录。
-        <font size="4">\n\n</font><b>3.3 截图</b>
-        \n那些带有截图的记录也会在收件箱中列出。
+        <font size="6">\n\n</font><b>3.2 徽章</b>
+        <font size="4">\n\n</font>收件箱图标上的徽章用于指示您有多少未完成的记录。通常我们鼓励未完成记录，因为您可能的确没有时间，但它们对统计数据是有害的。当您在收件箱图标上看到一个带有数字的徽章时，您应该在空闲时完成记录。
+        <font size="6">\n\n</font><b>3.3 截图</b>
+        <font size="4">\n\n</font>那些带有截图的记录也会在收件箱中列出。
     </string>
     <string name="specification_title" translatable="false">说明</string>
     <string name="menu_title_inbox_notification">提醒</string>
@@ -133,4 +133,43 @@
     <string name="rec_del_confirm">您确定要删除这条记录吗？</string>
     <string name="notifications">通知</string>
     <string name="discard_changes">丢弃修改</string>
+    <string name="unit_day">天</string>
+    <string name="unit_month">月</string>
+    <string name="unit_year">年</string>
+    <string name="event_info_fmt">开始于%s，周期为%d%s.</string>
+    <string name="unconditionally_remind">无条件提醒</string>
+    <string name="unconditionally_remind_sum">即便没有到期的重复事件</string>
+    <string name="alert">提醒</string>
+    <string name="recurring_events">重复事件</string>
+    <string name="stop_ck_prompt">正在停止前台服务</string>
+    <string name="content_description_add_event_to_list">向列表中添加新事件</string>
+    <string name="no_events_prompt">您还没有添加事件。</string>
+    <string name="alert_time">提醒时间</string>
+    <string name="noti_time_sum_fmt">当前为 %s (24小时制)</string>
+    <string name="have_not_set_time_prompt">您还没有设定时间。</string>
+    <string name="event_del_comfirm">您确定要删除这个事件吗？</string>
+    <string name="create_event">创建事件</string>
+    <string name="modify_event">修改事件</string>
+    <string name="starts_on">开始于</string>
+    <string name="cycle">周期</string>
+    <string name="name">名称</string>
+    <string name="set">设定</string>
+    <string name="template">模板</string>
+    <string name="icon">图标</string>
+    <string name="del_event_confirmation">您确定要删除这个事件吗？</string>
+    <string name="management">管理</string>
+    <string name="manage_categories">管理种类</string>
+    <string name="manage_sources">管理来源</string>
+    <string name="no_info_prompt"><i>（没有提供备注。）</i></string>
+    <string name="sources">来源</string>
+    <string name="modify_name">修改名称</string>
+    <string name="new_source">新建来源</string>
+    <string name="del_item_confirm">您确定要删除该项吗？</string>
+    <string name="categories">种类</string>
+    <string name="modify_category">修改种类</string>
+    <string name="changes_not_saved">修改未保存</string>
+    <string name="category_not_saved_prompt">提交的名称为空或已经是现有种类的名称。您需要重新考虑一个名称。</string>
+    <string name="category_number_too_large_prompt">您的种类太多了，我们强烈建议您只保留一部分种类。</string>
+    <string name="unspecified"><i>（未指定）</i></string>
+    <string name="new_category">新建种类</string>
 </resources>

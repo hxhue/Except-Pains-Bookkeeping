@@ -63,7 +63,7 @@ class CKForeground: Service() {
 
         // 有结束请求时提前中止
         if (STOP_FOREGROUND == intent.action) {
-            Log.d(CLASS_NAME, "Stop action received. Bye.")
+            Log.d(CLASS_NAME, "Stop action received.")
             stopForeground(true)
             stopSelfResult(startId);
             return super.onStartCommand(intent, flags, startId)

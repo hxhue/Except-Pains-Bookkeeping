@@ -13,12 +13,14 @@ import android.view.View
 import android.view.Window
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
 import com.example.epledger.R
 import com.example.epledger.detail.DetailRecord
+import com.example.epledger.model.GlobalDBViewModel
 import com.example.epledger.qaction.tool.PairTask
 import com.example.epledger.qaction.tool.Store
 import com.example.epledger.qaction.screenshot.ScreenshotUtils
@@ -35,6 +37,8 @@ import java.util.*
  * or quick actions in the notification center.
  */
 class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnItemSelectedListener {
+    private val cardViewModel: CardViewModel by viewModels()
+
     private var waitingEvent: Int = -1
     private lateinit var handler: Handler
     private var shown = false
@@ -46,8 +50,10 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
     private var screenshotAtStart = false
 
     // For spinners
-    private val sources: Array<String> =  arrayOf("Unspecified", "Alipay", "Wechat", "Cash")
-    private val types: Array<String> = arrayOf("Unspecified", "Daily", "Transportation", "Study")
+    private lateinit var sources: ArrayList<String>
+    private lateinit var types: ArrayList<String>
+    private lateinit var sourcesSpinnerAdapter: ArrayAdapter<String>
+    private lateinit var typesSpinnerAdapter: ArrayAdapter<String>
 
     // References of widgets(to fetch user inputs)
     private lateinit var screenshotSwitch: SwitchMaterial // Screenshot switch
@@ -70,6 +76,25 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         // 根据用户偏好决定是否截屏
         if (screenshotAtStart) {
             performScreenshot()
+        }
+
+        // 注册observers
+        registerObservers()
+    }
+
+    private fun registerObservers() {
+        cardViewModel.categories.observeForever {
+            types.clear()
+            types.add(getString(R.string.unspecified))
+            types.addAll(it.map { category -> category.name })
+            typesSpinnerAdapter.notifyDataSetChanged()
+        }
+
+        cardViewModel.sources.observeForever {
+            sources.clear()
+            sources.add(getString(R.string.unspecified))
+            sources.addAll(it.map { source -> source.name })
+            sourcesSpinnerAdapter.notifyDataSetChanged()
         }
     }
 
@@ -225,15 +250,23 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
     }
 
     private fun setupSpinners() {
+        // Late init here
+        val unspecifiedString = getString(R.string.unspecified)
+        sources = arrayListOf(unspecifiedString)
+        types = arrayListOf(unspecifiedString)
+        sourcesSpinnerAdapter = ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_dropdown_item, sources)
+        typesSpinnerAdapter = ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_dropdown_item, types)
+
         // Set up sourceSpinner
         val sourceSpinner = findViewById<Spinner>(R.id.qa_src_spinner)
-        sourceSpinner.adapter = ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_dropdown_item, sources)
+        sourceSpinner.adapter = sourcesSpinnerAdapter
         sourceSpinner.onItemSelectedListener = this
+
         // Set up typeSpinner
         val typeSpinner = findViewById<Spinner>(R.id.qa_type_spinner)
-        typeSpinner.adapter = ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_dropdown_item, types)
+        typeSpinner.adapter = typesSpinnerAdapter
         typeSpinner.onItemSelectedListener = this
     }
 
@@ -343,11 +376,11 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
             timeText.setText(str)
         }, hour, minute, true)
 
-        dialog.setOnShowListener {
-            val color = getColor(R.color.lightColorSecondary)
-            dialog.getButton(TimePickerDialog.BUTTON_POSITIVE).setTextColor(color)
-            dialog.getButton(TimePickerDialog.BUTTON_NEGATIVE).setTextColor(color)
-        }
+//        dialog.setOnShowListener {
+//            val color = getColor(R.color.lightColorSecondary)
+//            dialog.getButton(TimePickerDialog.BUTTON_POSITIVE).setTextColor(color)
+//            dialog.getButton(TimePickerDialog.BUTTON_NEGATIVE).setTextColor(color)
+//        }
 
         timePickerButton.setOnClickListener {
             dialog.show()
@@ -367,7 +400,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         dateText.setText(simpleFormat.format(dateOfNow))
 
         // 添加按钮回调
-        val dialog = DatePickerDialog(this, R.style.Theme_DatePicker_NoWhiteExtraSpace)
+        val dialog = DatePickerDialog(this)
         dialog.setOnDateSetListener { view, year, month, dayOfMonth ->
             val cal = Calendar.getInstance()
             cal.set(year, month, dayOfMonth)
@@ -445,4 +478,5 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
     private fun discardFields() {
         ledgerRecord.screenshot = null
     }
+
 }

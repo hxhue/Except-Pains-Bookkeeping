@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory android:title="@string/alert">
+
+    <!-- 整数，0-1439用来表示当天的分钟数；负数表示取消设置 -->
+        <Preference android:key="noti_time"
+            android:title="@string/alert_time"
+            android:icon="@drawable/ic_baseline_alarm"
+            android:summary="@string/noti_time_sum_fmt"
+            />
+
+        <SwitchPreferenceCompat android:title="@string/unconditionally_remind"
+            android:summary="@string/unconditionally_remind_sum"
+            android:key="noti_daily_alert"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/recurring_events">
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
                 android:text="@string/act_popup_newrec_title"
-                android:textColor="#E6000000"
+                android:textColor="@color/title_black"
                 android:textSize="20sp"
                 app:layout_constraintBottom_toBottomOf="@id/qa_title_compo"
                 app:layout_constraintStart_toStartOf="@id/qa_title_compo" />
@@ -233,7 +233,6 @@
                 android:layout_width="110dp"
                 android:layout_height="40dp"
                 android:layout_marginStart="@dimen/popup_widgets_padding"
-                android:gravity="center"
                 android:layout_marginTop="12dp"
                 android:id="@+id/qa_money_text"
                 android:ems="10"

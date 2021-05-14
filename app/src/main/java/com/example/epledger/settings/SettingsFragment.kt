@@ -14,6 +14,8 @@ import androidx.preference.PreferenceFragmentCompat
 import com.example.epledger.R
 import com.example.epledger.nav.NavigationFragment
 import com.example.epledger.qaction.loadQuickActionModule
+import com.example.epledger.settings.datamgr.CategoryManagerFragment
+import com.example.epledger.settings.datamgr.SourceManagerFragment
 
 
 class SettingsFragment: PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
@@ -22,10 +24,54 @@ class SettingsFragment: PreferenceFragmentCompat(), SharedPreferences.OnSharedPr
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences, rootKey)
         setHasOptionsMenu(true)
+        setUpOnClickListeners()
+    }
 
+    private fun setUpOnClickListeners() {
+        // Management
+        val sourceManagement = preferenceScreen.findPreference<Preference>("manage_sources")
+        sourceManagement?.setOnPreferenceClickListener {
+            val newFragment = SourceManagerFragment()
+            NavigationFragment.pushToStack(this.requireActivity().supportFragmentManager, newFragment)
+            true
+        }
+
+        val categoryManagement = preferenceScreen.findPreference<Preference>("manage_tags")
+        categoryManagement?.setOnPreferenceClickListener {
+            val newFragment = CategoryManagerFragment()
+            NavigationFragment.pushToStack(this.requireActivity().supportFragmentManager, newFragment)
+            true
+        }
+
+        // Data
         val eJSON = preferenceScreen.findPreference<Preference>("data_export_json")
         eJSON?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-            Toast.makeText(requireContext(), "clicked", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "data_export_json", Toast.LENGTH_SHORT).show()
+            true
+        }
+
+        val eCSV = preferenceScreen.findPreference<Preference>("data_export_csv")
+        eCSV?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            Toast.makeText(requireContext(), "data_export_csv", Toast.LENGTH_SHORT).show()
+            true
+        }
+
+        val iJSON = preferenceScreen.findPreference<Preference>("data_import_json")
+        iJSON?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            Toast.makeText(requireContext(), "data_import_json", Toast.LENGTH_SHORT).show()
+            true
+        }
+
+
+        val iAlipay = preferenceScreen.findPreference<Preference>("data_import_alipay")
+        iAlipay?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            Toast.makeText(requireContext(), "data_import_alipay", Toast.LENGTH_SHORT).show()
+            true
+        }
+
+        val iWechat = preferenceScreen.findPreference<Preference>("data_import_wechat")
+        iWechat?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            Toast.makeText(requireContext(), "data_import_wechat", Toast.LENGTH_SHORT).show()
             true
         }
     }
@@ -40,7 +86,7 @@ class SettingsFragment: PreferenceFragmentCompat(), SharedPreferences.OnSharedPr
             R.id.menu_item_settings_question -> {
                 // 显示说明页面
                 val newFragment = SpecificationFragment()
-                NavigationFragment.pushToStack(activity as AppCompatActivity, newFragment)
+                NavigationFragment.pushToStack(requireActivity().supportFragmentManager, newFragment, true)
                 return true
             }
         }
@@ -78,7 +124,7 @@ class SettingsFragment: PreferenceFragmentCompat(), SharedPreferences.OnSharedPr
             // If the preference is changed to false
             if (!sharedPreferences.getBoolean("qa_notification", true)) {
                 Toast.makeText(
-                        context, "Stopping foreground service. Please be patient.",
+                        context, getString(R.string.stop_ck_prompt),
                         Toast.LENGTH_SHORT
                 ).show()
             }
