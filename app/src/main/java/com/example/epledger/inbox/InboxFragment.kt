@@ -3,16 +3,21 @@ package com.example.epledger.inbox
 import android.os.Bundle
 import android.view.*
 import android.widget.Button
-import android.widget.TextView
 import android.widget.TimePicker
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.example.epledger.MainActivity
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.epledger.R
-import com.example.epledger.nav.NavigationFragment
-import com.example.epledger.detail.RecordDetailFragment
 import com.example.epledger.detail.DetailRecord
+import com.example.epledger.detail.RecordDetailFragment
+import com.example.epledger.model.SectionLab
+import com.example.epledger.nav.NavigationFragment
 import com.example.epledger.qaction.screenshot.ScreenshotUtils
+import com.xwray.groupie.ExpandableGroup
+import com.xwray.groupie.GroupieAdapter
+import com.xwray.groupie.Section
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -20,36 +25,36 @@ import kotlinx.coroutines.withContext
 import java.util.*
 
 class InboxFragment : Fragment() {
-    var numOfStarredItems = 0
-        set(value) {
-            view?.let {
-                val starLabel = it.findViewById<TextView>(R.id.inbox_star_label)
-                starLabel.text = String.format("%s (%d)", getString(R.string.inbox_label_star), value)
-            }
-            field = value
-        }
-
-    var numOfIncompleteItems = 0
-        set(value) {
-            // 数量标识
-            view?.let {
-                val starLabel = it.findViewById<TextView>(R.id.inbox_incomplete_label)
-                starLabel.text = String.format("%s (%d)", getString(R.string.inbox_label_incomplete), value)
-            }
-            field = value
-            // 更新徽章
-            val mainActivity = this.activity as MainActivity
-            mainActivity.setInboxBadge(value)
-        }
-
-    var numOfScreenshotItems = 0
-        set(value) {
-            view?.let {
-                val starLabel = it.findViewById<TextView>(R.id.inbox_shot_label)
-                starLabel.text = String.format("%s (%d)", getString(R.string.inbox_label_screenshot), value)
-            }
-            field = value
-        }
+//    var numOfStarredItems = 0
+//        set(value) {
+//            view?.let {
+//                val starLabel = it.findViewById<TextView>(R.id.inbox_star_label)
+//                starLabel.text = String.format("%s (%d)", getString(R.string.inbox_label_star), value)
+//            }
+//            field = value
+//        }
+//
+//    var numOfIncompleteItems = 0
+//        set(value) {
+//            // 数量标识
+//            view?.let {
+//                val starLabel = it.findViewById<TextView>(R.id.inbox_incomplete_label)
+//                starLabel.text = String.format("%s (%d)", getString(R.string.inbox_label_incomplete), value)
+//            }
+//            field = value
+//            // 更新徽章
+//            val mainActivity = this.activity as MainActivity
+//            mainActivity.setInboxBadge(value)
+//        }
+//
+//    var numOfScreenshotItems = 0
+//        set(value) {
+//            view?.let {
+//                val starLabel = it.findViewById<TextView>(R.id.inbox_shot_label)
+//                starLabel.text = String.format("%s (%d)", getString(R.string.inbox_label_screenshot), value)
+//            }
+//            field = value
+//        }
 
     // 缓存的待提交的提醒时间
     var cachedMinuteOfHour = 0
@@ -87,6 +92,31 @@ class InboxFragment : Fragment() {
         }
 
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val sectionLab = SectionLab.get(context)
+        val sections = sectionLab.sections
+
+        val recyclerView = view.findViewById<RecyclerView>(R.id.inbox_recycler_view)
+        recyclerView.layoutManager = LinearLayoutManager(view.context)
+        recyclerView.itemAnimator = DefaultItemAnimator()
+
+        val adapter = GroupieAdapter()
+
+        // TODO: delete this
+        for (i in 0 until sections.size) {
+            val header = InboxExpandableHeaderItem("Starred")
+            val group = ExpandableGroup(header, true)
+            val entryList = sections[i].entryList
+            for (j in 0 until entryList.size) {
+                group.add(InboxEntryItem(entryList[j]))
+            }
+            adapter.add(group)
+        }
+
+        recyclerView.adapter = adapter
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -148,9 +178,9 @@ class InboxFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         // TODO: Remove this debug code
-        numOfStarredItems = 1
-        numOfIncompleteItems = 13
-        numOfScreenshotItems = 7
+//        numOfStarredItems = 1
+//        numOfIncompleteItems = 13
+//        numOfScreenshotItems = 7
         // TODO: Remove this debug code
         // TODO: 实际上在刚加载好数据库时这个已经需要加载，否则会有延迟感
     }
