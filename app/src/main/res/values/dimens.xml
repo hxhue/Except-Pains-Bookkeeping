@@ -5,4 +5,5 @@
     <dimen name="detail_second_left_padding">106dp</dimen>
     <dimen name="detail_spinner_left_padding">100dp</dimen>
     <dimen name="detail_label_vertical_space">28dp</dimen>
+    <dimen name="icon_recycler_view_space">8dp</dimen>
 </resources>

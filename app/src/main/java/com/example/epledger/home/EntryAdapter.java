@@ -1,6 +1,7 @@
 package com.example.epledger.home;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,8 @@ import com.example.epledger.R;
 import com.example.epledger.model.Entry;
 
 import java.util.List;
+
+import kotlin.random.Random;
 
 public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> {
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -38,7 +41,17 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
 
         public void bind(Entry entry) {
             mEntry = entry;
-            
+
+            // Get a context
+            Context ctx = itemView.getContext();
+            // Set image (**Testing**)
+            if (Random.Default.nextInt() % 3 == 0)
+                labelImage.setImageDrawable(ContextCompat.getDrawable(ctx, R.drawable.u_sports_basketball));
+            else if (Random.Default.nextInt() % 3 == 1)
+                labelImage.setImageDrawable(ContextCompat.getDrawable(ctx, R.drawable.ic_fas_car));
+            else
+                labelImage.setImageDrawable(null);
+
             labelText.setText(mEntry.getLabel());
             if (mEntry.getAmount() >= 0) {
                 amountText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.amount_income_color));
@@ -47,7 +60,16 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
                 amountText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.amount_expand_color));
                 amountText.setText("-￥" + String.format("%.2f", Math.abs(mEntry.getAmount())));
             }
-            infoText.setText(mEntry.getInfo());
+
+            // Set info
+            final String infoStr = null;
+            // Check if it's empty
+            if (infoStr != null && !infoStr.trim().isEmpty()) {
+                infoText.setText(mEntry.getInfo());
+            } else {
+                infoText.setText(R.string.no_info_prompt);
+            }
+
             sourceText.setText(mEntry.getSource());
         }
     }
@@ -73,7 +95,7 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         Entry entry = mEntryList.get(position);
         holder.bind(entry);
 

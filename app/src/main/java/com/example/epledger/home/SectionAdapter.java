@@ -41,7 +41,7 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ViewHold
             ft = new SimpleDateFormat ("yyyy-MM-dd");
         }
 
-        public void bind(Date date, List<Entry> entryList, int sectionPosition) {
+        public void bind(Date date, List<Entry> entryList, final int sectionPosition) {
             textDate.setText(ft.format(date));
 
             EntryAdapter entryAdapter = new EntryAdapter(entryList);

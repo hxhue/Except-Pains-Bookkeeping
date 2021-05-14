@@ -11,7 +11,9 @@ import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.fragment.app.activityViewModels
 import com.example.epledger.R
+import com.example.epledger.model.GlobalDBViewModel
 import com.example.epledger.nav.NavigationFragment
 import com.example.epledger.qaction.screenshot.ScreenshotUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -22,24 +24,42 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
+import java.lang.RuntimeException
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
-
+/**
+ * A fragment to input all information of an expenditure or income record in database.
+ * To use this fragment, you need:
+ * 1. Get a DetailRecord instance. You may fetch a record in **IO thread**
+ *    and transform it into DetailRecord.
+ * 2. Create this fragment in **Main thread** (All follow steps are suggested performing
+ *    in the Main thread.)
+ * 3. Call bindRecord()
+ * 4. Call setDetailRecordMsgReceiver() to set a listener.
+ * 5. Call NavigationFragment.pushToStack(activity.supportFragmentManager, newFragment)
+ */
 class RecordDetailFragment:
     NavigationFragment(), AdapterView.OnItemSelectedListener {
+    private val dbModel: GlobalDBViewModel by activityViewModels()
+
     companion object {
         // 没有被注明的来源或种类始终放在0号位
         const val UNSPECIFIED_ITEM_POSITION = 0
     }
 
     // 创建一个空记录
-    var bindingRecord: DetailRecord? = null
+    private var bindingRecord: DetailRecord? = null
 
     /**
      * 当前的记录是否正在被修改。
      */
-    var editing = false
+    private var editing = false
+
+    fun isEditing(): Boolean {
+        return editing
+    }
 
     /**
      * 保存的记录副本，用来恢复。
@@ -55,9 +75,29 @@ class RecordDetailFragment:
         bindingRecord = record
     }
 
+    fun getBindingRecord(): DetailRecord {
+        if (bindingRecord == null) {
+            throw RuntimeException("Record is not bound yet. You can't get a record out of null.")
+        }
+        return bindingRecord!!
+    }
+
     // 种类和来源属性需要绑定在滚轮上面
-    private val sources: Array<String> =  arrayOf("Unspecified", "Alipay", "Wechat", "Cash")
-    private val categories: Array<String> = arrayOf("Unspecified", "Daily", "Transportation", "Study")
+    private lateinit var sources: ArrayList<String>
+    private lateinit var categories: ArrayList<String>
+    private lateinit var sourceSpinnerAdapter: ArrayAdapter<String>
+    private lateinit var categorySpinnerAdapter: ArrayAdapter<String>
+
+    interface DetailRecordMsgReceiver {
+        fun onDetailRecordSubmitted(record: DetailRecord)
+        fun onDetailRecordSDeleted(record: DetailRecord)
+    }
+
+    private var receiver: DetailRecordMsgReceiver? = null
+
+    fun setDetailRecordMsgReceiver(rv: DetailRecordMsgReceiver?) {
+        this.receiver = rv
+    }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         require(parent != null)
@@ -83,26 +123,56 @@ class RecordDetailFragment:
         return view
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        // Add observers
+        dbModel.categories.observe(viewLifecycleOwner, {
+            categories.clear()
+            categories.add(getString(R.string.unspecified))
+            categories.addAll(it.map { category -> category.name })
+            categorySpinnerAdapter.notifyDataSetChanged()
+        })
 
+        dbModel.sources.observe(viewLifecycleOwner, {
+            sources.clear()
+            sources.add(getString(R.string.unspecified))
+            sources.addAll(it.map { src -> src.name })
+            sourceSpinnerAdapter.notifyDataSetChanged()
+        })
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        // Late Initialization for spinner data
+        val initialString = getString(R.string.unspecified)
+        sources = arrayListOf(initialString)
+        categories = arrayListOf(initialString)
+        categorySpinnerAdapter = ArrayAdapter<String>(requireContext(),
+                android.R.layout.simple_spinner_dropdown_item, categories)
+        sourceSpinnerAdapter = ArrayAdapter<String>(requireContext(),
+                android.R.layout.simple_spinner_dropdown_item, sources)
+    }
+
+    override fun onResume() {
         val bindingRecord = bindingRecord!!
         val view = requireView()
 
         // 设置标题
         val newTitle =  if (bindingRecord.ID == null) requireContext().getString(R.string.detail_page_title_create)
                         else requireContext().getString(R.string.detail_page_title_modify)
-        setNavigation(view, newTitle, view.detail_note_text, view.detail_money_text)
+        setNavigation(view, newTitle)
 
         // 设置页面内容
         setUpDetailView(view)
         syncViewWithRecord(view)
+        super.onResume()
     }
 
     /**
      * 从活动中取得信息。用来布局等。只能够用在界面完成初始化之后。
      */
-    fun syncViewWithRecord(view: View) {
+    private fun syncViewWithRecord(view: View) {
         val bindingRecord = bindingRecord!!
 
         // 更新截图组件显示，由于在更新按钮时要用到这个状态，因此要先更新这里
@@ -170,7 +240,7 @@ class RecordDetailFragment:
         if (bindingRecord.type == null) {
             categorySpinner.setSelection(UNSPECIFIED_ITEM_POSITION)
         } else {
-            val index = sources.indexOf(bindingRecord.type!!)
+            val index = categories.indexOf(bindingRecord.type!!)
             if (index < 0) {
                 categorySpinner.setSelection(UNSPECIFIED_ITEM_POSITION)
             } else {
@@ -188,7 +258,7 @@ class RecordDetailFragment:
         // 设置日期选择按钮回调
         val dateButton = view.findViewById<Button>(R.id.detail_date_button)
         dateButton.setOnClickListener {
-            val dialog = DatePickerDialog(requireContext(), R.style.Theme_DatePicker_NoWhiteExtraSpace)
+            val dialog = DatePickerDialog(requireContext())
             dialog.setOnDateSetListener { _, year, month, dayOfMonth ->
                 this.setDate(view, year, month, dayOfMonth)
             }
@@ -207,26 +277,19 @@ class RecordDetailFragment:
         // 设置时间选择按钮回调
         val timeButton = view.findViewById<Button>(R.id.detail_time_button)
         timeButton.setOnClickListener {
-            val dialog = TimePickerDialog(requireContext(), R.style.Theme_TimePicker, { _, hour, minute ->
+            val dialog = TimePickerDialog(requireContext(), { _, hour, minute ->
                 setTime(view, hour, minute)
             }, h, m, true)
-            dialog.setOnShowListener {
-                val color = requireContext().getColor(R.color.lightColorSecondary)
-                dialog.getButton(TimePickerDialog.BUTTON_POSITIVE).setTextColor(color)
-                dialog.getButton(TimePickerDialog.BUTTON_NEGATIVE).setTextColor(color)
-            }
             dialog.show()
         }
 
         // 设置种类和来源的滚轮
         val sourceSpinner = view.findViewById<Spinner>(R.id.detail_src_spinner)
-        sourceSpinner.adapter = ArrayAdapter<String>(requireContext(),
-                android.R.layout.simple_spinner_dropdown_item, sources)
+        sourceSpinner.adapter = sourceSpinnerAdapter
         sourceSpinner.onItemSelectedListener = this
 
         val categorySpinner = view.findViewById<Spinner>(R.id.detail_type_spinner)
-        categorySpinner.adapter = ArrayAdapter<String>(requireContext(),
-                android.R.layout.simple_spinner_dropdown_item, categories)
+        categorySpinner.adapter = categorySpinnerAdapter
         categorySpinner.onItemSelectedListener = this
 
         // 设置截图按钮的功能
@@ -301,17 +364,18 @@ class RecordDetailFragment:
     // 设置菜单按钮的点击效果
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return super.onOptionsItemSelected(item) or when(item.itemId) {
-            R.id.menu_item_detail_submit -> {
+            R.id.menu_item_submit -> {
                 Toast.makeText(context, "Submit", Toast.LENGTH_SHORT).show()
                 // 拉取更改
                 prepareRecord()
                 // TODO: 提交数据库
+                receiver?.onDetailRecordSubmitted(bindingRecord!!)
                 Log.d("prepareRecord", bindingRecord.toString())
                 // 返回
-                super.onBackPressed()
+                super.exitNavigationFragment()
                 true
             }
-            R.id.menu_item_detail_discard -> {
+            R.id.menu_item_discard -> {
                 Toast.makeText(context, getString(R.string.discard_changes), Toast.LENGTH_SHORT).show()
                 editing = false
                 // 复原做出的修改
@@ -319,18 +383,19 @@ class RecordDetailFragment:
                 syncViewWithRecord(requireView())
                 true
             }
-            R.id.menu_item_detail_edit -> {
+            R.id.menu_item_edit -> {
                 editing = true
                 setContentModifiable(requireView(), true)
                 true
             }
-            R.id.menu_item_detail_delete -> {
+            R.id.menu_item_delete -> {
                 val dialog = MaterialAlertDialogBuilder(requireContext())
                         .setMessage(getString(R.string.rec_del_confirm))
                         .setPositiveButton(getString(R.string.sure)) { _, _ ->
                             // TODO：删除该条记录
+                            receiver?.onDetailRecordSDeleted(bindingRecord!!)
                             // 返回
-                            super.onBackPressed()
+                            super.exitNavigationFragment()
                         }
                         .setNegativeButton(getString(R.string.no)) { _, _ -> /* Nothing */ }
                 dialog.show()
@@ -370,7 +435,7 @@ class RecordDetailFragment:
  */
 fun RecordDetailFragment.setTime(view: View, hourOfDay: Int, minuteOfHour: Int) {
     // 保存记录
-    val bindingRecord = bindingRecord!!
+    val bindingRecord = getBindingRecord()
     bindingRecord.hourOfDay = hourOfDay
     bindingRecord.minuteOfHour = minuteOfHour
     val str = String.format("%02d:%02d", hourOfDay, minuteOfHour)
@@ -393,7 +458,7 @@ fun RecordDetailFragment.clearDate(view: View) {
  * 设置保存的记录的日期，并更新组件的视图。
  */
 fun RecordDetailFragment.setDate(view: View, year: Int, month: Int, dayOfMonth: Int) {
-    val bindingRecord = bindingRecord!!
+    val bindingRecord = getBindingRecord()
     // 生成日期数据
     val cal = Calendar.getInstance()
     cal.set(year, month, dayOfMonth)
@@ -415,7 +480,7 @@ fun RecordDetailFragment.syncScreenshot(view: View) {
     val imageView = view.findViewById<ImageView>(R.id.detail_screenshot)
 
     var bitmap: Bitmap? = null
-    val record = bindingRecord!!
+    val record = getBindingRecord()
 
     GlobalScope.launch {
         withContext(Dispatchers.IO) {
@@ -432,7 +497,7 @@ fun RecordDetailFragment.syncScreenshot(view: View) {
                 }
             }
             Handler(Looper.getMainLooper()).post {
-                bindingRecord!!.screenshot = bitmap
+                record.screenshot = bitmap
                 if (bitmap == null) {
                     promptText.setText(R.string.empty_prompt)
                     promptText.setTextColor(requireContext().getColor(R.color.silver))
@@ -442,8 +507,8 @@ fun RecordDetailFragment.syncScreenshot(view: View) {
                 } else {
                     imageView.setImageBitmap(bitmap)
                     promptText.setText("")
-                    removeButton.isEnabled = editing
-                    removeButton.setTextColor(  if (editing) requireContext().getColor(R.color.lightColorPrimary)
+                    removeButton.isEnabled = isEditing()
+                    removeButton.setTextColor(  if (isEditing()) requireContext().getColor(R.color.lightColorPrimary)
                                                 else requireContext().getColor(R.color.silver))
                 }
             }
@@ -452,7 +517,7 @@ fun RecordDetailFragment.syncScreenshot(view: View) {
 }
 
 fun RecordDetailFragment.clearScreenshot() {
-    val bindingRecord = bindingRecord!!
+    val bindingRecord = getBindingRecord()
     bindingRecord.screenshot = null
     bindingRecord.screenshotPath = null
     syncScreenshot(requireView())
@@ -462,7 +527,7 @@ fun RecordDetailFragment.clearScreenshot() {
  * 从组件上拉取信息构成DetailRecord。
  */
 fun RecordDetailFragment.prepareRecord() {
-    val bindingRecord = bindingRecord!!
+    val bindingRecord = getBindingRecord()
     // 拉取金额
     bindingRecord.amount = try {
         detail_money_text.text.toString().toDouble()

@@ -14,7 +14,7 @@
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="Theme.Dialog.WithOurColors" parent="@style/Theme.MaterialComponents.DayNight.Dialog.Alert">
+    <style name="Theme.Dialog.Alert.WithOurColors" parent="@style/Theme.MaterialComponents.DayNight.Dialog.Alert">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/lightColorPrimary</item>
         <item name="colorPrimaryVariant">@color/lightColorPrimaryVariant</item>
@@ -27,19 +27,32 @@
         <item name="android:backgroundDimAmount">0.3</item>
     </style>
 
-    <style name="Theme.DatePicker.NoWhiteExtraSpace" parent="Theme.Dialog.WithOurColors">
-        <!-- 比例控制 -->
-        <item name="android:windowMinWidthMajor">@dimen/abc_dialog_min_width_major</item>
-        <item name="android:windowMinWidthMinor">92%</item>
-        <!-- 放大以去除白边 -->
-<!--        <item name="windowActionBar">false</item>-->
-<!--        <item name="windowNoTitle">true</item>-->
-<!--        <item name="android:layout_gravity">center</item>-->
-<!--        <item name="android:scaleX">1.004</item>-->
-<!--        <item name="android:scaleY">1.004</item>-->
-        <item name="colorAccent">?attr/colorPrimary</item>
+    <style name="Theme.Dialog.WithOurColors" parent="@style/Theme.MaterialComponents.DayNight.Dialog">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/lightColorPrimary</item>
+        <item name="colorPrimaryVariant">@color/lightColorPrimaryVariant</item>
+        <item name="colorOnPrimary">@color/lightColorOnPrimary</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/lightColorSecondary</item>
+        <item name="colorSecondaryVariant">@color/lightColorSecondaryVariant</item>
+        <item name="colorOnSecondary">@color/lightColorOnSecondary</item>
+        <!-- 背景模糊度 -->
+        <item name="android:backgroundDimAmount">0.3</item>
     </style>
 
-    <style name="Theme.TimePicker" parent="Theme.Dialog.WithOurColors">
-    </style>
+<!--    <style name="Theme.DatePicker.NoWhiteExtraSpace" parent="@style/Theme.Dialog.WithOurColors">-->
+<!--        &lt;!&ndash; 比例控制 &ndash;&gt;-->
+<!--&lt;!&ndash;        <item name="android:windowMinWidthMajor">@dimen/abc_dialog_min_width_major</item>&ndash;&gt;-->
+<!--&lt;!&ndash;        <item name="android:windowMinWidthMinor">92%</item>&ndash;&gt;-->
+<!--        &lt;!&ndash; 放大以去除白边 &ndash;&gt;-->
+<!--&lt;!&ndash;        <item name="windowActionBar">false</item>&ndash;&gt;-->
+<!--&lt;!&ndash;        <item name="windowNoTitle">true</item>&ndash;&gt;-->
+<!--&lt;!&ndash;        <item name="android:layout_gravity">center</item>&ndash;&gt;-->
+<!--&lt;!&ndash;        <item name="android:scaleX">1.004</item>&ndash;&gt;-->
+<!--&lt;!&ndash;        <item name="android:scaleY">1.004</item>&ndash;&gt;-->
+<!--        <item name="colorAccent">?attr/colorPrimary</item>-->
+<!--    </style>-->
+
+<!--    <style name="Theme.TimePicker" parent="Theme.Dialog.WithOurColors">-->
+<!--    </style>-->
 </resources>

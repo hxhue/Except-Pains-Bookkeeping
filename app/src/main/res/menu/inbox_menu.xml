@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/menu_item_inbox_notification"
-        android:icon="@drawable/ic_baseline_notifications"
+        android:icon="@drawable/ic_fas_bullhorn"
         android:title="@string/menu_title_inbox_notification"
         app:showAsAction="always" />
 </menu>

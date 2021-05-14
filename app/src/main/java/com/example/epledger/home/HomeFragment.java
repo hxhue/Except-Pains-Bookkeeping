@@ -4,16 +4,22 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.epledger.R;
+import com.example.epledger.detail.DetailRecord;
+import com.example.epledger.detail.RecordDetailFragment;
 import com.example.epledger.model.Section;
 import com.example.epledger.model.SectionLab;
+import com.example.epledger.nav.NavigationFragment;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
@@ -35,6 +41,20 @@ public class HomeFragment extends Fragment {
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+
+        // 点击FloatingActionButton的功能
+        FloatingActionButton btn = view.findViewById(R.id.addEntryButton);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RecordDetailFragment frag = new RecordDetailFragment();
+                frag.bindRecord(new DetailRecord());
+                NavigationFragment.Companion.pushToStack(
+                        HomeFragment.this.requireActivity().getSupportFragmentManager(),
+                        frag, true);
+            }
+        });
+
         updateUI();
     }
 

@@ -4,9 +4,6 @@ import android.R
 
 import android.util.TypedValue
 
-
-
-
 object ThemeColors {
     fun getColorPrimary(theme: android.content.res.Resources.Theme): Int {
         val typedValue = TypedValue()
