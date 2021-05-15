@@ -23,6 +23,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
+import kotlin.random.Random
 
 class InboxFragment : Fragment() {
 //    var numOfStarredItems = 0
@@ -106,10 +107,15 @@ class InboxFragment : Fragment() {
         val adapter = GroupieAdapter()
 
         // TODO: delete this
+        val sectionTitles = arrayOf<InboxHeaderItem.InboxHeaderTitle>(
+                InboxHeaderItem.InboxHeaderTitle.EVENTS,
+                InboxHeaderItem.InboxHeaderTitle.STARRED,
+                InboxHeaderItem.InboxHeaderTitle.SCREENSHOTS
+        )
         for (i in 0 until sections.size) {
-            val header = InboxExpandableHeaderItem("Starred")
-            val group = ExpandableGroup(header, true)
             val entryList = sections[i].entryList
+            val header = InboxExpandableHeaderItem(sectionTitles[i], entryList)
+            val group = ExpandableGroup(header, true)
             for (j in 0 until entryList.size) {
                 group.add(InboxEntryItem(entryList[j]))
             }
