@@ -15,3 +15,9 @@
 local.properties
 .idea/render.experimental.xml
 .gitignore
+.project
+.settings/
+app/.classpath
+app/.project
+app/.settings/
+.gitignore
