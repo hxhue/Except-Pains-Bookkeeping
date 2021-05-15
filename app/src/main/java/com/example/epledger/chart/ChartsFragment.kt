@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.*
 import android.widget.Button
 import android.widget.RelativeLayout
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.epledger.R
 import com.github.mikephil.charting.charts.LineChart
@@ -204,5 +205,13 @@ class ChartsFragment: Fragment() {
         inflater.inflate(R.menu.top_app_bar, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
+    override fun onResume() {
+        super.onResume()
+        Toast.makeText(context,"Hello World",Toast.LENGTH_SHORT)
+    }
+
+
+
+
 
 }
