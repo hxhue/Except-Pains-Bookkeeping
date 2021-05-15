@@ -8,18 +8,20 @@ import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 
 import com.example.epledger.R;
+import com.example.epledger.model.Entry;
 import com.xwray.groupie.ExpandableGroup;
 import com.xwray.groupie.ExpandableItem;
 import com.xwray.groupie.GroupieViewHolder;
 import com.xwray.groupie.Item;
 
+import java.util.List;
+
 public class InboxExpandableHeaderItem extends InboxHeaderItem implements ExpandableItem {
-    private String name;
     private ExpandableGroup expandableGroup;
     private View.OnClickListener clickListener;
 
-    public InboxExpandableHeaderItem(String name) {
-        super(name);
+    public InboxExpandableHeaderItem(InboxHeaderTitle title, List<Entry> list) {
+        super(title, list);
         clickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {

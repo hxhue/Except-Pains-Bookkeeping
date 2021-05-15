@@ -133,4 +133,8 @@
     <string name="rec_del_confirm">您确定要删除这条记录吗？</string>
     <string name="notifications">通知</string>
     <string name="discard_changes">丢弃修改</string>
+    <string name="starred">标星</string>
+    <string name="incomplete">不完整</string>
+    <string name="screenshots">截图</string>
+    <string name="events">事件</string>
 </resources>
