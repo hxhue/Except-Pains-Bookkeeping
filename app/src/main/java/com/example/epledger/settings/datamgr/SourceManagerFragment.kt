@@ -10,7 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.epledger.R
-import com.example.epledger.model.GlobalDBViewModel
+import com.example.epledger.model.DatabaseViewModel
 import com.example.epledger.nav.NavigationFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.dialog_text_input.view.*
@@ -19,9 +19,9 @@ import kotlinx.android.synthetic.main.mgr_rec_src_item.view.*
 
 
 class SourceManagerFragment: NavigationFragment() {
-    private val dbModel: GlobalDBViewModel by activityViewModels()
+    private val dbModel: DatabaseViewModel by activityViewModels()
     private val recyclerViewAdapter by lazy {
-        val sourceList = dbModel.getSources()
+        val sourceList = dbModel.requireSources()
         SourceAdapter(sourceList)
     }
 

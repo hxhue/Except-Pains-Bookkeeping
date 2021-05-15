@@ -1,4 +1,4 @@
-package com.example.epledger.inbox;
+package com.example.epledger.inbox.content;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -8,7 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.example.epledger.R;
-import com.example.epledger.model.Entry;
+import com.example.epledger.model.entry.Entry;
 import com.xwray.groupie.GroupieViewHolder;
 import com.xwray.groupie.Item;
 import com.xwray.groupie.Section;

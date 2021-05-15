@@ -1,14 +1,10 @@
-package com.example.epledger.inbox;
+package com.example.epledger.inbox.content;
 
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.StringRes;
 
-import com.example.epledger.R;
-import com.example.epledger.model.Entry;
+import com.example.epledger.model.entry.Entry;
 import com.xwray.groupie.ExpandableGroup;
 import com.xwray.groupie.ExpandableItem;
 import com.xwray.groupie.GroupieViewHolder;

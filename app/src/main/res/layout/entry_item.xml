@@ -44,10 +44,10 @@
                 android:id="@+id/label_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="8dp"
                 android:text="food"
                 android:textColor="@color/label_text_color"
-                android:textSize="24sp"
+                android:textSize="20sp"
                 app:layout_constraintStart_toStartOf="@+id/info"
                 app:layout_constraintTop_toTopOf="parent" />
 

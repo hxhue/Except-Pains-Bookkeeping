@@ -1,10 +1,7 @@
 package com.example.epledger.settings.datamgr
 
 import android.app.Dialog
-import android.graphics.Color
 import android.graphics.Point
-import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,7 +17,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.epledger.R
 import com.example.epledger.inbox.event.item.IconItemAdapter
 import com.example.epledger.inbox.event.item.SpaceItemDecoration
-import com.example.epledger.model.GlobalDBViewModel
+import com.example.epledger.model.DatabaseViewModel
 import com.example.epledger.util.IconAsset
 import com.example.epledger.util.ScreenMetrics
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -28,7 +25,7 @@ import kotlinx.android.synthetic.main.dialog_category_edit.view.*
 
 
 class CategoryItemDialogFragment: DialogFragment(), IconItemAdapter.OnPositionClickListener {
-    private val dbModel: GlobalDBViewModel by activityViewModels()
+    private val dbModel: DatabaseViewModel by activityViewModels()
     private val mModel: CategoryDialogViewModel by viewModels()
 
     class CategoryDialogViewModel: ViewModel() {
@@ -184,7 +181,7 @@ class CategoryItemDialogFragment: DialogFragment(), IconItemAdapter.OnPositionCl
         }
 
         // Check if we already have that name
-        val categories = dbModel.getCategories()
+        val categories = dbModel.requireCategories()
         // Bad time complex but good enough in practice
         categories.forEach {
             if ((it.name == category.name) && !(category.ID != null && category.ID == it.ID)) {
@@ -195,7 +192,7 @@ class CategoryItemDialogFragment: DialogFragment(), IconItemAdapter.OnPositionCl
     }
 
     private fun checkMaxCategoryNumber(): Boolean {
-        val categories = dbModel.getCategories()
+        val categories = dbModel.requireCategories()
         return categories.size < CATEGORY_MAX_SIZE
     }
 }

@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment
 import com.example.epledger.R
 import com.example.epledger.chart.ChartsFragment
 import com.example.epledger.home.HomeFragment
-import com.example.epledger.inbox.InboxFragment
+import com.example.epledger.inbox.content.InboxFragment
 import com.example.epledger.settings.SettingsFragment
 
 /**

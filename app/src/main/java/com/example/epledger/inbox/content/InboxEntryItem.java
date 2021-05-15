@@ -1,4 +1,4 @@
-package com.example.epledger.inbox;
+package com.example.epledger.inbox.content;
 
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
 import com.example.epledger.R;
-import com.example.epledger.model.Entry;
+import com.example.epledger.model.entry.Entry;
 import com.xwray.groupie.GroupieViewHolder;
 import com.xwray.groupie.Item;
 
@@ -36,7 +36,7 @@ public class InboxEntryItem extends Item {
             amountText.setText("-￥" + String.format("%.2f", Math.abs(mEntry.getAmount())));
         }
         infoText.setText(mEntry.getInfo());
-        paySourceText.setText(mEntry.getSource());
+        paySourceText.setText(mEntry.getEntrySource());
     }
 
     @Override
