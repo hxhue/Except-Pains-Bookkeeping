@@ -20,7 +20,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
 import com.example.epledger.R
 import com.example.epledger.detail.DetailRecord
-import com.example.epledger.model.GlobalDBViewModel
 import com.example.epledger.qaction.tool.PairTask
 import com.example.epledger.qaction.tool.Store
 import com.example.epledger.qaction.screenshot.ScreenshotUtils
@@ -279,7 +278,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         } else if (parent.id == R.id.qa_type_spinner) {
             Log.d("qaction.PopupActivity",
                     "onItemSelected(): typeSpinner has (${types[position]}) selected.")
-            ledgerRecord.type = types[position]
+            ledgerRecord.category = types[position]
         }
     }
 
@@ -290,7 +289,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
 
     private fun discardDatePickerWidget() {
         // Set data
-        ledgerRecord.date = Date()
+        ledgerRecord.startingDate = Date()
 
         // Set the view
         val view = findViewById<View>(R.id.qa_date_compo)
@@ -396,7 +395,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         // 设置默认日期为今日
         val simpleFormat = SimpleDateFormat("yyyy/MM/dd", Locale.US)
         val dateOfNow = Date()
-        ledgerRecord.date = dateOfNow
+        ledgerRecord.startingDate = dateOfNow
         dateText.setText(simpleFormat.format(dateOfNow))
 
         // 添加按钮回调
@@ -405,7 +404,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
             val cal = Calendar.getInstance()
             cal.set(year, month, dayOfMonth)
             val date = Date(cal.timeInMillis)
-            ledgerRecord.date = date
+            ledgerRecord.startingDate = date
             dateText.setText(simpleFormat.format(date))
         }
 

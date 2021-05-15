@@ -1,4 +1,4 @@
-package com.example.epledger.model;
+package com.example.epledger.model.entry;
 
 import java.util.Date;
 import java.util.List;

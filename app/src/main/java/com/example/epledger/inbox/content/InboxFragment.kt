@@ -1,33 +1,24 @@
-package com.example.epledger.inbox
+package com.example.epledger.inbox.content
 
-import android.content.Context
 import android.os.Bundle
 import android.view.*
-import android.widget.Button
-import android.widget.TimePicker
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.epledger.MainActivity
 import com.example.epledger.R
-import com.example.epledger.detail.DetailRecord
-import com.example.epledger.detail.RecordDetailFragment
-import com.example.epledger.model.SectionLab
+import com.example.epledger.model.entry.SectionLab
 import com.example.epledger.nav.NavigationFragment
-import com.example.epledger.qaction.screenshot.ScreenshotUtils
 import com.xwray.groupie.ExpandableGroup
 import com.xwray.groupie.GroupieAdapter
-import com.xwray.groupie.Section
 import com.example.epledger.inbox.event.list.EventFragment
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.*
-import kotlin.random.Random
+import com.example.epledger.model.DatabaseViewModel
+import com.example.epledger.model.entry.Entry
 
 class InboxFragment : Fragment() {
+    private val dbModel: DatabaseViewModel by activityViewModels()
 //    var numOfStarredItems = 0
 //        set(value) {
 //            view?.let {
@@ -70,42 +61,42 @@ class InboxFragment : Fragment() {
         setHasOptionsMenu(true)
 
         // TODO: remove this debug section
-        val button = view.findViewById<Button>(R.id.inbox_button_debug_create)
-        button.setOnClickListener {
-            GlobalScope.launch {
-                withContext(Dispatchers.IO) {
-                    val rec = DetailRecord()
-                    rec.ID = 11
-                    rec.amount = 123.0
-                    rec.source = "Alipay"
-                    rec.date = Date()
-                    rec.hourOfDay = 12
-                    rec.starred = true
-                    rec.minuteOfHour = 13
-                    rec.note = "Happy birthday!"
-                    try {
-//                        rec.screenshot = ScreenshotUtils.loadBitmap(
-//                                requireContext(),
-//                                "/storage/emulated/0/Android/data/com.example.epledger/files/Pictures/1619754991133.jpg"
-//                        )
-                    } catch (e: Exception) {
-                        rec.screenshot = null
-                    }
-                    withContext(Dispatchers.Main) {
-                        val newFragment = RecordDetailFragment()
-                        newFragment.bindRecord(rec)
-                        NavigationFragment.pushToStack(requireActivity().supportFragmentManager, newFragment, true)
-                    }
-                }
-            }
-        }
+//        val button = view.findViewById<Button>(R.id.inbox_button_debug_create)
+//        button.setOnClickListener {
+//            GlobalScope.launch {
+//                withContext(Dispatchers.IO) {
+//                    val rec = DetailRecord()
+//                    rec.ID = 11
+//                    rec.amount = 123.0
+//                    rec.source = "Alipay"
+//                    rec.date = Date()
+//                    rec.hourOfDay = 12
+//                    rec.starred = true
+//                    rec.minuteOfHour = 13
+//                    rec.note = "Happy birthday!"
+//                    try {
+////                        rec.screenshot = ScreenshotUtils.loadBitmap(
+////                                requireContext(),
+////                                "/storage/emulated/0/Android/data/com.example.epledger/files/Pictures/1619754991133.jpg"
+////                        )
+//                    } catch (e: Exception) {
+//                        rec.screenshot = null
+//                    }
+//                    withContext(Dispatchers.Main) {
+//                        val newFragment = RecordDetailFragment()
+//                        newFragment.bindRecord(rec)
+//                        NavigationFragment.pushToStack(requireActivity().supportFragmentManager, newFragment, true)
+//                    }
+//                }
+//            }
+//        }
 
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val sectionLab = SectionLab.get(context)
+        val sectionLab = SectionLab(arrayListOf(dbModel.requireRecords()) as List<MutableList<Entry>>?)
         val sections = sectionLab.sections
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.inbox_recycler_view)
@@ -157,5 +148,9 @@ class InboxFragment : Fragment() {
 //        numOfScreenshotItems = 7
         // TODO: Remove this debug code
         // TODO: 实际上在刚加载好数据库时这个已经需要加载，否则会有延迟感
+    }
+
+    fun setInBoxBadge(number: Int) {
+        (this.activity as MainActivity).setInboxBadge(num = number)
     }
 }

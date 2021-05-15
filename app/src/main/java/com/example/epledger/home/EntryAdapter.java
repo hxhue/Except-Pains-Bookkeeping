@@ -1,32 +1,36 @@
 package com.example.epledger.home;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.SectionIndexer;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModel;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.epledger.R;
-import com.example.epledger.model.Entry;
+import com.example.epledger.detail.DetailRecord;
+import com.example.epledger.model.DatabaseViewModel;
+import com.example.epledger.model.entry.Entry;
+import com.example.epledger.settings.datamgr.Category;
 
 import java.util.List;
 
 import kotlin.random.Random;
 
 public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> {
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    private DatabaseViewModel dbModel;
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
         private final ImageView labelImage;
         private final TextView labelText;
         private final TextView amountText;
         private final TextView infoText;
-        private final TextView sourceText;
+        private final TextView categoryText;
 
         private Entry mEntry;
 
@@ -36,7 +40,7 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
             labelText = itemView.findViewById(R.id.label_text);
             amountText = itemView.findViewById(R.id.amount);
             infoText = itemView.findViewById(R.id.info);
-            sourceText = itemView.findViewById(R.id.pay_source);
+            categoryText = itemView.findViewById(R.id.pay_source);
         }
 
         public void bind(Entry entry) {
@@ -45,12 +49,20 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
             // Get a context
             Context ctx = itemView.getContext();
             // Set image (**Testing**)
-            if (Random.Default.nextInt() % 3 == 0)
-                labelImage.setImageDrawable(ContextCompat.getDrawable(ctx, R.drawable.u_sports_basketball));
-            else if (Random.Default.nextInt() % 3 == 1)
-                labelImage.setImageDrawable(ContextCompat.getDrawable(ctx, R.drawable.ic_fas_car));
-            else
-                labelImage.setImageDrawable(null);
+//            int choice = Random.Default.nextInt();
+//            if (choice % 3 == 0)
+//                labelImage.setImageDrawable(ContextCompat.getDrawable(ctx, R.drawable.u_sports_basketball));
+//            else if (choice % 3 == 1)
+//                labelImage.setImageDrawable(ContextCompat.getDrawable(ctx, R.drawable.ic_fas_car));
+//            else
+//                labelImage.setImageDrawable(null);
+            labelImage.setImageDrawable(null);
+            for (Category category: dbModel.requireCategories()) {
+                if (category.getName().equals(entry.getEntryCategory())) {
+                    labelImage.setImageDrawable(ContextCompat.getDrawable(ctx, category.getIconResID()));
+                    break;
+                }
+            }
 
             labelText.setText(mEntry.getLabel());
             if (mEntry.getAmount() >= 0) {
@@ -62,7 +74,7 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
             }
 
             // Set info
-            final String infoStr = null;
+            final String infoStr = mEntry.getInfo();
             // Check if it's empty
             if (infoStr != null && !infoStr.trim().isEmpty()) {
                 infoText.setText(mEntry.getInfo());
@@ -70,7 +82,7 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
                 infoText.setText(R.string.no_info_prompt);
             }
 
-            sourceText.setText(mEntry.getSource());
+            categoryText.setText(mEntry.getEntrySource());
         }
     }
 
@@ -83,8 +95,9 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
     // 事件回调监听
     private EntryAdapter.OnItemClickListener onItemClickListener;
 
-    public EntryAdapter(List<Entry> entryList) {
+    public EntryAdapter(List<Entry> entryList, DatabaseViewModel model) {
         this.mEntryList = entryList;
+        dbModel = model;
     }
 
     @NonNull

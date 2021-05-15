@@ -1,0 +1,72 @@
+package com.example.epledger.home
+
+import android.os.Bundle
+import android.view.*
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.epledger.R
+import com.example.epledger.detail.DetailRecord
+import com.example.epledger.detail.RecordDetailFragment
+import com.example.epledger.model.DatabaseViewModel
+import com.example.epledger.model.entry.Entry
+import com.example.epledger.model.entry.Section
+import com.example.epledger.model.entry.SectionLab
+import com.example.epledger.nav.NavigationFragment.Companion.pushToStack
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+
+class HomeFragment : Fragment() {
+    private var mRecyclerView: RecyclerView? = null
+    private var mSectionAdapter: SectionAdapter? = null
+    private val dbModel by activityViewModels<DatabaseViewModel>()
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+        val view = inflater.inflate(R.layout.page_home, container, false)
+        setHasOptionsMenu(true)
+        return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        mRecyclerView = view.findViewById<View>(R.id.recyclerView) as RecyclerView
+        mRecyclerView!!.layoutManager = LinearLayoutManager(view.context)
+
+        // 点击FloatingActionButton的功能
+        val btn: FloatingActionButton = view.findViewById(R.id.addEntryButton)
+        btn.setOnClickListener {
+            val frag = RecordDetailFragment()
+            frag.bindRecord(DetailRecord())
+            pushToStack(
+                requireActivity().supportFragmentManager,
+                frag, true
+            )
+        }
+        updateUI()
+
+        // Register observers
+        dbModel.records.observeForever {
+            val groupedEntries = SectionLab(arrayListOf(it) as List<MutableList<Entry>>?)
+            mSectionAdapter!!.setSections(groupedEntries.sections)
+            mSectionAdapter!!.notifyDataSetChanged()
+        }
+    }
+
+    private fun updateUI() {
+        val sectionLab = SectionLab(arrayListOf(dbModel.requireRecords()) as List<MutableList<Entry>>?)
+        val sections: List<Section> = sectionLab.sections
+        mSectionAdapter = SectionAdapter(sections, dbModel)
+        mRecyclerView!!.adapter = mSectionAdapter
+        mRecyclerView!!.itemAnimator = DefaultItemAnimator()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.top_app_bar, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+}

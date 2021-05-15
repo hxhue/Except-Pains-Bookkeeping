@@ -13,7 +13,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.fragment.app.activityViewModels
 import com.example.epledger.R
-import com.example.epledger.model.GlobalDBViewModel
+import com.example.epledger.model.DatabaseViewModel
 import com.example.epledger.nav.NavigationFragment
 import com.example.epledger.qaction.screenshot.ScreenshotUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -42,7 +42,7 @@ import kotlin.collections.ArrayList
  */
 class RecordDetailFragment:
     NavigationFragment(), AdapterView.OnItemSelectedListener {
-    private val dbModel: GlobalDBViewModel by activityViewModels()
+    private val dbModel: DatabaseViewModel by activityViewModels()
 
     companion object {
         // 没有被注明的来源或种类始终放在0号位
@@ -111,7 +111,7 @@ class RecordDetailFragment:
             R.id.qa_type_spinner -> {
                 Log.d("RecordDetailFragment",
                         "onItemSelected(): categorySpinner has (${categories[position]}) selected.")
-                bindingRecord.type = categories[position]
+                bindingRecord.category = categories[position]
             }
         }
     }
@@ -185,10 +185,10 @@ class RecordDetailFragment:
         view.detail_star.isChecked = bindingRecord.starred
 
         // 更新日期组件显示
-        if (bindingRecord.date == null) {
+        if (bindingRecord.startingDate == null) {
             clearDate(view)
         } else {
-            val date = bindingRecord.date!!
+            val date = bindingRecord.startingDate!!
             val cal = Calendar.getInstance()
             cal.time = date
             val month = cal.get(Calendar.MONTH)
@@ -237,10 +237,10 @@ class RecordDetailFragment:
 
         // 更新种类组件
         val categorySpinner = view.findViewById<Spinner>(R.id.detail_type_spinner)
-        if (bindingRecord.type == null) {
+        if (bindingRecord.category == null) {
             categorySpinner.setSelection(UNSPECIFIED_ITEM_POSITION)
         } else {
-            val index = categories.indexOf(bindingRecord.type!!)
+            val index = categories.indexOf(bindingRecord.category!!)
             if (index < 0) {
                 categorySpinner.setSelection(UNSPECIFIED_ITEM_POSITION)
             } else {
@@ -464,7 +464,7 @@ fun RecordDetailFragment.setDate(view: View, year: Int, month: Int, dayOfMonth: 
     cal.set(year, month, dayOfMonth)
     val date = Date(cal.timeInMillis)
     // 保存记录
-    bindingRecord.date = date
+    bindingRecord.startingDate = date
     // 更新视图
     val simpleFormat = SimpleDateFormat("yyyy/MM/dd", Locale.US)
     val dateText = view.findViewById<EditText>(R.id.detail_date_text)

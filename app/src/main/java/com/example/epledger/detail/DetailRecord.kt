@@ -3,15 +3,17 @@ package com.example.epledger.detail
 import android.graphics.Bitmap
 import android.os.Parcel
 import android.os.Parcelable
+import com.example.epledger.model.entry.Entry
+import com.example.epledger.settings.datamgr.Category
 import java.util.Date
 
-class DetailRecord() : Parcelable {
+class DetailRecord() : Parcelable, Entry {
     var ID: Long? = null
-    var date: Date? = null
+    var startingDate: Date? = null
     var hourOfDay: Int? = null
     var minuteOfHour: Int? = null
     var amount: Double? = 0.0
-    var type: String? = null
+    var category: String? = null
     var source: String? = null
     var screenshot: Bitmap? = null
     var screenshotPath: String? = null
@@ -23,18 +25,74 @@ class DetailRecord() : Parcelable {
         hourOfDay = parcel.readValue(Int::class.java.classLoader) as? Int
         minuteOfHour = parcel.readValue(Int::class.java.classLoader) as? Int
         amount = parcel.readValue(Double::class.java.classLoader) as? Double
-        type = parcel.readString()
+        category = parcel.readString()
         source = parcel.readString()
         screenshotPath = parcel.readString()
         note = parcel.readString()
         starred = parcel.readByte() != 0.toByte()
-        date = parcel.readValue(Date::class.java.classLoader) as? Date
+        startingDate = parcel.readValue(Date::class.java.classLoader) as? Date
     }
 
     // 是否完整可以通过上面关系自动判断，至少有前三个即为完整
-
     override fun toString(): String {
-        return "LedgerRecord(date=$date, hourOfDay=$hourOfDay, minuteOfHour=$minuteOfHour, amount=$amount, type=$type, source=$source, screenshot=$screenshot, note=$note, starred=$starred)"
+        return "LedgerRecord(date=$startingDate, hourOfDay=$hourOfDay, minuteOfHour=$minuteOfHour, amount=$amount, " +
+                "type=$category, source=$source, screenshot=$screenshot, note=$note, starred=$starred)"
+    }
+
+    override fun getEntryId(): Int {
+        return ID!!.toInt()
+    }
+
+    override fun setEntryId(id: Int) {
+        this.ID = id.toLong()
+    }
+
+    override fun getAmount(): Double {
+        return this.amount!!
+    }
+
+    override fun setAmount(amount: Double) {
+        this.amount = amount
+    }
+
+    override fun getLabel(): String? {
+        return this.category
+    }
+
+    override fun setLabel(label: String?) {
+        this.category = label!!
+    }
+
+    override fun getInfo(): String? {
+        return this.note
+    }
+
+    override fun setInfo(info: String?) {
+        this.note = info!!
+    }
+
+    override fun getEntrySource(): String? {
+        return this.source
+    }
+
+    override fun setEntrySource(source: String?) {
+        this.source = source!!
+    }
+
+    override fun getDate(): Date? {
+        return this.startingDate
+    }
+
+    override fun setDate(date: Date?) {
+        this.startingDate = date!!
+    }
+
+    override fun getEntryCategory(): String? {
+        return this.category
+    }
+
+    override fun setEntryCategory(s: String) {
+        this.category = s
     }
 
     fun getCopy(): DetailRecord {
@@ -45,11 +103,11 @@ class DetailRecord() : Parcelable {
 
     fun copyTo(another: DetailRecord) {
         another.ID = ID
-        another.date = date
+        another.startingDate = startingDate
         another.hourOfDay = hourOfDay
         another.minuteOfHour = minuteOfHour
         another.amount = amount
-        another.type = type
+        another.category = category
         another.source = source
         another.screenshot = screenshot
         another.note = note
@@ -62,12 +120,12 @@ class DetailRecord() : Parcelable {
         parcel.writeValue(hourOfDay)
         parcel.writeValue(minuteOfHour)
         parcel.writeValue(amount)
-        parcel.writeString(type)
+        parcel.writeString(category)
         parcel.writeString(source)
         parcel.writeString(screenshotPath)
         parcel.writeString(note)
         parcel.writeByte(if (starred) 1 else 0)
-        parcel.writeValue(date)
+        parcel.writeValue(startingDate)
     }
 
     override fun describeContents(): Int {
