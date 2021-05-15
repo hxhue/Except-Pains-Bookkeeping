@@ -172,4 +172,8 @@
     <string name="category_number_too_large_prompt">您的种类太多了，我们强烈建议您只保留一部分种类。</string>
     <string name="unspecified"><i>（未指定）</i></string>
     <string name="new_category">新建种类</string>
+    <string name="starred">标星</string>
+    <string name="incomplete">不完整</string>
+    <string name="screenshots">截图</string>
+    <string name="events">事件</string>
 </resources>

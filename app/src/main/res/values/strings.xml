@@ -154,6 +154,10 @@
     <string name="rec_del_confirm">Are you sure about deleting this record?</string>
     <string name="notifications">Notifications</string>
     <string name="discard_changes">Discard Changes</string>
+    <string name="starred">Starred</string>
+    <string name="incomplete">Incomplete</string>
+    <string name="screenshots">Screenshots</string>
+    <string name="events">Events</string>
     <string name="unit_day">" day(s)"</string>
     <string name="unit_month">" month(s)"</string>
     <string name="unit_year">" year(s)"</string>
