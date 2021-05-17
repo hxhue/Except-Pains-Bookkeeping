@@ -202,6 +202,7 @@ class ChartsFragment: Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        menu.clear()
         inflater.inflate(R.menu.top_app_bar, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }

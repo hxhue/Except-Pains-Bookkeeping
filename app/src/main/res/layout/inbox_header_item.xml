@@ -18,14 +18,12 @@
 
     <ImageView
         android:id="@+id/inbox_header_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:scaleX="0.9"
-        android:scaleY="0.9"
         app:srcCompat="@drawable/ic_baseline_star" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

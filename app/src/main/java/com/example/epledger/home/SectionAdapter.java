@@ -12,9 +12,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.epledger.R;
-import com.example.epledger.model.DatabaseViewModel;
-import com.example.epledger.model.entry.Entry;
-import com.example.epledger.model.entry.Section;
+import com.example.epledger.db.DatabaseModel;
+import com.example.epledger.home.model.Entry;
+import com.example.epledger.home.model.Section;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -25,9 +25,9 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ViewHold
         private TextView textDate;
         private RecyclerView rv;
         private SimpleDateFormat ft;
-        private DatabaseViewModel dbModel;
+        private DatabaseModel dbModel;
 
-        public ViewHolder(@NonNull View itemView, DatabaseViewModel dbModel) {
+        public ViewHolder(@NonNull View itemView, DatabaseModel dbModel) {
             super(itemView);
             this.dbModel = dbModel;
 
@@ -59,9 +59,9 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ViewHold
     }
 
     private List<Section> mSections;
-    private DatabaseViewModel dbModel;
+    private DatabaseModel dbModel;
 
-    public SectionAdapter(List<Section> mSections, DatabaseViewModel dbModel) {
+    public SectionAdapter(List<Section> mSections, DatabaseModel dbModel) {
         this.mSections = mSections;
         this.dbModel = dbModel;
     }

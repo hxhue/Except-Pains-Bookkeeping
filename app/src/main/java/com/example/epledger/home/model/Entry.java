@@ -1,6 +1,4 @@
-package com.example.epledger.model.entry;
-
-import com.example.epledger.settings.datamgr.Category;
+package com.example.epledger.home.model;
 
 import java.util.Date;
 

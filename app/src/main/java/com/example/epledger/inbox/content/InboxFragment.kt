@@ -9,16 +9,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.epledger.MainActivity
 import com.example.epledger.R
-import com.example.epledger.model.entry.SectionLab
+import com.example.epledger.home.model.SectionGroup
 import com.example.epledger.nav.NavigationFragment
 import com.xwray.groupie.ExpandableGroup
 import com.xwray.groupie.GroupieAdapter
 import com.example.epledger.inbox.event.list.EventFragment
-import com.example.epledger.model.DatabaseViewModel
-import com.example.epledger.model.entry.Entry
+import com.example.epledger.db.DatabaseModel
+import com.example.epledger.home.model.Section
 
 class InboxFragment : Fragment() {
-    private val dbModel: DatabaseViewModel by activityViewModels()
+    private val dbModel: DatabaseModel by activityViewModels()
 //    var numOfStarredItems = 0
 //        set(value) {
 //            view?.let {
@@ -96,7 +96,10 @@ class InboxFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val sectionLab = SectionLab(arrayListOf(dbModel.requireRecords()) as List<MutableList<Entry>>?)
+        val sectionLab = SectionGroup(
+            dbModel.requireGroupedRecords().map { group ->
+                Section(group.date, group.records)
+            })
         val sections = sectionLab.sections
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.inbox_recycler_view)
@@ -106,10 +109,10 @@ class InboxFragment : Fragment() {
         val adapter = GroupieAdapter()
 
         // TODO: delete this
-        val sectionTitles = arrayOf<InboxHeaderItem.InboxHeaderTitle>(
-                InboxHeaderItem.InboxHeaderTitle.EVENTS,
-                InboxHeaderItem.InboxHeaderTitle.STARRED,
-                InboxHeaderItem.InboxHeaderTitle.SCREENSHOTS
+        val sectionTitles = arrayOf(
+            Section.SectionType.EVENTS,
+            Section.SectionType.STARRED,
+            Section.SectionType.SCREENSHOTS
         )
         for (i in 0 until sections.size) {
             val entryList = sections[i].entryList
@@ -125,6 +128,7 @@ class InboxFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        menu.clear()
         inflater.inflate(R.menu.inbox_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }

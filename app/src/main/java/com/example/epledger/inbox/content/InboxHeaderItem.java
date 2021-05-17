@@ -8,24 +8,20 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.example.epledger.R;
-import com.example.epledger.model.entry.Entry;
+import com.example.epledger.home.model.Entry;
+import com.example.epledger.home.model.Section;
 import com.xwray.groupie.GroupieViewHolder;
 import com.xwray.groupie.Item;
-import com.xwray.groupie.Section;
 
 import java.util.List;
 
 public class InboxHeaderItem extends Item {
-    private InboxHeaderTitle headerTitle;
+    private Section.SectionType sectionType;
     private List<Entry> list;
 
-    enum InboxHeaderTitle {
-        STARRED, INCOMPLETE, SCREENSHOTS, EVENTS
-    }
-
-    public InboxHeaderItem(InboxHeaderTitle title, List<Entry> list) {
+    public InboxHeaderItem(Section.SectionType sectionType, List<Entry> list) {
         this.list = list;
-        this.headerTitle = title;
+        this.sectionType = sectionType;
     }
 
     @SuppressLint("DefaultLocale")
@@ -35,7 +31,7 @@ public class InboxHeaderItem extends Item {
         TextView textView = viewHolder.itemView.findViewById(R.id.inbox_header_label);
         ImageView imageView = viewHolder.itemView.findViewById(R.id.inbox_header_icon);
         final String format = "%s (%d)";
-        switch (headerTitle) {
+        switch (sectionType) {
             case STARRED:
                 imageView.setImageResource(R.drawable.ic_baseline_star);
                 textView.setText(String.format(format, context.getString(R.string.starred), list.size()));
@@ -49,7 +45,7 @@ public class InboxHeaderItem extends Item {
                 textView.setText(String.format(format, context.getString(R.string.screenshots), list.size()));
                 break;
             case EVENTS:
-                imageView.setImageResource(R.drawable.ic_baseline_close);
+                imageView.setImageResource(R.drawable.ic_fas_bookmark);
                 textView.setText(String.format(format, context.getString(R.string.events), list.size()));
                 break;
             default:

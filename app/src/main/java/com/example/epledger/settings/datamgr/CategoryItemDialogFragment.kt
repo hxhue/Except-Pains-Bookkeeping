@@ -1,11 +1,14 @@
 package com.example.epledger.settings.datamgr
 
 import android.app.Dialog
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.graphics.Point
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
@@ -17,7 +20,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.epledger.R
 import com.example.epledger.inbox.event.item.IconItemAdapter
 import com.example.epledger.inbox.event.item.SpaceItemDecoration
-import com.example.epledger.model.DatabaseViewModel
+import com.example.epledger.db.DatabaseModel
 import com.example.epledger.util.IconAsset
 import com.example.epledger.util.ScreenMetrics
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -25,7 +28,7 @@ import kotlinx.android.synthetic.main.dialog_category_edit.view.*
 
 
 class CategoryItemDialogFragment: DialogFragment(), IconItemAdapter.OnPositionClickListener {
-    private val dbModel: DatabaseViewModel by activityViewModels()
+    private val dbModel: DatabaseModel by activityViewModels()
     private val mModel: CategoryDialogViewModel by viewModels()
 
     class CategoryDialogViewModel: ViewModel() {
@@ -118,7 +121,7 @@ class CategoryItemDialogFragment: DialogFragment(), IconItemAdapter.OnPositionCl
                 })
                 .create()
 
-        // Set up RecyclerView
+        // 1. Set up RecyclerView
         val iconRecyclerView = dialogContent.category_edit_icon_recyclerview
 
         // Count of span
@@ -129,7 +132,7 @@ class CategoryItemDialogFragment: DialogFragment(), IconItemAdapter.OnPositionCl
 
         // CAUTION: Hard code!
         val spanCount = ((w - 16.0f * 2 + 8.0f) / (44.0f + 8.0f)).toInt()
-        val layoutMgr = object: GridLayoutManager(requireContext(), spanCount) {}
+        val layoutMgr = GridLayoutManager(requireContext(), spanCount)
         iconRecyclerView.layoutManager = layoutMgr
 
         // Adjust space
@@ -137,11 +140,38 @@ class CategoryItemDialogFragment: DialogFragment(), IconItemAdapter.OnPositionCl
         iconRecyclerView.addItemDecoration(SpaceItemDecoration(spacingInPixels, spanCount))
         iconRecyclerView.adapter = IconItemAdapter(IconAsset.assets, this)
 
-//        dialog.setOnShowListener {
-//            // Display keyboard
-//            val imm= ctx.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
-//            imm?.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0)
-//        }
+        // 2. Set up iconImageView
+        val iconView = dialogContent.category_icon_imageview
+        iconView.isClickable = true
+        iconView.setOnClickListener {
+            // Hide keyboard
+            val imm: InputMethodManager? =
+                requireContext().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager?
+            imm?.hideSoftInputFromWindow(dialogContent.category_name_edittext.windowToken, 0)
+            // Move focus off input field
+            dialogContent.category_name_edittext.clearFocus()
+            // Set icon recyclerView visible
+            setIconRecyclerViewVisibility(true)
+        }
+
+        // 3. Set up input field
+        val editText = dialogContent.category_name_edittext
+        editText.apply {
+            // When view is already focused, onClickListener works
+            setOnClickListener { setIconRecyclerViewVisibility(false) }
+            // When view is not focused, onFocusChangeListener works
+            setOnFocusChangeListener { _, hasFocus -> if (hasFocus) setIconRecyclerViewVisibility(false) }
+        }
+
+        dialog.setOnShowListener {
+            // Make input field able to show keyboard when focused
+            dialog.window!!.apply {
+                clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
+                setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+            }
+            editText.requestFocus()
+        }
+
         mDialogView = dialogContent
         return dialog
     }
@@ -153,14 +183,22 @@ class CategoryItemDialogFragment: DialogFragment(), IconItemAdapter.OnPositionCl
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         // Add observer
         mModel.categoryIconResID.observe(viewLifecycleOwner, {
             view.category_icon_imageview.setImageDrawable(ContextCompat.getDrawable(view.context, it))
         })
 
         mModel.categoryName.observe(viewLifecycleOwner, {
-            view.category_name_edittext.setText(it)
+            view.category_name_edittext.apply {
+                setText(it)
+                // 将光标位置移动到末尾
+                setSelection(it.length)
+            }
         })
+
+        // Add keyboard event listener
+//        setKeyboardVisibilityListener(view,this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -194,5 +232,57 @@ class CategoryItemDialogFragment: DialogFragment(), IconItemAdapter.OnPositionCl
     private fun checkMaxCategoryNumber(): Boolean {
         val categories = dbModel.requireCategories()
         return categories.size < CATEGORY_MAX_SIZE
+    }
+
+    // Some how the keyboard will cause a few events in a row
+    // So I block the listener for some time (400ms)
+    // But it still didn't work, the algorithm cheats us sometimes!!
+    // https://stackoverflow.com/a/36259261/13785815
+
+//    private fun setKeyboardVisibilityListener(rootView: View,
+//                                              onKeyboardVisibilityListener: OnKeyboardVisibilityListener) {
+//        val parentView = (rootView as ViewGroup).getChildAt(0)
+//        parentView.viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
+//            private var alreadyOpen = false
+//            private val defaultKeyboardHeightDP = 100
+//            private val EstimatedKeyboardDP = defaultKeyboardHeightDP + 48
+//            private val rect: Rect = Rect()
+//            private var blockingConsequentEvent = false
+//            override fun onGlobalLayout() {
+//                if (blockingConsequentEvent) {
+//                    return
+//                }
+//                val estimatedKeyboardHeight = TypedValue.applyDimension(
+//                    TypedValue.COMPLEX_UNIT_DIP,
+//                    EstimatedKeyboardDP.toFloat(),
+//                    parentView.resources.displayMetrics
+//                ).toInt()
+//                parentView.getWindowVisibleDisplayFrame(rect)
+//                val heightDiff: Int = parentView.rootView.height - (rect.bottom - rect.top)
+//                val isShown = heightDiff >= estimatedKeyboardHeight
+//                if (isShown == alreadyOpen) {
+//                    Log.i("Keyboard state", "Ignoring global layout change...")
+//                    return
+//                }
+//                alreadyOpen = isShown
+//                onKeyboardVisibilityListener.onVisibilityChanged(isShown)
+//
+//                // Blocking consequent events
+//                blockingConsequentEvent = true
+//                viewLifecycleOwner.lifecycleScope.launch {
+//                    delay(400)
+//                    blockingConsequentEvent = false
+//                }
+//            }
+//        })
+//    }
+
+    private fun setIconRecyclerViewVisibility(visible: Boolean) {
+        val recyclerView = requireView().category_edit_icon_recyclerview
+        if (visible) {
+            recyclerView.visibility = View.VISIBLE
+        } else {
+            recyclerView.visibility = View.GONE
+        }
     }
 }

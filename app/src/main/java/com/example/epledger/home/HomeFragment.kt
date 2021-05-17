@@ -10,17 +10,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.epledger.R
 import com.example.epledger.detail.DetailRecord
 import com.example.epledger.detail.RecordDetailFragment
-import com.example.epledger.model.DatabaseViewModel
-import com.example.epledger.model.entry.Entry
-import com.example.epledger.model.entry.Section
-import com.example.epledger.model.entry.SectionLab
+import com.example.epledger.db.DatabaseModel
+import com.example.epledger.home.model.Section
+import com.example.epledger.home.model.SectionGroup
 import com.example.epledger.nav.NavigationFragment.Companion.pushToStack
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class HomeFragment : Fragment() {
     private var mRecyclerView: RecyclerView? = null
     private var mSectionAdapter: SectionAdapter? = null
-    private val dbModel by activityViewModels<DatabaseViewModel>()
+    private val dbModel by activityViewModels<DatabaseModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,15 +49,21 @@ class HomeFragment : Fragment() {
         updateUI()
 
         // Register observers
-        dbModel.records.observeForever {
-            val groupedEntries = SectionLab(arrayListOf(it) as List<MutableList<Entry>>?)
+        dbModel.groupedRecords.observeForever {
+            val groupedEntries =
+                SectionGroup(it.map { group ->
+                    Section(group.date, group.records)
+                })
             mSectionAdapter!!.setSections(groupedEntries.sections)
             mSectionAdapter!!.notifyDataSetChanged()
         }
     }
 
     private fun updateUI() {
-        val sectionLab = SectionLab(arrayListOf(dbModel.requireRecords()) as List<MutableList<Entry>>?)
+        val sectionLab = SectionGroup(
+            dbModel.requireGroupedRecords().map { group ->
+                Section(group.date, group.records)
+            })
         val sections: List<Section> = sectionLab.sections
         mSectionAdapter = SectionAdapter(sections, dbModel)
         mRecyclerView!!.adapter = mSectionAdapter
@@ -66,6 +71,7 @@ class HomeFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        menu.clear()
         inflater.inflate(R.menu.top_app_bar, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }

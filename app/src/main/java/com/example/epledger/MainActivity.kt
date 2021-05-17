@@ -68,6 +68,10 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                 supportActionBar?.setTitle(selectedScreen.titleStringId)
             }
         })
+
+        // Set offscreen limit to pages of APP to avoid lag of reloading
+        // https://stackoverflow.com/a/16781845/13785815
+        viewPager.offscreenPageLimit = 4
     }
 
     /**

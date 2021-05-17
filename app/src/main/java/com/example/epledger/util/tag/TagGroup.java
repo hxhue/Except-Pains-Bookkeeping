@@ -1,4 +1,4 @@
-package com.example.epledger.model.tag;
+package com.example.epledger.util.tag;
 
 import android.content.Context;
 import android.view.LayoutInflater;

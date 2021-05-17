@@ -1,25 +1,27 @@
 package com.example.epledger.settings.datamgr
 
+import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
+import android.view.WindowManager
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.epledger.R
-import com.example.epledger.model.DatabaseViewModel
+import com.example.epledger.db.DatabaseModel
 import com.example.epledger.nav.NavigationFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.android.synthetic.main.dialog_text_input.*
 import kotlinx.android.synthetic.main.dialog_text_input.view.*
 import kotlinx.android.synthetic.main.mgr_rec_src.view.*
 import kotlinx.android.synthetic.main.mgr_rec_src_item.view.*
 
 
 class SourceManagerFragment: NavigationFragment() {
-    private val dbModel: DatabaseViewModel by activityViewModels()
+    private val dbModel: DatabaseModel by activityViewModels()
     private val recyclerViewAdapter by lazy {
         val sourceList = dbModel.requireSources()
         SourceAdapter(sourceList)
@@ -39,34 +41,18 @@ class SourceManagerFragment: NavigationFragment() {
         recyclerView.layoutManager = LinearLayoutManager(ctx)
         recyclerView.adapter = recyclerViewAdapter
 
-        // Floating button
+        // **User Intention: add a new item
         val floatingButton = view.floating_add
         floatingButton.setOnClickListener {
-            val inflater = LayoutInflater.from(ctx)
-            val dialogContent  = inflater.inflate(R.layout.dialog_text_input, null)
-            dialogContent.layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-            )
-            val dialog = MaterialAlertDialogBuilder(ctx)
-                    .setView(dialogContent)
-                    .setNegativeButton(R.string.no) { _, _ -> /**/ }
-                    .setPositiveButton(R.string.ok) { _, _ ->
-                        val newName = dialogContent.string_input_textview.text.toString()
-                        // TODO: check duplicates of name
-                        val newSource = Source(newName)
-                        // TODO: add source to database and **fetch its ID**
-                        val list = recyclerViewAdapter.sourceList
-                        list.add(newSource)
-                        recyclerViewAdapter.notifyItemInserted(list.size - 1)
-                    }
-                    .setTitle(getString(R.string.new_source))
-                    .create()
-            dialog.setOnShowListener {
-                // Display keyboard
-                val imm= ctx.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
-                imm?.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0)
-            }
+            val dialog = createSourceDialog(ctx, null, object : OnSourceSubmitListener {
+                override fun onSourceSubmit(sourceName: String) {
+                    val newSource = Source(sourceName)
+                    // TODO: add source to database and **fetch its ID**
+                    val list = recyclerViewAdapter.sourceList
+                    list.add(newSource)
+                    recyclerViewAdapter.notifyItemInserted(list.size - 1)
+                }
+            })
             dialog.show()
         }
     }
@@ -97,30 +83,15 @@ class SourceManagerFragment: NavigationFragment() {
 
             // Short click to modify name
             view.setOnClickListener {
-                val inflater = LayoutInflater.from(ctx)
-                val dialogContent  = inflater.inflate(R.layout.dialog_text_input, null)
-                dialogContent.layoutParams = ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT
-                )
-                val dialog = MaterialAlertDialogBuilder(ctx)
-                        .setView(dialogContent)
-                        .setNegativeButton(R.string.no) { _, _ -> /**/ }
-                        .setPositiveButton(R.string.ok) { _, _ ->
-                            val newName = dialogContent.string_input_textview.text.toString()
-                            // TODO: Check if name already exists
-                            sourceList[position].name = newName
-                            this.notifyItemChanged(position)
-                            // TODO: write data into database
-                            // TODO: inform other modules that this item has changed
-                        }
-                        .setTitle(ctx.getString(R.string.modify_name))
-                        .create()
-                dialog.setOnShowListener {
-                    // Display keyboard
-                    val imm= ctx.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
-                    imm?.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0)
-                }
+                val adapter = this
+                val dialog = createSourceDialog(ctx, sourceList[position].name, object : OnSourceSubmitListener {
+                    override fun onSourceSubmit(sourceName: String) {
+                        sourceList[position].name = sourceName
+                        adapter.notifyItemChanged(position)
+                        // TODO: write data into database
+                        // TODO: inform other modules that this item has changed
+                    }
+                })
                 dialog.show()
             }
 
@@ -148,4 +119,66 @@ class SourceManagerFragment: NavigationFragment() {
             return sourceList.size
         }
     }
+}
+
+/**
+ * 创建一个对话，用来提交修改或新增source条目。
+ * @param contentView: 当前对话的contentView
+ * @param sourceName: 已有source的名称。如果为空，表明是正在新建一个source
+ * @param onSubmitListener: 提交时的回调接口
+ */
+private fun createSourceDialog(ctx: Context, sourceName: CharSequence?,
+                               onSubmitListener: OnSourceSubmitListener): Dialog {
+    val inflater = LayoutInflater.from(ctx)
+    val contentView  = inflater.inflate(R.layout.dialog_text_input, null).apply {
+        layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        // 如果这是一个已存在的source记录，则在文本框中显示当前的名称
+        sourceName?.let {
+            this.string_input_edittext.apply {
+                // 设置文本
+                setText(sourceName)
+                // 把输入光标移动到文本最后面
+                setSelection(text.length)
+            }
+        }
+    }
+
+    val dialog = MaterialAlertDialogBuilder(ctx)
+        .setView(contentView)
+        .setNegativeButton(R.string.no) { _, _ -> /**/ }
+        .setPositiveButton(R.string.ok) { _, _ ->
+            // Check if it's empty or duplicate
+            val stringToSubmit = contentView.string_input_edittext.text.toString()
+            if (stringToSubmit.isBlank()) {
+                val emptyCheckFailureDialog = MaterialAlertDialogBuilder(ctx)
+                    .setPositiveButton(R.string.ok) { _, _ -> }
+                    .setTitle(ctx.getString(R.string.changes_not_saved))
+                    .setMessage(ctx.getString(R.string.source_name_empty_prompt))
+                emptyCheckFailureDialog.show()
+            } else {
+                // TODO: Check source name duplication
+                onSubmitListener.onSourceSubmit(stringToSubmit)
+            }
+        }
+        .setTitle(if (sourceName != null) {
+            ctx.getString(R.string.modify_name)
+        } else {
+            ctx.getString(R.string.new_source)
+        })
+        .create()
+    dialog.setOnShowListener {
+        dialog.window!!.apply {
+            clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
+            setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        }
+        contentView.string_input_edittext.requestFocus()
+    }
+    return dialog
+}
+
+private interface OnSourceSubmitListener {
+    fun onSourceSubmit(sourceName: String)
 }

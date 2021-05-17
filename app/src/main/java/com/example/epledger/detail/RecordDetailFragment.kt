@@ -13,7 +13,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.fragment.app.activityViewModels
 import com.example.epledger.R
-import com.example.epledger.model.DatabaseViewModel
+import com.example.epledger.db.DatabaseModel
 import com.example.epledger.nav.NavigationFragment
 import com.example.epledger.qaction.screenshot.ScreenshotUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -42,7 +42,7 @@ import kotlin.collections.ArrayList
  */
 class RecordDetailFragment:
     NavigationFragment(), AdapterView.OnItemSelectedListener {
-    private val dbModel: DatabaseViewModel by activityViewModels()
+    private val dbModel: DatabaseModel by activityViewModels()
 
     companion object {
         // 没有被注明的来源或种类始终放在0号位
@@ -185,10 +185,10 @@ class RecordDetailFragment:
         view.detail_star.isChecked = bindingRecord.starred
 
         // 更新日期组件显示
-        if (bindingRecord.startingDate == null) {
+        if (bindingRecord.mDate == null) {
             clearDate(view)
         } else {
-            val date = bindingRecord.startingDate!!
+            val date = bindingRecord.mDate!!
             val cal = Calendar.getInstance()
             cal.time = date
             val month = cal.get(Calendar.MONTH)
@@ -464,7 +464,7 @@ fun RecordDetailFragment.setDate(view: View, year: Int, month: Int, dayOfMonth: 
     cal.set(year, month, dayOfMonth)
     val date = Date(cal.timeInMillis)
     // 保存记录
-    bindingRecord.startingDate = date
+    bindingRecord.mDate = date
     // 更新视图
     val simpleFormat = SimpleDateFormat("yyyy/MM/dd", Locale.US)
     val dateText = view.findViewById<EditText>(R.id.detail_date_text)

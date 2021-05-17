@@ -67,8 +67,8 @@ open class NavigationFragment: Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
         menu.clear()
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onStop() {
@@ -133,30 +133,31 @@ open class NavigationFragment: Fragment() {
                         fromMainPage: Boolean = false) {
             val transaction: FragmentTransaction = fragmentManager.beginTransaction()
             // Set transition animations
-            if (fromMainPage) {
-                transaction.setCustomAnimations(
-                        R.anim.fade_in,
-                        R.anim.fade_out,
-                        R.anim.fade_in,
-                        R.anim.fade_out
-                )
-            } else {
-                // Somewhat ugly...
+//            if (fromMainPage) {
 //                transaction.setCustomAnimations(
-//                        R.anim.slide_in,
-//                        R.anim.slide_out_below,
-//                        R.anim.slide_in_below,
-//                        R.anim.slide_out
+//                        R.anim.fade_in,
+//                        R.anim.fade_out,
+//                        R.anim.fade_in,
+//                        R.anim.fade_out
 //                )
-                transaction.setCustomAnimations(
-                        R.anim.fade_in,
-                        R.anim.fade_out,
-                        R.anim.fade_in,
-                        R.anim.fade_out
-                )
-            }
+//            } else {
+//                // Somewhat ugly...
+////                transaction.setCustomAnimations(
+////                        R.anim.slide_in,
+////                        R.anim.slide_out_below,
+////                        R.anim.slide_in_below,
+////                        R.anim.slide_out
+////                )
+//                transaction.setCustomAnimations(
+//                        R.anim.fade_in,
+//                        R.anim.fade_out,
+//                        R.anim.fade_in,
+//                        R.anim.fade_out
+//                )
+//            }
             // Use replace to get animation to work
 //            transaction.replace(android.R.id.content, fragment)
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
             // Use add to ignore bottom-layer animation
             transaction.add(android.R.id.content, fragment)
             // Commit
