@@ -9,21 +9,17 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.ViewModel;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.epledger.R;
-import com.example.epledger.detail.DetailRecord;
-import com.example.epledger.model.DatabaseViewModel;
-import com.example.epledger.model.entry.Entry;
+import com.example.epledger.db.DatabaseModel;
+import com.example.epledger.home.model.Entry;
 import com.example.epledger.settings.datamgr.Category;
 
 import java.util.List;
 
-import kotlin.random.Random;
-
 public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> {
-    private DatabaseViewModel dbModel;
+    private DatabaseModel dbModel;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private final ImageView labelImage;
@@ -95,7 +91,7 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
     // 事件回调监听
     private EntryAdapter.OnItemClickListener onItemClickListener;
 
-    public EntryAdapter(List<Entry> entryList, DatabaseViewModel model) {
+    public EntryAdapter(List<Entry> entryList, DatabaseModel model) {
         this.mEntryList = entryList;
         dbModel = model;
     }

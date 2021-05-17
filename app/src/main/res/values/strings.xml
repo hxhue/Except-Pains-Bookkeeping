@@ -197,5 +197,8 @@
     <string name="category_number_too_large_prompt">Your categories are too many. We strongly suggest keeping only a few of them.</string>
     <string name="unspecified"><i>(Unspecified)</i></string>
     <string name="new_category">New Category</string>
+    <string name="discard_changes_confirm">Are you sure about discarding all the changes?</string>
+    <string name="restore_prev_state">Previous state restored.</string>
+    <string name="source_name_empty_prompt">You can\'t create a source whose name is empty. Please input some useful information.</string>
 
 </resources>

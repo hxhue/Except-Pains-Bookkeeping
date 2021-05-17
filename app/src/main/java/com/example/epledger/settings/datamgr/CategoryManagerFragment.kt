@@ -10,7 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.epledger.R
-import com.example.epledger.model.DatabaseViewModel
+import com.example.epledger.db.DatabaseModel
 import com.example.epledger.nav.NavigationFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.dialog_category_edit.view.*
@@ -19,7 +19,7 @@ import kotlinx.android.synthetic.main.mgr_rec_cate.view.*
 import kotlinx.android.synthetic.main.mgr_rec_cate_item.view.*
 
 class CategoryManagerFragment: NavigationFragment() {
-    private val dbModel: DatabaseViewModel by activityViewModels()
+    private val dbModel: DatabaseModel by activityViewModels()
     private val recyclerViewAdapter by lazy {
         val categories = dbModel.requireCategories()
         CategoryAdapter(categories, requireActivity().supportFragmentManager)
@@ -66,8 +66,8 @@ class CategoryManagerFragment: NavigationFragment() {
     }
 
     class CategoryAdapter(
-            var categoryList: ArrayList<Category>,
-            val fragmentManager: FragmentManager
+        var categoryList: ArrayList<Category>,
+        private val fragmentManager: FragmentManager
     ):RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         class ViewHolder(view: View): RecyclerView.ViewHolder(view) {}

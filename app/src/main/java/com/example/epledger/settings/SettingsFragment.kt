@@ -77,6 +77,7 @@ class SettingsFragment: PreferenceFragmentCompat(), SharedPreferences.OnSharedPr
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        menu.clear()
         inflater.inflate(R.menu.settings_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }

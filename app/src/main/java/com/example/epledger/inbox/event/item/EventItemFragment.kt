@@ -7,8 +7,10 @@ import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.EditText
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
+import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
@@ -41,9 +43,7 @@ class EventItemFragment: NavigationFragment(),
     private var firstTimeForIcons = true
 
     // TODO: move to another place
-    private val iconIDs = {
-        IconAsset.assets
-    }()
+    private val iconIDs = IconAsset.assets
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         menu.clear()
@@ -57,7 +57,22 @@ class EventItemFragment: NavigationFragment(),
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return super.onOptionsItemSelected(item) or when (item.itemId) {
+        return when (item.itemId) {
+            // Somewhat useless? (API 30)
+            android.R.id.home -> {
+                if (eventsModel.isEditing()) {
+                    val dialog = MaterialAlertDialogBuilder(requireContext())
+                        .setMessage(getString(R.string.discard_changes_confirm))
+                        .setNegativeButton(R.string.no) {_, _ -> }
+                        .setPositiveButton(R.string.ok) {_, _ ->
+                            exitNavigationFragment()
+                        }
+                    dialog.show()
+                } else {
+                    exitNavigationFragment()
+                }
+                true
+            }
             R.id.menu_item_delete -> {
                 if (!eventsModel.isNewEvent() && eventsModel.eventIndex >= 0) {
                     val dialog = MaterialAlertDialogBuilder(requireContext())
@@ -86,6 +101,9 @@ class EventItemFragment: NavigationFragment(),
                     eventsModel.setEditing(false)
                     // Resume previous status && no need to prepare
                     itemModel.item.value = eventsModel.getCurrentEvent().copy()
+                    Toast.makeText(requireContext(), getString(R.string.restore_prev_state), Toast.LENGTH_SHORT).show()
+                } else {
+                    throw java.lang.IllegalStateException()
                 }
                 true
             }
@@ -179,12 +197,9 @@ class EventItemFragment: NavigationFragment(),
             view.event_item_name_text.isEnabled = editing
             view.event_item_icon_recycler_view.apply {
                 if (firstTimeForIcons and !editing) {
-                    alpha = 0.0f
+                    this.alpha = 0.0f
                 } else {
                     animate().alpha(if (editing) 1.0f else 0.0f).setDuration(100)
-                }
-                itemModel.viewModelScope.launch {
-                    setAllEnabled(editing)
                 }
                 firstTimeForIcons = false
             }
@@ -271,6 +286,12 @@ class EventItemFragment: NavigationFragment(),
     }
 
     override fun onPositionClick(position: Int) {
+        // Do not perform change when view is not being edited
+        if (!eventsModel.isEditing()) {
+            return
+        }
+
+        // Change iconResID
         val e = itemModel.getCurrentEvent()
         e.iconResID = iconIDs[position]
         prepareItemRebind()

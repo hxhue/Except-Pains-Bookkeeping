@@ -289,7 +289,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
 
     private fun discardDatePickerWidget() {
         // Set data
-        ledgerRecord.startingDate = Date()
+        ledgerRecord.mDate = Date()
 
         // Set the view
         val view = findViewById<View>(R.id.qa_date_compo)
@@ -395,7 +395,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         // 设置默认日期为今日
         val simpleFormat = SimpleDateFormat("yyyy/MM/dd", Locale.US)
         val dateOfNow = Date()
-        ledgerRecord.startingDate = dateOfNow
+        ledgerRecord.mDate = dateOfNow
         dateText.setText(simpleFormat.format(dateOfNow))
 
         // 添加按钮回调
@@ -404,7 +404,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
             val cal = Calendar.getInstance()
             cal.set(year, month, dayOfMonth)
             val date = Date(cal.timeInMillis)
-            ledgerRecord.startingDate = date
+            ledgerRecord.mDate = date
             dateText.setText(simpleFormat.format(date))
         }
 

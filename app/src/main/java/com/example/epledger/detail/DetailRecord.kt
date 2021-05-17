@@ -3,13 +3,12 @@ package com.example.epledger.detail
 import android.graphics.Bitmap
 import android.os.Parcel
 import android.os.Parcelable
-import com.example.epledger.model.entry.Entry
-import com.example.epledger.settings.datamgr.Category
+import com.example.epledger.home.model.Entry
 import java.util.Date
 
 class DetailRecord() : Parcelable, Entry {
     var ID: Long? = null
-    var startingDate: Date? = null
+    var mDate: Date? = null
     var hourOfDay: Int? = null
     var minuteOfHour: Int? = null
     var amount: Double? = 0.0
@@ -30,12 +29,11 @@ class DetailRecord() : Parcelable, Entry {
         screenshotPath = parcel.readString()
         note = parcel.readString()
         starred = parcel.readByte() != 0.toByte()
-        startingDate = parcel.readValue(Date::class.java.classLoader) as? Date
+        mDate = parcel.readValue(Date::class.java.classLoader) as? Date
     }
 
-    // 是否完整可以通过上面关系自动判断，至少有前三个即为完整
     override fun toString(): String {
-        return "LedgerRecord(date=$startingDate, hourOfDay=$hourOfDay, minuteOfHour=$minuteOfHour, amount=$amount, " +
+        return "LedgerRecord(date=$mDate, hourOfDay=$hourOfDay, minuteOfHour=$minuteOfHour, amount=$amount, " +
                 "type=$category, source=$source, screenshot=$screenshot, note=$note, starred=$starred)"
     }
 
@@ -80,11 +78,11 @@ class DetailRecord() : Parcelable, Entry {
     }
 
     override fun getDate(): Date? {
-        return this.startingDate
+        return this.mDate
     }
 
     override fun setDate(date: Date?) {
-        this.startingDate = date!!
+        this.mDate = date!!
     }
 
     override fun getEntryCategory(): String? {
@@ -103,7 +101,7 @@ class DetailRecord() : Parcelable, Entry {
 
     fun copyTo(another: DetailRecord) {
         another.ID = ID
-        another.startingDate = startingDate
+        another.mDate = mDate
         another.hourOfDay = hourOfDay
         another.minuteOfHour = minuteOfHour
         another.amount = amount
@@ -125,7 +123,7 @@ class DetailRecord() : Parcelable, Entry {
         parcel.writeString(screenshotPath)
         parcel.writeString(note)
         parcel.writeByte(if (starred) 1 else 0)
-        parcel.writeValue(startingDate)
+        parcel.writeValue(mDate)
     }
 
     override fun describeContents(): Int {

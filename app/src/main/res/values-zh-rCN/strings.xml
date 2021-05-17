@@ -176,4 +176,7 @@
     <string name="incomplete">不完整</string>
     <string name="screenshots">截图</string>
     <string name="events">事件</string>
+    <string name="discard_changes_confirm">您确定要丢弃所有更改吗？</string>
+    <string name="restore_prev_state">已恢复之前的状态。</string>
+    <string name="source_name_empty_prompt">您不能创建一个名称为空的来源。请输入一些有用的信息。</string>
 </resources>
