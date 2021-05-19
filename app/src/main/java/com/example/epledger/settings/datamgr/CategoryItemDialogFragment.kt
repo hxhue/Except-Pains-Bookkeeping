@@ -4,6 +4,8 @@ import android.app.Dialog
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.graphics.Point
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,6 +27,9 @@ import com.example.epledger.util.IconAsset
 import com.example.epledger.util.ScreenMetrics
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.dialog_category_edit.view.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 class CategoryItemDialogFragment: DialogFragment(), IconItemAdapter.OnPositionClickListener {
@@ -150,8 +155,12 @@ class CategoryItemDialogFragment: DialogFragment(), IconItemAdapter.OnPositionCl
             imm?.hideSoftInputFromWindow(dialogContent.category_name_edittext.windowToken, 0)
             // Move focus off input field
             dialogContent.category_name_edittext.clearFocus()
-            // Set icon recyclerView visible
-            setIconRecyclerViewVisibility(true)
+
+            // Wait some time and set set recyclerView visible
+            // 通过Post运行能够延缓一段时间
+            Handler(Looper.getMainLooper()).post {
+                setIconRecyclerViewVisibility(true)
+            }
         }
 
         // 3. Set up input field
@@ -196,9 +205,6 @@ class CategoryItemDialogFragment: DialogFragment(), IconItemAdapter.OnPositionCl
                 setSelection(it.length)
             }
         })
-
-        // Add keyboard event listener
-//        setKeyboardVisibilityListener(view,this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

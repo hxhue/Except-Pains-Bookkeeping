@@ -3,13 +3,15 @@ package com.example.epledger
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.viewpager.widget.ViewPager
+import com.example.epledger.db.DatabaseModel
+import com.example.epledger.inbox.event.item.EventItemFragment
 import com.example.epledger.nav.MainPagerAdapter
 import com.example.epledger.nav.MainScreen
-import com.example.epledger.nav.NavigationFragment
 import com.example.epledger.nav.getMainScreenForMenuItem
 import com.example.epledger.qaction.loadQuickActionModule
 import com.example.epledger.util.loadNotificationModule
@@ -18,9 +20,15 @@ import com.google.android.material.bottomnavigation.LabelVisibilityMode
 
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
+    private val dbModel by viewModels<DatabaseModel>()
     private lateinit var viewPager: ViewPager
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var mainPagerAdapter: MainPagerAdapter
+
+    /**
+     * 由于EventItem页面打开很卡，所以需要事先缓存。
+     */
+    private var cachedEventItemFragment: EventItemFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,6 +82,11 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         viewPager.offscreenPageLimit = 4
     }
 
+    override fun onResume() {
+        super.onResume()
+        dbModel.reloadDatabase()
+    }
+
     /**
      * Selects the specified item in the bottom navigation view.
      */
@@ -97,6 +110,20 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         val ctx = this.applicationContext
         loadNotificationModule(ctx)
         loadQuickActionModule(ctx)
+        // 创建cache的视图
+        createViewCache()
+    }
+
+    private fun createViewCache() {
+        cachedEventItemFragment = EventItemFragment()
+    }
+
+    private fun invalidateCachedViews() {
+        cachedEventItemFragment = null
+    }
+
+    fun requireCachedEventItemFragment(): EventItemFragment {
+        return cachedEventItemFragment!!
     }
 
     override fun onStop() {
@@ -106,6 +133,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     override fun onDestroy() {
         super.onDestroy()
+        invalidateCachedViews()
         Log.d("MainActivity", "onDestroy")
     }
 

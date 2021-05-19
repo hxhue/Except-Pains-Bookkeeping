@@ -146,7 +146,7 @@
     <string name="no_events_prompt">您还没有添加事件。</string>
     <string name="alert_time">提醒时间</string>
     <string name="noti_time_sum_fmt">当前为 %s (24小时制)</string>
-    <string name="have_not_set_time_prompt">您还没有设定时间。</string>
+    <string name="have_not_set_time_prompt">您还没有设定时间</string>
     <string name="event_del_comfirm">您确定要删除这个事件吗？</string>
     <string name="create_event">创建事件</string>
     <string name="modify_event">修改事件</string>
@@ -179,4 +179,5 @@
     <string name="discard_changes_confirm">您确定要丢弃所有更改吗？</string>
     <string name="restore_prev_state">已恢复之前的状态。</string>
     <string name="source_name_empty_prompt">您不能创建一个名称为空的来源。请输入一些有用的信息。</string>
+    <string name="record_incomplete_prompt">这条记录不完整因而不能够被提交。请至少提供金额和种类信息。</string>
 </resources>

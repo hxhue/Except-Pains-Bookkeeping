@@ -4,12 +4,14 @@ import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
+import com.example.epledger.MainActivity
 import com.example.epledger.R
 import com.example.epledger.inbox.event.viewmodel.EventViewModel
 import com.example.epledger.inbox.event.item.EventItem
 import com.example.epledger.inbox.event.item.EventItemFragment
 import com.example.epledger.nav.NavigationFragment
 import kotlinx.android.synthetic.main.fragment_event.view.*
+import kotlinx.android.synthetic.main.fragment_event_list.view.*
 import java.util.Date
 
 class EventFragment: NavigationFragment() {
@@ -24,12 +26,15 @@ class EventFragment: NavigationFragment() {
 
     private fun setUpView(view: View) {
         view.btn_add_event_to_list.setOnClickListener {
-            val newFragment = EventItemFragment()
+            val newFragment = (this.activity as MainActivity).requireCachedEventItemFragment()
+            newFragment.shouldCopyItem = true
+
             model.setNewEvent(true)
             model.setEditing(true)
             val newEvent = EventItem("", Date(), 1, EventItem.CycleUnit.DAY)
             model.setCurrentEvent(newEvent)
-            NavigationFragment.pushToStack(requireActivity().supportFragmentManager, newFragment)
+
+            pushToStack(requireActivity().supportFragmentManager, newFragment)
         }
     }
 }
