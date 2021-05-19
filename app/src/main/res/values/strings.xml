@@ -163,7 +163,7 @@
     <string name="unit_year">" year(s)"</string>
     <string name="event_info_fmt">From %s. Cycle: %d%s.</string>
     <string name="unconditionally_remind">Remind me unconditionally</string>
-    <string name="unconditionally_remind_sum">even if no recurring events have expired</string>
+    <string name="unconditionally_remind_sum">even if no events have expired</string>
     <string name="alert">Alert</string>
     <string name="recurring_events">Recurring Events</string>
     <string name="stop_ck_prompt">Stopping foreground service</string>
@@ -171,7 +171,7 @@
     <string name="no_events_prompt">You have no events here.</string>
     <string name="alert_time">Alert time</string>
     <string name="noti_time_sum_fmt">Current: %s (24-hour clock)</string>
-    <string name="have_not_set_time_prompt">You haven\'t set the time yet.</string>
+    <string name="have_not_set_time_prompt">You haven\'t set the time yet</string>
     <string name="event_del_comfirm">Are you sure about deleting this event?</string>
     <string name="create_event">Create Event</string>
     <string name="modify_event">Modify Event</string>
@@ -200,5 +200,6 @@
     <string name="discard_changes_confirm">Are you sure about discarding all the changes?</string>
     <string name="restore_prev_state">Previous state restored.</string>
     <string name="source_name_empty_prompt">You can\'t create a source whose name is empty. Please input some useful information.</string>
+    <string name="record_incomplete_prompt">This record is considered incomplete and cannot be submitted. Please at least provide information about money and category.</string>
 
 </resources>

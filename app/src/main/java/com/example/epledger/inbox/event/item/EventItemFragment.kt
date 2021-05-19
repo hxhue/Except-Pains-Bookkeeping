@@ -28,7 +28,10 @@ import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 
-
+/**
+ * 每次进入之前都应该设置shouldCopyItem为true。
+ * 因为这个类是可以缓存下来的，因此要设置额外的标志。
+ */
 class EventItemFragment: NavigationFragment(),
         AdapterView.OnItemSelectedListener, IconItemAdapter.OnPositionClickListener {
     private val eventsModel: EventViewModel by activityViewModels()
@@ -40,7 +43,9 @@ class EventItemFragment: NavigationFragment(),
             getString(R.string.unit_year)
         )
     }
+
     private var firstTimeForIcons = true
+    var shouldCopyItem = true
 
     // TODO: move to another place
     private val iconIDs = IconAsset.assets
@@ -132,10 +137,14 @@ class EventItemFragment: NavigationFragment(),
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        // Copy EventItem
-        itemModel.item.value = eventsModel.getCurrentEvent().copy()
+    override fun onResume() {
+        super.onResume()
+        if (shouldCopyItem) {
+            // Copy EventItem
+            itemModel.item.value = eventsModel.getCurrentEvent().copy()
+            shouldCopyItem = false
+            firstTimeForIcons = true
+        }
     }
 
     override fun onCreateView(
@@ -299,7 +308,7 @@ class EventItemFragment: NavigationFragment(),
     }
 }
 
-fun View.setAllEnabled(enabled: Boolean) {
-    isEnabled = enabled
-    if (this is ViewGroup) this.children.forEach { child -> child.setAllEnabled(enabled) }
-}
+//fun View.setAllEnabled(enabled: Boolean) {
+//    isEnabled = enabled
+//    if (this is ViewGroup) this.children.forEach { child -> child.setAllEnabled(enabled) }
+//}

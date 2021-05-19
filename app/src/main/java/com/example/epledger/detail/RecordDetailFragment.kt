@@ -16,6 +16,7 @@ import com.example.epledger.R
 import com.example.epledger.db.DatabaseModel
 import com.example.epledger.nav.NavigationFragment
 import com.example.epledger.qaction.screenshot.ScreenshotUtils
+import com.example.epledger.util.Fmt
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.activity_detail_content.*
 import kotlinx.android.synthetic.main.activity_detail_content.view.*
@@ -25,7 +26,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
 import java.lang.RuntimeException
-import java.text.SimpleDateFormat
+import java.math.RoundingMode
+import java.text.DecimalFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -89,8 +91,8 @@ class RecordDetailFragment:
     private lateinit var categorySpinnerAdapter: ArrayAdapter<String>
 
     interface DetailRecordMsgReceiver {
-        fun onDetailRecordSubmitted(record: DetailRecord)
-        fun onDetailRecordSDeleted(record: DetailRecord)
+        fun onDetailRecordSubmit(record: DetailRecord)
+        fun onDetailRecordDelete(record: DetailRecord)
     }
 
     private var receiver: DetailRecordMsgReceiver? = null
@@ -103,15 +105,23 @@ class RecordDetailFragment:
         require(parent != null)
         val bindingRecord = bindingRecord!!
         when (parent.id) {
-            R.id.qa_src_spinner -> {
+            R.id.detail_src_spinner -> {
                 Log.d("RecordDetailFragment",
                         "onItemSelected(): sourceSpinner has (${sources[position]}) selected.")
-                bindingRecord.source = sources[position]
+                if (position == UNSPECIFIED_ITEM_POSITION) {
+                    bindingRecord.source = null
+                } else {
+                    bindingRecord.source = sources[position]
+                }
             }
-            R.id.qa_type_spinner -> {
+            R.id.detail_type_spinner -> {
                 Log.d("RecordDetailFragment",
                         "onItemSelected(): categorySpinner has (${categories[position]}) selected.")
-                bindingRecord.category = categories[position]
+                if (position == UNSPECIFIED_ITEM_POSITION) {
+                    bindingRecord.category = null
+                } else {
+                    bindingRecord.category = categories[position]
+                }
             }
         }
     }
@@ -120,6 +130,18 @@ class RecordDetailFragment:
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.activity_detail_scrollable_content, container, false)
+
+        // 如果是新建一个记录，那么就不会有已有的截图（因为截图是快捷操作对话框提供的功能）
+        // 因此，和截图有关的组件不必显示出来
+        if (bindingRecord == null || bindingRecord!!.ID == null) {
+            view.apply {
+                detail_screenshot.visibility = View.GONE
+                detail_screenshot_empty_prompt.visibility = View.GONE
+                detail_screenshot_label.visibility = View.GONE
+                detail_screenshot_remove_button.visibility = View.GONE
+            }
+        }
+
         return view
     }
 
@@ -184,34 +206,27 @@ class RecordDetailFragment:
         // 更新标星属性
         view.detail_star.isChecked = bindingRecord.starred
 
+        // 更新日期和时间
+        val date = bindingRecord.mDate
+        val cal = Calendar.getInstance()
+        cal.time = date
+
         // 更新日期组件显示
-        if (bindingRecord.mDate == null) {
-            clearDate(view)
-        } else {
-            val date = bindingRecord.mDate!!
-            val cal = Calendar.getInstance()
-            cal.time = date
-            val month = cal.get(Calendar.MONTH)
-            val year = cal.get(Calendar.YEAR)
-            val dayOfMonth = cal.get(Calendar.DAY_OF_MONTH)
-            setDate(view, year, month, dayOfMonth)
-        }
+        val month = cal.get(Calendar.MONTH)
+        val year = cal.get(Calendar.YEAR)
+        val dayOfMonth = cal.get(Calendar.DAY_OF_MONTH)
+        setDate(view, year, month, dayOfMonth)
 
         // 更新时间组件显示
-        val hr = bindingRecord.hourOfDay
-        val m = bindingRecord.minuteOfHour
-        if (hr != null && m != null) {
-            setTime(view, hr, m)
-        } else {
-            clearTime(view)
-        }
+        val hr = cal.get(Calendar.HOUR_OF_DAY)
+        val m = cal.get(Calendar.MINUTE)
+        setTime(view, hr, m)
 
         // 更新金额组件显示
         val moneyText = view.findViewById<EditText>(R.id.detail_money_text)
-        if (bindingRecord.amount == null) {
-            moneyText.setText("")
-        } else {
-            moneyText.setText(bindingRecord.amount.toString())
+        moneyText.apply {
+            setText(bindingRecord.moneyAmount.toString())
+            setSelection(text.length)
         }
 
         // 更新备注组件显示
@@ -365,14 +380,24 @@ class RecordDetailFragment:
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return super.onOptionsItemSelected(item) or when(item.itemId) {
             R.id.menu_item_submit -> {
-                Toast.makeText(context, "Submit", Toast.LENGTH_SHORT).show()
                 // 拉取更改
                 prepareRecord()
+
                 // TODO: 提交数据库
-                receiver?.onDetailRecordSubmitted(bindingRecord!!)
-                Log.d("prepareRecord", bindingRecord.toString())
-                // 返回
-                super.exitNavigationFragment()
+                Log.d("************************ Submit record", "$bindingRecord")
+
+                if (bindingRecord!!.isComplete()) {
+                    // 提交并返回
+                    receiver?.onDetailRecordSubmit(bindingRecord!!)
+                    super.exitNavigationFragment()
+                } else {
+                    // 对于不完整的记录给出提醒且不予提交
+                    val dialog = MaterialAlertDialogBuilder(requireContext())
+                        .setMessage(getString(R.string.record_incomplete_prompt))
+                        .setPositiveButton(R.string.ok) { _, _ -> }
+                    dialog.show()
+                }
+
                 true
             }
             R.id.menu_item_discard -> {
@@ -393,7 +418,7 @@ class RecordDetailFragment:
                         .setMessage(getString(R.string.rec_del_confirm))
                         .setPositiveButton(getString(R.string.sure)) { _, _ ->
                             // TODO：删除该条记录
-                            receiver?.onDetailRecordSDeleted(bindingRecord!!)
+                            receiver?.onDetailRecordDelete(bindingRecord!!)
                             // 返回
                             super.exitNavigationFragment()
                         }
@@ -436,8 +461,15 @@ class RecordDetailFragment:
 fun RecordDetailFragment.setTime(view: View, hourOfDay: Int, minuteOfHour: Int) {
     // 保存记录
     val bindingRecord = getBindingRecord()
-    bindingRecord.hourOfDay = hourOfDay
-    bindingRecord.minuteOfHour = minuteOfHour
+    bindingRecord.mDate.let { date ->
+        val cal = Calendar.getInstance()
+        // 和设置timeInMills是等效的，可以点进去看jdk的实现。不会影响到date这个参数
+        cal.time = date
+        cal.set(Calendar.HOUR_OF_DAY, hourOfDay)
+        cal.set(Calendar.MINUTE, minuteOfHour)
+        date.time = cal.timeInMillis
+    }
+
     val str = String.format("%02d:%02d", hourOfDay, minuteOfHour)
     // 更新视图
     val timeText = view.findViewById<EditText>(R.id.detail_time_text)
@@ -461,14 +493,13 @@ fun RecordDetailFragment.setDate(view: View, year: Int, month: Int, dayOfMonth: 
     val bindingRecord = getBindingRecord()
     // 生成日期数据
     val cal = Calendar.getInstance()
+    cal.timeInMillis = bindingRecord.mDate.time
     cal.set(year, month, dayOfMonth)
-    val date = Date(cal.timeInMillis)
     // 保存记录
-    bindingRecord.mDate = date
+    bindingRecord.mDate.time = cal.timeInMillis
     // 更新视图
-    val simpleFormat = SimpleDateFormat("yyyy/MM/dd", Locale.US)
     val dateText = view.findViewById<EditText>(R.id.detail_date_text)
-    dateText.setText(simpleFormat.format(date))
+    dateText.setText(Fmt.date.format(bindingRecord.mDate))
 }
 
 /**
@@ -482,37 +513,36 @@ fun RecordDetailFragment.syncScreenshot(view: View) {
     var bitmap: Bitmap? = null
     val record = getBindingRecord()
 
-    GlobalScope.launch {
-        withContext(Dispatchers.IO) {
-            if (record.screenshot != null) {
+    GlobalScope.launch(Dispatchers.IO) {
+        if (record.screenshot != null) {
+            bitmap = record.screenshot
+        } else if (record.screenshotPath != null) {
+            try {
+                record.screenshot = ScreenshotUtils.loadBitmap(requireContext(),
+                    record.screenshotPath!!)
+            } catch (e: Exception) {
+                record.screenshot = null
+            } finally {
                 bitmap = record.screenshot
-            } else if (record.screenshotPath != null) {
-                try {
-                    record.screenshot = ScreenshotUtils.loadBitmap(requireContext(),
-                            record.screenshotPath!!)
-                } catch (e: Exception) {
-                    record.screenshot = null
-                } finally {
-                    bitmap = record.screenshot
-                }
-            }
-            Handler(Looper.getMainLooper()).post {
-                record.screenshot = bitmap
-                if (bitmap == null) {
-                    promptText.setText(R.string.empty_prompt)
-                    promptText.setTextColor(requireContext().getColor(R.color.silver))
-                    removeButton.isEnabled = false
-                    removeButton.setTextColor(requireContext().getColor(R.color.silver))
-                    imageView.setImageDrawable(null)
-                } else {
-                    imageView.setImageBitmap(bitmap)
-                    promptText.setText("")
-                    removeButton.isEnabled = isEditing()
-                    removeButton.setTextColor(  if (isEditing()) requireContext().getColor(R.color.lightColorPrimary)
-                                                else requireContext().getColor(R.color.silver))
-                }
             }
         }
+        Handler(Looper.getMainLooper()).post {
+            record.screenshot = bitmap
+            if (bitmap == null) {
+                promptText.setText(R.string.empty_prompt)
+                promptText.setTextColor(requireContext().getColor(R.color.silver))
+                removeButton.isEnabled = false
+                removeButton.setTextColor(requireContext().getColor(R.color.silver))
+                imageView.setImageDrawable(null)
+            } else {
+                imageView.setImageBitmap(bitmap)
+                promptText.setText("")
+                removeButton.isEnabled = isEditing()
+                removeButton.setTextColor(  if (isEditing()) requireContext().getColor(R.color.lightColorPrimary)
+                else requireContext().getColor(R.color.silver))
+            }
+        }
+
     }
 }
 
@@ -528,11 +558,16 @@ fun RecordDetailFragment.clearScreenshot() {
  */
 fun RecordDetailFragment.prepareRecord() {
     val bindingRecord = getBindingRecord()
+
     // 拉取金额
-    bindingRecord.amount = try {
-        detail_money_text.text.toString().toDouble()
+    bindingRecord.moneyAmount = try {
+        val money = detail_money_text.text.toString().toDouble()
+        // 格式化金额
+        val format = DecimalFormat("0.##")
+        format.roundingMode = RoundingMode.FLOOR
+        format.format(money).toDouble()
     } catch (e: Exception) {
-        null
+        -0.0
     }
 
     // 拉取附注

@@ -2,6 +2,7 @@ package com.example.epledger.inbox.content
 
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -15,10 +16,13 @@ import com.xwray.groupie.ExpandableGroup
 import com.xwray.groupie.GroupieAdapter
 import com.example.epledger.inbox.event.list.EventFragment
 import com.example.epledger.db.DatabaseModel
+import com.example.epledger.home.model.Entry
 import com.example.epledger.home.model.Section
 
 class InboxFragment : Fragment() {
     private val dbModel: DatabaseModel by activityViewModels()
+    private var cachedEventFragment: EventFragment? = null
+
 //    var numOfStarredItems = 0
 //        set(value) {
 //            view?.let {
@@ -60,6 +64,8 @@ class InboxFragment : Fragment() {
         // Turn on option menu
         setHasOptionsMenu(true)
 
+        cachedEventFragment = EventFragment()
+
         // TODO: remove this debug section
 //        val button = view.findViewById<Button>(R.id.inbox_button_debug_create)
 //        button.setOnClickListener {
@@ -98,7 +104,7 @@ class InboxFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val sectionLab = SectionGroup(
             dbModel.requireGroupedRecords().map { group ->
-                Section(group.date, group.records)
+                Section(group.date, group.records as List<Entry>?)
             })
         val sections = sectionLab.sections
 
@@ -127,6 +133,11 @@ class InboxFragment : Fragment() {
         recyclerView.adapter = adapter
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        cachedEventFragment = null
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         menu.clear()
         inflater.inflate(R.menu.inbox_menu, menu)
@@ -136,8 +147,10 @@ class InboxFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_item_inbox_notification -> {
-                val newFragment = EventFragment()
-                NavigationFragment.pushToStack(requireActivity().supportFragmentManager, newFragment, true)
+                if (cachedEventFragment == null) {
+                    cachedEventFragment = EventFragment()
+                }
+                NavigationFragment.pushToStack(requireActivity().supportFragmentManager, cachedEventFragment!!, true)
                 true
             }
             else -> false

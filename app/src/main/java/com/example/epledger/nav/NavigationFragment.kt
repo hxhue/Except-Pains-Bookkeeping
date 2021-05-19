@@ -155,10 +155,15 @@ open class NavigationFragment: Fragment() {
 //                        R.anim.fade_out
 //                )
 //            }
-            // Use replace to get animation to work
-//            transaction.replace(android.R.id.content, fragment)
+            transaction.setCustomAnimations(
+                R.anim.slide_in,
+                R.anim.fade_out,
+                R.anim.fade_in,
+                R.anim.slide_out
+            )
+            // Use **replace to get animation to work.
+            // Or: use add to ignore bottom-layer animation.
             transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-            // Use add to ignore bottom-layer animation
             transaction.add(android.R.id.content, fragment)
             // Commit
             transaction.addToBackStack(null).commit()

@@ -8,10 +8,8 @@ import java.util.Date
 
 class DetailRecord() : Parcelable, Entry {
     var ID: Long? = null
-    var mDate: Date? = null
-    var hourOfDay: Int? = null
-    var minuteOfHour: Int? = null
-    var amount: Double? = 0.0
+    var mDate: Date = Date()
+    var moneyAmount: Double = -0.0
     var category: String? = null
     var source: String? = null
     var screenshot: Bitmap? = null
@@ -21,20 +19,19 @@ class DetailRecord() : Parcelable, Entry {
 
     constructor(parcel: Parcel) : this() {
         ID = parcel.readValue(Long::class.java.classLoader) as? Long
-        hourOfDay = parcel.readValue(Int::class.java.classLoader) as? Int
-        minuteOfHour = parcel.readValue(Int::class.java.classLoader) as? Int
-        amount = parcel.readValue(Double::class.java.classLoader) as? Double
+        moneyAmount = parcel.readValue(Double::class.java.classLoader) as Double
         category = parcel.readString()
         source = parcel.readString()
         screenshotPath = parcel.readString()
         note = parcel.readString()
         starred = parcel.readByte() != 0.toByte()
-        mDate = parcel.readValue(Date::class.java.classLoader) as? Date
+        mDate = parcel.readValue(Date::class.java.classLoader) as Date
     }
 
     override fun toString(): String {
-        return "LedgerRecord(date=$mDate, hourOfDay=$hourOfDay, minuteOfHour=$minuteOfHour, amount=$amount, " +
-                "type=$category, source=$source, screenshot=$screenshot, note=$note, starred=$starred)"
+        return "LedgerRecord(date=$mDate, amount=$moneyAmount, " +
+                "type=$category, source=$source, screenshot=$screenshot, " +
+                "note=$note, starred=$starred)"
     }
 
     override fun getEntryId(): Int {
@@ -46,11 +43,11 @@ class DetailRecord() : Parcelable, Entry {
     }
 
     override fun getAmount(): Double {
-        return this.amount!!
+        return this.moneyAmount!!
     }
 
     override fun setAmount(amount: Double) {
-        this.amount = amount
+        this.moneyAmount = amount
     }
 
     override fun getLabel(): String? {
@@ -77,12 +74,12 @@ class DetailRecord() : Parcelable, Entry {
         this.source = source!!
     }
 
-    override fun getDate(): Date? {
+    override fun getDate(): Date {
         return this.mDate
     }
 
-    override fun setDate(date: Date?) {
-        this.mDate = date!!
+    override fun setDate(date: Date) {
+        this.mDate = date
     }
 
     override fun getEntryCategory(): String? {
@@ -102,9 +99,7 @@ class DetailRecord() : Parcelable, Entry {
     fun copyTo(another: DetailRecord) {
         another.ID = ID
         another.mDate = mDate
-        another.hourOfDay = hourOfDay
-        another.minuteOfHour = minuteOfHour
-        another.amount = amount
+        another.moneyAmount = moneyAmount
         another.category = category
         another.source = source
         another.screenshot = screenshot
@@ -115,9 +110,7 @@ class DetailRecord() : Parcelable, Entry {
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeValue(ID)
-        parcel.writeValue(hourOfDay)
-        parcel.writeValue(minuteOfHour)
-        parcel.writeValue(amount)
+        parcel.writeValue(moneyAmount)
         parcel.writeString(category)
         parcel.writeString(source)
         parcel.writeString(screenshotPath)
@@ -130,6 +123,13 @@ class DetailRecord() : Parcelable, Entry {
         return 0
     }
 
+    /**
+     * 判断一个记录是否不完整。
+     */
+    fun isComplete(): Boolean {
+        return (moneyAmount != 0.0 && moneyAmount != -0.0) && category != null
+    }
+
     companion object CREATOR : Parcelable.Creator<DetailRecord> {
         override fun createFromParcel(parcel: Parcel): DetailRecord {
             return DetailRecord(parcel)
@@ -137,6 +137,11 @@ class DetailRecord() : Parcelable, Entry {
 
         override fun newArray(size: Int): Array<DetailRecord?> {
             return arrayOfNulls(size)
+        }
+
+        val dateReverseComparator = Comparator<DetailRecord> { o1, o2 ->
+            // 将o2这个参数放到前面就能够得到相反的比较结果
+            o2.mDate.compareTo(o1.mDate)
         }
     }
 }
