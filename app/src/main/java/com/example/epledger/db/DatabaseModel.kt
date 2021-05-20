@@ -19,7 +19,7 @@ class DatabaseModel: ViewModel() {
     // TODO: 把接口中的ArrayList去掉
     val sources = MutableLiveData<ArrayList<Source>>(ArrayList(0))
     val categories = MutableLiveData<ArrayList<Category>>(ArrayList(0))
-    val groupedRecords = MutableLiveData<Iterable<LedgerDatabase.RecordGroup>>(ArrayList())
+    val groupedRecords = MutableLiveData<Iterable<LedgerDatabase.RecordGroup>>(ArrayList(0))
 
     // 所有的记录
     private val records = MutableLiveData<ArrayList<DetailRecord>>(ArrayList(0))
@@ -31,6 +31,22 @@ class DatabaseModel: ViewModel() {
 //    val incompleteRecords = MutableLiveData<ArrayList<DetailRecord>>(ArrayList(0))
 //    val shotsIncludedRecords = MutableLiveData<ArrayList<DetailRecord>>(ArrayList(0))
 //    val starredRecords = MutableLiveData<ArrayList<DetailRecord>>(ArrayList(0))
+
+    /**
+     * 清空所有记录，释放存储。但必须已经初始化了之后才能够调用这个函数。
+     * （2021年5月20日13:43:15）Harmful，但是不知道原因
+     */
+    fun clearDatabase() {
+        sources.postValue(ArrayList(0))
+        categories.postValue(ArrayList(0))
+        groupedRecords.postValue(ArrayList(0))
+        records.postValue(ArrayList(0))
+
+        // 非ViewModel的数据是可以在IO线程更新的，也不必post到主线程
+        GlobalScope.launch(Dispatchers.IO) {
+            groupedRecordsWithDate.clear()
+        }
+    }
 
     /**
      * 重载数据库，拉取所有数据。
@@ -55,15 +71,9 @@ class DatabaseModel: ViewModel() {
             this@DatabaseModel.groupedRecordsWithDate = groupRecordsByDate(records)
             val groups = this@DatabaseModel.groupedRecordsWithDate.values
 
-            withContext(Dispatchers.Main) {
-                sources.value = srcList
-                categories.value = cateList
-                groupedRecords.value = groups
-//                    records.value = recordList
-//                    incompleteRecords.value = arrayListOf(rec2, rec3)
-//                    starredRecords.value = arrayListOf(rec1)
-//                    shotsIncludedRecords.value = arrayListOf(rec3)
-            }
+            sources.postValue(srcList)
+            categories.postValue(cateList)
+            groupedRecords.postValue(groups)
         }
     }
 
@@ -133,9 +143,7 @@ class DatabaseModel: ViewModel() {
             }
 
             // 3. 更新groupedRecords
-            withContext(Dispatchers.Main) {
-                groupedRecords.value = groupedRecordsWithDate.values
-            }
+            groupedRecords.postValue(groupedRecordsWithDate.values)
 
             // TODO: 检查其他相关信息，目前只做了首页
         }
@@ -146,7 +154,7 @@ class DatabaseModel: ViewModel() {
      * @param recordsOrderByDate 必须是已经按照date排序好的records
      * 注意，此方法会过滤掉那些不完整的记录。
      */
-    fun groupRecordsByDate(recordsOrderByDate: List<DetailRecord>): TreeMap<Date, LedgerDatabase.RecordGroup> {
+    private fun groupRecordsByDate(recordsOrderByDate: List<DetailRecord>): TreeMap<Date, LedgerDatabase.RecordGroup> {
         val map = TreeMap<Date, LedgerDatabase.RecordGroup>(reverseOrder())
         var group = ArrayList<DetailRecord>()
 
