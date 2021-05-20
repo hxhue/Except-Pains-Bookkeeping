@@ -134,17 +134,8 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     override fun onDestroy() {
         super.onDestroy()
         invalidateCachedViews()
+//        dbModel.clearDatabase()
         Log.d("MainActivity", "onDestroy")
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-//        try {
-//            val cur = supportFragmentManager.fragments.last()
-//            if (cur is NavigationFragment) {
-//                cur.onBackPressed()
-//            }
-//        } catch (e: Exception) {}
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {

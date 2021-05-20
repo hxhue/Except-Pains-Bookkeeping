@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.epledger.MainActivity
 import com.example.epledger.R
-import com.example.epledger.home.model.SectionGroup
 import com.example.epledger.nav.NavigationFragment
 import com.xwray.groupie.ExpandableGroup
 import com.xwray.groupie.GroupieAdapter
@@ -102,12 +101,10 @@ class InboxFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val sectionLab = SectionGroup(
-            dbModel.requireGroupedRecords().map { group ->
-                Section(group.date, group.records as List<Entry>?)
-            })
-        val sections = sectionLab.sections
 
+        val sections = dbModel.requireGroupedRecords().map { group ->
+            Section(group.date, group.records as List<Entry>?)
+        }
         val recyclerView = view.findViewById<RecyclerView>(R.id.inbox_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(view.context)
         recyclerView.itemAnimator = DefaultItemAnimator()
