@@ -2,7 +2,6 @@ package com.example.epledger.inbox.content
 
 import android.os.Bundle
 import android.view.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -15,8 +14,8 @@ import com.xwray.groupie.ExpandableGroup
 import com.xwray.groupie.GroupieAdapter
 import com.example.epledger.inbox.event.list.EventFragment
 import com.example.epledger.db.DatabaseModel
-import com.example.epledger.home.model.Entry
-import com.example.epledger.home.model.Section
+import com.example.epledger.model.Entry
+import com.example.epledger.model.Section
 
 class InboxFragment : Fragment() {
     private val dbModel: DatabaseModel by activityViewModels()

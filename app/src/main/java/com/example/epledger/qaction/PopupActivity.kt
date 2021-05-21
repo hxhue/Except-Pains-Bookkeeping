@@ -20,9 +20,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
 import com.example.epledger.R
-import com.example.epledger.db.DatabaseModel
 import com.example.epledger.db.model.AppDatabase
-import com.example.epledger.detail.DetailRecord
+import com.example.epledger.model.Record
 import com.example.epledger.detail.RecordDetailFragment
 import com.example.epledger.qaction.tool.PairTask
 import com.example.epledger.qaction.tool.Store
@@ -31,9 +30,7 @@ import com.example.epledger.util.Fmt
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.switchmaterial.SwitchMaterial
 import java.math.RoundingMode
-import java.text.DateFormat
 import java.text.DecimalFormat
-import java.text.SimpleDateFormat
 import java.util.*
 
 /**
@@ -48,7 +45,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
     private var shown = false
     private var noPermissionAlert: AlertDialog? = null
 
-    private var ledgerRecord = DetailRecord()
+    private var ledgerRecord = Record()
 
     // 用户的偏好设置
     private var briefMode = true

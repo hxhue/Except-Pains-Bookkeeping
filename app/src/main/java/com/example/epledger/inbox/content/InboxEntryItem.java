@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
 import com.example.epledger.R;
-import com.example.epledger.home.model.Entry;
+import com.example.epledger.model.Entry;
 import com.xwray.groupie.GroupieViewHolder;
 import com.xwray.groupie.Item;
 

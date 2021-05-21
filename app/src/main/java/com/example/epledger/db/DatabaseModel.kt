@@ -6,12 +6,11 @@ import androidx.lifecycle.ViewModel
 import com.example.epledger.R
 import com.example.epledger.db.model.AppDatabase
 import com.example.epledger.db.model.LedgerDatabase
-import com.example.epledger.detail.DetailRecord
-import com.example.epledger.settings.datamgr.Category
-import com.example.epledger.settings.datamgr.Source
+import com.example.epledger.model.Record
+import com.example.epledger.model.Category
+import com.example.epledger.model.Source
 import kotlinx.coroutines.*
 import java.util.*
-import kotlin.Comparator
 import kotlin.collections.ArrayList
 
 class DatabaseModel: ViewModel() {
@@ -22,7 +21,7 @@ class DatabaseModel: ViewModel() {
     val groupedRecords = MutableLiveData<Iterable<LedgerDatabase.RecordGroup>>(ArrayList(0))
 
     // 所有的记录
-    private val records = MutableLiveData<ArrayList<DetailRecord>>(ArrayList(0))
+    private val records = MutableLiveData<ArrayList<Record>>(ArrayList(0))
 
     // 反向排序的treeMap
     private var groupedRecordsWithDate = TreeMap<Date, LedgerDatabase.RecordGroup>(Collections.reverseOrder())
@@ -109,14 +108,14 @@ class DatabaseModel: ViewModel() {
 //        return starredRecords.value!!
 //    }
 
-    private fun requireRecords(): ArrayList<DetailRecord> {
+    private fun requireRecords(): ArrayList<Record> {
         return records.value!!
     }
 
-    fun insertNewRecord(detailRecord: DetailRecord) {
+    fun insertNewRecord(record: Record) {
         GlobalScope.launch(Dispatchers.IO) {
             // 获取拷贝
-            val record = detailRecord.getCopy()
+            val record = record.getCopy()
 
             // 插入记录到数据库
             val newID = AppDatabase.insertRecord(record)
@@ -134,7 +133,7 @@ class DatabaseModel: ViewModel() {
                 recordsWithDate.records.apply {
                     add(record)
                     // 加入后排序，由于每一天的记录不会太多，排序是很快的，用列表就足够
-                    sortWith(DetailRecord.dateReverseComparator)
+                    sortWith(Record.dateReverseComparator)
                 }
             } catch (e: NoSuchElementException) {
                 // 找不到这样的组则新建一个组加入
@@ -154,9 +153,9 @@ class DatabaseModel: ViewModel() {
      * @param recordsOrderByDate 必须是已经按照date排序好的records
      * 注意，此方法会过滤掉那些不完整的记录。
      */
-    private fun groupRecordsByDate(recordsOrderByDate: List<DetailRecord>): TreeMap<Date, LedgerDatabase.RecordGroup> {
+    private fun groupRecordsByDate(recordsOrderByDate: List<Record>): TreeMap<Date, LedgerDatabase.RecordGroup> {
         val map = TreeMap<Date, LedgerDatabase.RecordGroup>(reverseOrder())
-        var group = ArrayList<DetailRecord>()
+        var group = ArrayList<Record>()
 
         recordsOrderByDate.forEach {
             if (!it.isComplete()) {

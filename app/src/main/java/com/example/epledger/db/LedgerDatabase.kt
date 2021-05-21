@@ -1,22 +1,22 @@
 package com.example.epledger.db.model
 
-import com.example.epledger.detail.DetailRecord
+import com.example.epledger.model.Record
 import java.text.SimpleDateFormat
 import java.util.*
 
 interface LedgerDatabase {
-    data class RecordGroup(val date: Date, val records: MutableList<DetailRecord>)
+    data class RecordGroup(val date: Date, val records: MutableList<Record>)
 
     /**
      * 从数据库中获取按照日期排序的记录。时间越靠近现在，排序后的位置越靠前。
      */
-    fun getRecordsOrderByDate(): List<DetailRecord>
+    fun getRecordsOrderByDate(): List<Record>
 
     /**
      * 向数据库中插入一条记录，插入后返回id。
      * 建议：根据是否完整插入考虑插入到不同的位置以提高之后查找的效率。
      */
-    fun insertRecord(record: DetailRecord): Long
+    fun insertRecord(record: Record): Long
 }
 
 /**
@@ -31,9 +31,9 @@ class MemoryDatabase : LedgerDatabase {
 
     var currentId: Long = 20
 
-    val records: MutableList<DetailRecord> = run {
+    val records: MutableList<Record> = run {
         val simpleFormat = SimpleDateFormat("yyyy/MM/dd hh:mm", Locale.US)
-        val rec1 = DetailRecord().apply {
+        val rec1 = Record().apply {
             ID = 11
             moneyAmount = -199.0
             category = "Sports"
@@ -43,7 +43,7 @@ class MemoryDatabase : LedgerDatabase {
 //            minuteOfHour = 13
             note = "买了一个新球拍。"
         }
-        val rec2 = DetailRecord().apply {
+        val rec2 = Record().apply {
             ID = 13
             moneyAmount = -29.9
             category = "Study"
@@ -64,11 +64,11 @@ class MemoryDatabase : LedgerDatabase {
         arrayListOf(rec1, rec2, rec3)
     }
 
-    override fun getRecordsOrderByDate(): List<DetailRecord> {
-        return records.sortedWith(DetailRecord.dateReverseComparator)
+    override fun getRecordsOrderByDate(): List<Record> {
+        return records.sortedWith(Record.dateReverseComparator)
     }
 
-    override fun insertRecord(record: DetailRecord): Long {
+    override fun insertRecord(record: Record): Long {
         val recordToInsert = record.getCopy()
         recordToInsert.ID = ++currentId
         records.add(recordToInsert)

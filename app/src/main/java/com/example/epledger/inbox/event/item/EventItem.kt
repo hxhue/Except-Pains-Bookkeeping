@@ -1,6 +1,6 @@
 package com.example.epledger.inbox.event.item
 
-import com.example.epledger.detail.DetailRecord
+import com.example.epledger.model.Record
 import java.lang.RuntimeException
 
 
@@ -9,7 +9,7 @@ class EventItem(var name: String,
                 var startingDate: java.util.Date,
                 var cycle: Int,
                 var unit: CycleUnit,
-                var template: DetailRecord? = null,
+                var template: Record? = null,
                 var iconResID: Int? = null) {
 
     init {

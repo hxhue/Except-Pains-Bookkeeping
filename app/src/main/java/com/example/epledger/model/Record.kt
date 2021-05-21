@@ -1,12 +1,11 @@
-package com.example.epledger.detail
+package com.example.epledger.model
 
 import android.graphics.Bitmap
 import android.os.Parcel
 import android.os.Parcelable
-import com.example.epledger.home.model.Entry
 import java.util.Date
 
-class DetailRecord() : Parcelable, Entry {
+class Record() : Parcelable, Entry {
     var ID: Long? = null
     var mDate: Date = Date()
     var moneyAmount: Double = -0.0
@@ -90,13 +89,13 @@ class DetailRecord() : Parcelable, Entry {
         this.category = s
     }
 
-    fun getCopy(): DetailRecord {
-        val another = DetailRecord()
+    fun getCopy(): Record {
+        val another = Record()
         copyTo(another)
         return another
     }
 
-    fun copyTo(another: DetailRecord) {
+    fun copyTo(another: Record) {
         another.ID = ID
         another.mDate = mDate
         another.moneyAmount = moneyAmount
@@ -130,16 +129,16 @@ class DetailRecord() : Parcelable, Entry {
         return (moneyAmount != 0.0 && moneyAmount != -0.0) && category != null
     }
 
-    companion object CREATOR : Parcelable.Creator<DetailRecord> {
-        override fun createFromParcel(parcel: Parcel): DetailRecord {
-            return DetailRecord(parcel)
+    companion object CREATOR : Parcelable.Creator<Record> {
+        override fun createFromParcel(parcel: Parcel): Record {
+            return Record(parcel)
         }
 
-        override fun newArray(size: Int): Array<DetailRecord?> {
+        override fun newArray(size: Int): Array<Record?> {
             return arrayOfNulls(size)
         }
 
-        val dateReverseComparator = Comparator<DetailRecord> { o1, o2 ->
+        val dateReverseComparator = Comparator<Record> { o1, o2 ->
             // 将o2这个参数放到前面就能够得到相反的比较结果
             o2.mDate.compareTo(o1.mDate)
         }

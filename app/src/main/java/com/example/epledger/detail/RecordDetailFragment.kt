@@ -14,6 +14,7 @@ import android.widget.*
 import androidx.fragment.app.activityViewModels
 import com.example.epledger.R
 import com.example.epledger.db.DatabaseModel
+import com.example.epledger.model.Record
 import com.example.epledger.nav.NavigationFragment
 import com.example.epledger.qaction.screenshot.ScreenshotUtils
 import com.example.epledger.util.Fmt
@@ -23,7 +24,6 @@ import kotlinx.android.synthetic.main.activity_detail_content.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.lang.Exception
 import java.lang.RuntimeException
 import java.math.RoundingMode
@@ -52,7 +52,7 @@ class RecordDetailFragment:
     }
 
     // 创建一个空记录
-    private var bindingRecord: DetailRecord? = null
+    private var bindingRecord: Record? = null
 
     /**
      * 当前的记录是否正在被修改。
@@ -66,18 +66,18 @@ class RecordDetailFragment:
     /**
      * 保存的记录副本，用来恢复。
      */
-    private var recordCopy: DetailRecord? = null
+    private var recordCopy: Record? = null
 
     /**
      * 在创建后必须被调用一次。
      */
-    fun bindRecord(record: DetailRecord) {
+    fun bindRecord(record: Record) {
         editing = (record.ID == null)
         recordCopy = record.getCopy()
         bindingRecord = record
     }
 
-    fun getBindingRecord(): DetailRecord {
+    fun getBindingRecord(): Record {
         if (bindingRecord == null) {
             throw RuntimeException("Record is not bound yet. You can't get a record out of null.")
         }
@@ -91,8 +91,8 @@ class RecordDetailFragment:
     private lateinit var categorySpinnerAdapter: ArrayAdapter<String>
 
     interface DetailRecordMsgReceiver {
-        fun onDetailRecordSubmit(record: DetailRecord)
-        fun onDetailRecordDelete(record: DetailRecord)
+        fun onDetailRecordSubmit(record: Record)
+        fun onDetailRecordDelete(record: Record)
     }
 
     private var receiver: DetailRecordMsgReceiver? = null
@@ -443,11 +443,11 @@ class RecordDetailFragment:
         val fragment = this
         savedInstanceState?.apply {
             fragment.editing = getBoolean("editing")
-            val record = getParcelable<DetailRecord>("record")
+            val record = getParcelable<Record>("record")
             if (record != null) {
                 fragment.bindingRecord = record
             }
-            val copy = getParcelable<DetailRecord>("recordCopy")
+            val copy = getParcelable<Record>("recordCopy")
             if (copy != null) {
                 fragment.recordCopy = copy
             }
