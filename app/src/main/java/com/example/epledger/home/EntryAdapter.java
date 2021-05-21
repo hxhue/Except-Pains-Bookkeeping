@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.epledger.R;
 import com.example.epledger.db.DatabaseModel;
-import com.example.epledger.home.model.Entry;
-import com.example.epledger.settings.datamgr.Category;
+import com.example.epledger.model.Entry;
+import com.example.epledger.model.Category;
 
 import java.util.List;
 

@@ -8,11 +8,11 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.epledger.R
-import com.example.epledger.detail.DetailRecord
+import com.example.epledger.model.Record
 import com.example.epledger.detail.RecordDetailFragment
 import com.example.epledger.db.DatabaseModel
-import com.example.epledger.home.model.Entry
-import com.example.epledger.home.model.Section
+import com.example.epledger.model.Entry
+import com.example.epledger.model.Section
 import com.example.epledger.nav.NavigationFragment.Companion.pushToStack
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.lang.RuntimeException
@@ -41,13 +41,13 @@ class HomeFragment : Fragment() {
         val btn: FloatingActionButton = view.findViewById(R.id.addEntryButton)
         btn.setOnClickListener {
             val frag = RecordDetailFragment()
-            frag.bindRecord(DetailRecord())
+            frag.bindRecord(Record())
             frag.setDetailRecordMsgReceiver(object : RecordDetailFragment.DetailRecordMsgReceiver {
-                override fun onDetailRecordSubmit(record: DetailRecord) {
+                override fun onDetailRecordSubmit(record: Record) {
                     dbModel.insertNewRecord(record)
                 }
 
-                override fun onDetailRecordDelete(record: DetailRecord) {
+                override fun onDetailRecordDelete(record: Record) {
                     throw RuntimeException("This page is used for creation so deletion is not allowed")
                 }
             })

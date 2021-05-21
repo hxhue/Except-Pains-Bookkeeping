@@ -3,8 +3,8 @@ package com.example.epledger.qaction
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.epledger.R
-import com.example.epledger.settings.datamgr.Category
-import com.example.epledger.settings.datamgr.Source
+import com.example.epledger.model.Category
+import com.example.epledger.model.Source
 import kotlinx.coroutines.*
 
 class CardViewModel: ViewModel() {

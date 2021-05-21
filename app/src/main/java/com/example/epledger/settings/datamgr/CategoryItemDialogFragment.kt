@@ -23,13 +23,12 @@ import com.example.epledger.R
 import com.example.epledger.inbox.event.item.IconItemAdapter
 import com.example.epledger.inbox.event.item.SpaceItemDecoration
 import com.example.epledger.db.DatabaseModel
+import com.example.epledger.model.CATEGORY_MAX_SIZE
+import com.example.epledger.model.Category
 import com.example.epledger.util.IconAsset
 import com.example.epledger.util.ScreenMetrics
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.dialog_category_edit.view.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 
 class CategoryItemDialogFragment: DialogFragment(), IconItemAdapter.OnPositionClickListener {
