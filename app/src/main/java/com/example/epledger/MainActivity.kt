@@ -35,7 +35,11 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         super.onCreate(savedInstanceState)
         // 禁用黑暗模式
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        val it=ImportDataFromExcel();
+
+        // 2021年5月22日17:17:23 [Simon Yu]
+        // Doubt if the following line is useful.
+//        val it=ImportDataFromExcel();
+
         // 界面初始化
         // Handler.post may fix the problem of frame skipping?
         // Not for ChartsFragment though.

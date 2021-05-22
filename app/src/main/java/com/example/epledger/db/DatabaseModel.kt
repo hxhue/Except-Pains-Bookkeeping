@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.example.epledger.R
 import com.example.epledger.db.model.AppDatabase
 import com.example.epledger.db.model.LedgerDatabase
+import com.example.epledger.home.SectionAdapter
 import com.example.epledger.model.Record
 import com.example.epledger.model.Category
 import com.example.epledger.model.Source
@@ -18,10 +19,11 @@ class DatabaseModel: ViewModel() {
     // TODO: 把接口中的ArrayList去掉
     val sources = MutableLiveData<ArrayList<Source>>(ArrayList(0))
     val categories = MutableLiveData<ArrayList<Category>>(ArrayList(0))
-    val groupedRecords = MutableLiveData<Iterable<LedgerDatabase.RecordGroup>>(ArrayList(0))
+    val groupedRecords = MutableLiveData<MutableCollection<LedgerDatabase.RecordGroup>>(ArrayList(0))
 
     // 所有的记录
-    private val records = MutableLiveData<ArrayList<Record>>(ArrayList(0))
+
+//    private val records = MutableLiveData<ArrayList<Record>>(ArrayList(0))
 
     // 反向排序的treeMap
     private var groupedRecordsWithDate = TreeMap<Date, LedgerDatabase.RecordGroup>(Collections.reverseOrder())
@@ -39,7 +41,7 @@ class DatabaseModel: ViewModel() {
         sources.postValue(ArrayList(0))
         categories.postValue(ArrayList(0))
         groupedRecords.postValue(ArrayList(0))
-        records.postValue(ArrayList(0))
+//        records.postValue(ArrayList(0))
 
         // 非ViewModel的数据是可以在IO线程更新的，也不必post到主线程
         GlobalScope.launch(Dispatchers.IO) {
@@ -84,7 +86,7 @@ class DatabaseModel: ViewModel() {
         return categories.value!!
     }
 
-    fun requireGroupedRecords(): Iterable<LedgerDatabase.RecordGroup> {
+    fun requireGroupedRecords(): MutableCollection<LedgerDatabase.RecordGroup> {
         return groupedRecords.value!!
     }
 
@@ -108,8 +110,52 @@ class DatabaseModel: ViewModel() {
 //        return starredRecords.value!!
 //    }
 
-    private fun requireRecords(): ArrayList<Record> {
-        return records.value!!
+//    private fun requireRecords(): ArrayList<Record> {
+//        return records.value!!
+//    }
+
+    fun deleteRecord(section: Int, position: Int, sectionAdapter: SectionAdapter) {
+        val groupedRecords = requireGroupedRecords()
+        GlobalScope.launch(Dispatchers.IO) {
+            // 在内存中找到数据，取出其ID
+            val group = groupedRecords.elementAt(section)
+            val recordID = group.records[position].ID!!
+            val groupKey = group.date
+
+            // 在外存中删除
+            AppDatabase.deleteRecordByID(recordID)
+
+            // 如果该组有多个元素则删除单个元素即可
+            if (group.records.size > 1) {
+                // 在内存中删除
+                // 注意：由于使用的records是引用，因此不要重复删除树结构中的记录
+                group.records.removeAt(position)
+
+                // 通知视图变更（不要更新value，否则整个视图都会刷新）
+                withContext(Dispatchers.Main) {
+                    // 2021年5月21日10:59:40
+                    // 因为嵌套的关系，不使用额外接口只能够让一个section整体刷新，不过因为一个section数据小
+                    // 所以应该不会出现性能问题，只是动画会是通用动画（而不是删除的专属动画）
+                    // TODO: 考虑动画？
+                    sectionAdapter.notifyItemChanged(section)
+                }
+            } else { // 如果该组只有一个元素，则应该删除整个组而不是单个元素
+                // 在内存中删除
+                groupedRecords.remove(group)
+                groupedRecordsWithDate.remove(groupKey)
+                // 通知视图变更
+                withContext(Dispatchers.Main) {
+                    // TODO: 2021/5/21
+                    // 由于List没有关联性，因此需要显式调用删掉整个section
+                    sectionAdapter.sections.removeAt(section)
+                    sectionAdapter.notifyItemRemoved(section)
+                    sectionAdapter.notifyItemRangeChanged(section, sectionAdapter.sections.size)
+//                    sectionAdapter.notifyItemRemoved(section)
+//                    Log.i("Model", "groupedRecords.size = ${groupedRecords.size}")
+//                    sectionAdapter.notifyItemRangeChanged(section - 1, groupedRecords.size)
+                }
+            }
+        }
     }
 
     fun insertNewRecord(record: Record) {
@@ -123,7 +169,8 @@ class DatabaseModel: ViewModel() {
 
             // 插入数据到主存并更新信息
             // 1. 更新records
-            requireRecords().add(record)
+            // records记录好像没有用
+//            requireRecords().add(record)
 
             // 2. 更新groupedRecordsWithDate
             val roundedDate = roundToDay(record.mDate)

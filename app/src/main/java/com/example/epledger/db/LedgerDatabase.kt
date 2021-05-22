@@ -17,6 +17,8 @@ interface LedgerDatabase {
      * 建议：根据是否完整插入考虑插入到不同的位置以提高之后查找的效率。
      */
     fun insertRecord(record: Record): Long
+
+    fun deleteRecordByID(id: Long)
 }
 
 /**
@@ -73,5 +75,11 @@ class MemoryDatabase : LedgerDatabase {
         recordToInsert.ID = ++currentId
         records.add(recordToInsert)
         return currentId
+    }
+
+    override fun deleteRecordByID(id: Long) {
+        records.removeIf {
+            it.ID == id
+        }
     }
 }

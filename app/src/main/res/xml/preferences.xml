@@ -82,7 +82,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        app:title="Debug &amp; Exploration"
+        app:title="Debug"
         app:key="debug_category"
         android:icon="@drawable/ic_fas_bug"
         >

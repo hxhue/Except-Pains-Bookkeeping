@@ -19,7 +19,8 @@ import com.example.epledger.model.Section
 
 class InboxFragment : Fragment() {
     private val dbModel: DatabaseModel by activityViewModels()
-    private var cachedEventFragment: EventFragment? = null
+    private var cachedEventFragment: EventFragment? = EventFragment()
+    private var needsViewLoadLatency: Boolean = true
 
 //    var numOfStarredItems = 0
 //        set(value) {
@@ -61,8 +62,6 @@ class InboxFragment : Fragment() {
 
         // Turn on option menu
         setHasOptionsMenu(true)
-
-        cachedEventFragment = EventFragment()
 
         // TODO: remove this debug section
 //        val button = view.findViewById<Button>(R.id.inbox_button_debug_create)
@@ -129,11 +128,6 @@ class InboxFragment : Fragment() {
         recyclerView.adapter = adapter
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        cachedEventFragment = null
-    }
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         menu.clear()
         inflater.inflate(R.menu.inbox_menu, menu)
@@ -143,10 +137,9 @@ class InboxFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_item_inbox_notification -> {
-                if (cachedEventFragment == null) {
-                    cachedEventFragment = EventFragment()
-                }
-                NavigationFragment.pushToStack(requireActivity().supportFragmentManager, cachedEventFragment!!, true)
+                NavigationFragment.pushToStack(requireActivity().supportFragmentManager, cachedEventFragment!!, true, needsViewLoadLatency)
+                // 多次加载之后就不需要延迟了
+                needsViewLoadLatency = false
                 true
             }
             else -> false

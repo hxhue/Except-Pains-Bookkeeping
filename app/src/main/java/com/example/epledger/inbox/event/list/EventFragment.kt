@@ -16,6 +16,7 @@ import java.util.Date
 
 class EventFragment: NavigationFragment() {
     val model: EventViewModel by activityViewModels()
+    private var needsViewLoadLatency: Boolean = true
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_event, container, false)
@@ -34,7 +35,10 @@ class EventFragment: NavigationFragment() {
             val newEvent = EventItem("", Date(), 1, EventItem.CycleUnit.DAY)
             model.setCurrentEvent(newEvent)
 
-            pushToStack(requireActivity().supportFragmentManager, newFragment)
+            // 增加延迟来减缓动画卡顿
+
+            pushToStack(requireActivity().supportFragmentManager, newFragment, fromMainPage = false, withLatency = needsViewLoadLatency)
+            needsViewLoadLatency = false
         }
     }
 }
