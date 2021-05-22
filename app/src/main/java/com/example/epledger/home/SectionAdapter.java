@@ -1,5 +1,6 @@
 package com.example.epledger.home;
 
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,16 +16,19 @@ import com.example.epledger.R;
 import com.example.epledger.db.DatabaseModel;
 import com.example.epledger.model.Record;
 import com.example.epledger.model.Section;
+import com.example.epledger.util.Fmt;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ViewHolder> {
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         private TextView textDate;
         private RecyclerView rv;
-        private SimpleDateFormat ft;
+        private DateFormat ft;
         private DatabaseModel dbModel;
 
         public ViewHolder(@NonNull View itemView, DatabaseModel dbModel) {
@@ -36,7 +40,7 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ViewHold
             rv.setLayoutManager(new LinearLayoutManager(itemView.getContext()));
             rv.setItemAnimator(new DefaultItemAnimator());
 
-            ft = new SimpleDateFormat ("yyyy-MM-dd");
+            ft = Fmt.INSTANCE.getDate();
         }
 
         public void bind(Date date, List<Record> entryList, final int sectionPosition) {
@@ -51,7 +55,11 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ViewHold
 
                 @Override
                 public void onItemLongClick(View view, int position) {
-                    Toast.makeText(view.getContext(), "long click " + sectionPosition + " section " + position + " item", Toast.LENGTH_SHORT).show();
+                    new MaterialAlertDialogBuilder(view.getContext())
+                            .setMessage(R.string.del_item_confirm)
+                            .setNegativeButton(R.string.no, (dialog, which) -> {})
+                            .setPositiveButton(R.string.ok, (dialog, which) -> dbModel.deleteRecord(sectionPosition, position, SectionAdapter.this))
+                    .show();
                 }
             });
             rv.setAdapter(entryAdapter);
@@ -59,7 +67,7 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ViewHold
     }
 
     private List<Section> mSections;
-    private DatabaseModel dbModel;
+    private final DatabaseModel dbModel;
 
     public SectionAdapter(List<Section> mSections, DatabaseModel dbModel) {
         this.mSections = mSections;
@@ -68,6 +76,10 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ViewHold
 
     public void setSections(List<Section> mSections) {
         this.mSections = mSections;
+    }
+
+    public List<Section> getSections() {
+        return mSections;
     }
 
     @NonNull

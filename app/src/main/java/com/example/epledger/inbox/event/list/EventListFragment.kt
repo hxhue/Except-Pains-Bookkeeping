@@ -25,6 +25,7 @@ class EventListFragment: PreferenceFragmentCompat(), EventAdapter.OnPositionClic
         adapter
     }
     lateinit var recyclerView: RecyclerView
+    private var needsViewLoadLatency: Boolean = true
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_event_list, container, false)
@@ -86,7 +87,13 @@ class EventListFragment: PreferenceFragmentCompat(), EventAdapter.OnPositionClic
         eventsModel.setEditing(false)
         eventsModel.setCurrentEvent(curEvent)
 
-        NavigationFragment.pushToStack(requireActivity().supportFragmentManager, newFragment)
+        NavigationFragment.pushToStack(
+            requireActivity().supportFragmentManager,
+            newFragment,
+            fromMainPage = false,
+            withLatency = needsViewLoadLatency
+        )
+        needsViewLoadLatency = false
     }
 
 }

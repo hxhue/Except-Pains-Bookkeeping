@@ -130,40 +130,18 @@ open class NavigationFragment: Fragment() {
 
     companion object {
         fun pushToStack(fragmentManager: FragmentManager, fragment: NavigationFragment,
-                        fromMainPage: Boolean = false) {
+                        fromMainPage: Boolean = false, withLatency: Boolean = false) {
             val transaction: FragmentTransaction = fragmentManager.beginTransaction()
-            // Set transition animations
-//            if (fromMainPage) {
-//                transaction.setCustomAnimations(
-//                        R.anim.fade_in,
-//                        R.anim.fade_out,
-//                        R.anim.fade_in,
-//                        R.anim.fade_out
-//                )
-//            } else {
-//                // Somewhat ugly...
-////                transaction.setCustomAnimations(
-////                        R.anim.slide_in,
-////                        R.anim.slide_out_below,
-////                        R.anim.slide_in_below,
-////                        R.anim.slide_out
-////                )
-//                transaction.setCustomAnimations(
-//                        R.anim.fade_in,
-//                        R.anim.fade_out,
-//                        R.anim.fade_in,
-//                        R.anim.fade_out
-//                )
-//            }
             transaction.setCustomAnimations(
-                R.anim.slide_in,
+                if (withLatency) R.anim.slide_in_with_latency else R.anim.slide_in,
                 R.anim.fade_out,
                 R.anim.fade_in,
                 R.anim.slide_out
             )
             // Use **replace to get animation to work.
             // Or: use add to ignore bottom-layer animation.
-            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+            // 由于静态的layout不能够被替代，所以如果要使用replace并提供退出效果，
+            // 需要主活动的布局包含一个FrameLayout，并把主活动的布局设置都独立在Fragment中
             transaction.add(android.R.id.content, fragment)
             // Commit
             transaction.addToBackStack(null).commit()

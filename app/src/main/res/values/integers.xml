@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="nav_frag_anim_duration">250</integer>
+    <integer name="anim_duration">250</integer>
+    <integer name="anim_heavy_ui_latency">100</integer>
 </resources>

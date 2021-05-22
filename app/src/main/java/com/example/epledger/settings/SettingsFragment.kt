@@ -36,14 +36,14 @@ class SettingsFragment: PreferenceFragmentCompat(), SharedPreferences.OnSharedPr
         val sourceManagement = preferenceScreen.findPreference<Preference>("manage_sources")
         sourceManagement?.setOnPreferenceClickListener {
             val newFragment = SourceManagerFragment()
-            NavigationFragment.pushToStack(this.requireActivity().supportFragmentManager, newFragment)
+            NavigationFragment.pushToStack(this.requireActivity().supportFragmentManager, newFragment, true)
             true
         }
 
         val categoryManagement = preferenceScreen.findPreference<Preference>("manage_tags")
         categoryManagement?.setOnPreferenceClickListener {
             val newFragment = CategoryManagerFragment()
-            NavigationFragment.pushToStack(this.requireActivity().supportFragmentManager, newFragment)
+            NavigationFragment.pushToStack(this.requireActivity().supportFragmentManager, newFragment, true)
             true
         }
 
