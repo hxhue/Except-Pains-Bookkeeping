@@ -11,7 +11,7 @@ import com.example.epledger.R
 import com.example.epledger.model.Record
 import com.example.epledger.detail.RecordDetailFragment
 import com.example.epledger.db.DatabaseModel
-import com.example.epledger.model.Entry
+//import com.example.epledger.model.Record
 import com.example.epledger.model.Section
 import com.example.epledger.nav.NavigationFragment.Companion.pushToStack
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -61,7 +61,7 @@ class HomeFragment : Fragment() {
         // Register observers
         dbModel.groupedRecords.observeForever {
             val groupedEntries = it.map { group ->
-                Section(group.date, group.records as List<Entry>?)
+                Section(group.date, group.records as List<Record>?)
             }
             mSectionAdapter!!.setSections(groupedEntries)
             mSectionAdapter!!.notifyDataSetChanged()
@@ -70,7 +70,7 @@ class HomeFragment : Fragment() {
 
     private fun updateUI() {
         val sections = dbModel.requireGroupedRecords().map { group ->
-            Section(group.date, group.records as List<Entry>?)
+            Section(group.date, group.records as List<Record>?)
         }
         mSectionAdapter = SectionAdapter(sections, dbModel)
         mRecyclerView!!.adapter = mSectionAdapter

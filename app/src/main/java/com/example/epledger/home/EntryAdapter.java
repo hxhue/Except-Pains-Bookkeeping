@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.epledger.R;
 import com.example.epledger.db.DatabaseModel;
-import com.example.epledger.model.Entry;
+import com.example.epledger.model.Record;
 import com.example.epledger.model.Category;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
         private final TextView infoText;
         private final TextView categoryText;
 
-        private Entry mEntry;
+        private Record mEntry;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -39,9 +39,8 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
             categoryText = itemView.findViewById(R.id.pay_source);
         }
 
-        public void bind(Entry entry) {
+        public void bind(Record entry) {
             mEntry = entry;
-
             // Get a context
             Context ctx = itemView.getContext();
             // Set image (**Testing**)
@@ -54,31 +53,31 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
 //                labelImage.setImageDrawable(null);
             labelImage.setImageDrawable(null);
             for (Category category: dbModel.requireCategories()) {
-                if (category.getName().equals(entry.getEntryCategory())) {
+                if (category.getName().equals(entry.getCategory())) {
                     labelImage.setImageDrawable(ContextCompat.getDrawable(ctx, category.getIconResID()));
                     break;
                 }
             }
 
-            labelText.setText(mEntry.getLabel());
-            if (mEntry.getAmount() >= 0) {
+            labelText.setText(mEntry.getCategory());
+            if (mEntry.getMoneyAmount() >= 0) {
                 amountText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.amount_income_color));
-                amountText.setText("+￥" + String.format("%.2f", Math.abs(mEntry.getAmount())));
+                amountText.setText("+￥" + String.format("%.2f", Math.abs(mEntry.getMoneyAmount())));
             } else  {
                 amountText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.amount_expand_color));
-                amountText.setText("-￥" + String.format("%.2f", Math.abs(mEntry.getAmount())));
+                amountText.setText("-￥" + String.format("%.2f", Math.abs(mEntry.getMoneyAmount())));
             }
 
             // Set info
-            final String infoStr = mEntry.getInfo();
+            final String infoStr = mEntry.getNote();
             // Check if it's empty
             if (infoStr != null && !infoStr.trim().isEmpty()) {
-                infoText.setText(mEntry.getInfo());
+                infoText.setText(mEntry.getNote());
             } else {
                 infoText.setText(R.string.no_info_prompt);
             }
 
-            categoryText.setText(mEntry.getEntrySource());
+            categoryText.setText(mEntry.getSource());
         }
     }
 
@@ -87,11 +86,11 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
         void onItemLongClick(View view, int position);
     }
 
-    private List<Entry> mEntryList;
+    private List<Record> mEntryList;
     // 事件回调监听
     private EntryAdapter.OnItemClickListener onItemClickListener;
 
-    public EntryAdapter(List<Entry> entryList, DatabaseModel model) {
+    public EntryAdapter(List<Record> entryList, DatabaseModel model) {
         this.mEntryList = entryList;
         dbModel = model;
     }
@@ -105,7 +104,7 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
-        Entry entry = mEntryList.get(position);
+        Record entry = mEntryList.get(position);
         holder.bind(entry);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {

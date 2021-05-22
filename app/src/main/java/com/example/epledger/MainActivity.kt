@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.viewpager.widget.ViewPager
 import com.example.epledger.db.DatabaseModel
+import com.example.epledger.db.ImportDataFromExcel
 import com.example.epledger.inbox.event.item.EventItemFragment
 import com.example.epledger.nav.MainPagerAdapter
 import com.example.epledger.nav.MainScreen
@@ -34,7 +35,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         super.onCreate(savedInstanceState)
         // 禁用黑暗模式
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-
+        val it=ImportDataFromExcel();
         // 界面初始化
         // Handler.post may fix the problem of frame skipping?
         // Not for ChartsFragment though.

@@ -12,6 +12,7 @@ import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.observe
 import com.example.epledger.R
 import com.example.epledger.db.DatabaseModel
 import com.example.epledger.model.Record

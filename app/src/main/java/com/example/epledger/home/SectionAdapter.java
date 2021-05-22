@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.epledger.R;
 import com.example.epledger.db.DatabaseModel;
-import com.example.epledger.model.Entry;
+import com.example.epledger.model.Record;
 import com.example.epledger.model.Section;
 
 import java.text.SimpleDateFormat;
@@ -39,7 +39,7 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ViewHold
             ft = new SimpleDateFormat ("yyyy-MM-dd");
         }
 
-        public void bind(Date date, List<Entry> entryList, final int sectionPosition) {
+        public void bind(Date date, List<Record> entryList, final int sectionPosition) {
             textDate.setText(ft.format(date));
 
             EntryAdapter entryAdapter = new EntryAdapter(entryList, dbModel);
