@@ -13,12 +13,14 @@ import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.observe
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.epledger.R
 import com.example.epledger.inbox.event.viewmodel.EventItemViewModel
 import com.example.epledger.inbox.event.viewmodel.EventViewModel
 import com.example.epledger.nav.NavigationFragment
+import com.example.epledger.inbox.event.item.SpaceItemDecoration
 import com.example.epledger.util.IconAsset
 import com.example.epledger.util.ScreenMetrics
 import com.google.android.material.dialog.MaterialAlertDialogBuilder

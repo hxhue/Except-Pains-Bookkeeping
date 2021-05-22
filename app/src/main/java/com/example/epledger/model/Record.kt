@@ -5,7 +5,7 @@ import android.os.Parcel
 import android.os.Parcelable
 import java.util.Date
 
-class Record() : Parcelable, Entry {
+class Record() : Parcelable{
     var ID: Long? = null
     var mDate: Date = Date()
     var moneyAmount: Double = -0.0
@@ -33,7 +33,7 @@ class Record() : Parcelable, Entry {
                 "note=$note, starred=$starred)"
     }
 
-    override fun getEntryId(): Int {
+    /*override fun getEntryId(): Int {
         return ID!!.toInt()
     }
 
@@ -87,7 +87,7 @@ class Record() : Parcelable, Entry {
 
     override fun setEntryCategory(s: String) {
         this.category = s
-    }
+    }*/
 
     fun getCopy(): Record {
         val another = Record()

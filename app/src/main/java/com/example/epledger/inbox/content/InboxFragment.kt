@@ -14,7 +14,7 @@ import com.xwray.groupie.ExpandableGroup
 import com.xwray.groupie.GroupieAdapter
 import com.example.epledger.inbox.event.list.EventFragment
 import com.example.epledger.db.DatabaseModel
-import com.example.epledger.model.Entry
+import com.example.epledger.model.Record
 import com.example.epledger.model.Section
 
 class InboxFragment : Fragment() {
@@ -102,7 +102,7 @@ class InboxFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val sections = dbModel.requireGroupedRecords().map { group ->
-            Section(group.date, group.records as List<Entry>?)
+            Section(group.date, group.records as List<Record>?)
         }
         val recyclerView = view.findViewById<RecyclerView>(R.id.inbox_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(view.context)

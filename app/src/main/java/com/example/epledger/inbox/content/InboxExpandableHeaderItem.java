@@ -4,7 +4,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
-import com.example.epledger.model.Entry;
+import com.example.epledger.model.Record;
 import com.example.epledger.model.Section;
 import com.xwray.groupie.ExpandableGroup;
 import com.xwray.groupie.ExpandableItem;
@@ -16,7 +16,7 @@ public class InboxExpandableHeaderItem extends InboxHeaderItem implements Expand
     private ExpandableGroup expandableGroup;
     private View.OnClickListener clickListener;
 
-    public InboxExpandableHeaderItem(Section.SectionType title, List<Entry> list) {
+    public InboxExpandableHeaderItem(Section.SectionType title, List<Record> list) {
         super(title, list);
         clickListener = new View.OnClickListener() {
             @Override

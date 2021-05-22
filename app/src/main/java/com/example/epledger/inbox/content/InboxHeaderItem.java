@@ -8,7 +8,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.example.epledger.R;
-import com.example.epledger.model.Entry;
+import com.example.epledger.model.Record;
+import com.example.epledger.model.Record;
 import com.example.epledger.model.Section;
 import com.xwray.groupie.GroupieViewHolder;
 import com.xwray.groupie.Item;
@@ -17,9 +18,9 @@ import java.util.List;
 
 public class InboxHeaderItem extends Item {
     private Section.SectionType sectionType;
-    private List<Entry> list;
+    private List<Record> list;
 
-    public InboxHeaderItem(Section.SectionType sectionType, List<Entry> list) {
+    public InboxHeaderItem(Section.SectionType sectionType, List<Record> list) {
         this.list = list;
         this.sectionType = sectionType;
     }

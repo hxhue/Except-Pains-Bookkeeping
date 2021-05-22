@@ -5,11 +5,11 @@ import java.util.List;
 
 public class Section {
     private Date date;
-    private List<Entry> entryList;
+    private List<Record> entryList;
     // Section name
     // Section icon res id
 
-    public Section(Date date, List<Entry> entryList) {
+    public Section(Date date, List<Record> entryList) {
         this.date = date;
         this.entryList = entryList;
     }
@@ -22,11 +22,11 @@ public class Section {
         this.date = date;
     }
 
-    public List<Entry> getEntryList() {
+    public List<Record> getEntryList() {
         return entryList;
     }
 
-    public void setEntryList(List<Entry> entryList) {
+    public void setEntryList(List<Record> entryList) {
         this.entryList = entryList;
     }
 

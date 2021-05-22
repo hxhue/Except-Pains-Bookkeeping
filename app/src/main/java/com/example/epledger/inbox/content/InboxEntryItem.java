@@ -7,14 +7,14 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
 import com.example.epledger.R;
-import com.example.epledger.model.Entry;
+import com.example.epledger.model.Record;
 import com.xwray.groupie.GroupieViewHolder;
 import com.xwray.groupie.Item;
 
 public class InboxEntryItem extends Item {
-    private Entry mEntry;
+    private Record mEntry;
 
-    public InboxEntryItem(Entry mEntry) {
+    public InboxEntryItem(Record mEntry) {
         this.mEntry = mEntry;
     }
 
@@ -27,16 +27,16 @@ public class InboxEntryItem extends Item {
         TextView paySourceText = viewHolder.itemView.findViewById(R.id.pay_source);
 
         imageView.setImageResource(R.drawable.ic_baseline_close);
-        labelText.setText(mEntry.getLabel());
-        if (mEntry.getAmount() >= 0) {
+        labelText.setText(mEntry.getCategory());
+        if (mEntry.getMoneyAmount() >= 0) {
             amountText.setTextColor(ContextCompat.getColor(viewHolder.itemView.getContext(), R.color.amount_income_color));
-            amountText.setText("+￥" + String.format("%.2f", Math.abs(mEntry.getAmount())));
+            amountText.setText("+￥" + String.format("%.2f", Math.abs(mEntry.getMoneyAmount())));
         } else  {
             amountText.setTextColor(ContextCompat.getColor(viewHolder.itemView.getContext(), R.color.amount_expand_color));
-            amountText.setText("-￥" + String.format("%.2f", Math.abs(mEntry.getAmount())));
+            amountText.setText("-￥" + String.format("%.2f", Math.abs(mEntry.getMoneyAmount())));
         }
-        infoText.setText(mEntry.getInfo());
-        paySourceText.setText(mEntry.getEntrySource());
+        infoText.setText(mEntry.getNote());
+        paySourceText.setText(mEntry.getSource());
     }
 
     @Override

@@ -76,7 +76,7 @@ import java.util.Date;
 //    }
 //}
 
-public interface Entry {
+/*public interface Entry {
     public int getEntryId();
 
     public void setEntryId(int id);
@@ -104,4 +104,4 @@ public interface Entry {
     public String getEntryCategory();
 
     public void setEntryCategory(String c);
-}
+}*/
