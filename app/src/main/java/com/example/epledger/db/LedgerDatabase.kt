@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 interface LedgerDatabase {
-    data class RecordGroup(val date: Date, val records: MutableList<Record>)
+//    data class RecordGroup(val date: Date, val records: MutableList<Record>)
 
     /**
      * 从数据库中获取按照日期排序的记录。时间越靠近现在，排序后的位置越靠前。
@@ -41,8 +41,6 @@ class MemoryDatabase : LedgerDatabase {
             category = "Sports"
             source = "Alipay"
             mDate = simpleFormat.parse("2020/12/31 12:13")!!
-//            hourOfDay = 12
-//            minuteOfHour = 13
             note = "买了一个新球拍。"
         }
         val rec2 = Record().apply {
@@ -50,8 +48,6 @@ class MemoryDatabase : LedgerDatabase {
             moneyAmount = -29.9
             category = "Study"
             mDate = simpleFormat.parse("2021/01/01 14:37")!!
-//            hourOfDay = 18
-//            minuteOfHour = 37
             note = "这是黄冈密卷，妈妈说这是她对我的爱。"
         }
         val rec3 = rec1.getCopy().apply {
@@ -59,11 +55,12 @@ class MemoryDatabase : LedgerDatabase {
             moneyAmount = -199.0
             source = "Wechat"
             mDate = simpleFormat.parse("2020/12/31 08:19")!!
-//            hourOfDay = 9
             starred = true
             note = "我是有钱人，我又买了一个新球拍。但这次是用微信支付。"
         }
-        arrayListOf(rec1, rec2, rec3)
+        val rec4 = rec3.getCopy().apply { ID = 17 }
+        val rec5 = rec4.getCopy().apply { ID = 18 }
+        arrayListOf(rec1, rec2, rec3, rec4, rec5)
     }
 
     override fun getRecordsOrderByDate(): List<Record> {

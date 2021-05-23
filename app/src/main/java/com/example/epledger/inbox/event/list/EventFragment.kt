@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
 import com.example.epledger.MainActivity
 import com.example.epledger.R
+import com.example.epledger.asMainActivity
 import com.example.epledger.inbox.event.viewmodel.EventViewModel
 import com.example.epledger.inbox.event.item.EventItem
 import com.example.epledger.inbox.event.item.EventItemFragment
@@ -16,7 +17,6 @@ import java.util.Date
 
 class EventFragment: NavigationFragment() {
     val model: EventViewModel by activityViewModels()
-    private var needsViewLoadLatency: Boolean = true
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_event, container, false)
@@ -35,10 +35,13 @@ class EventFragment: NavigationFragment() {
             val newEvent = EventItem("", Date(), 1, EventItem.CycleUnit.DAY)
             model.setCurrentEvent(newEvent)
 
-            // 增加延迟来减缓动画卡顿
-
-            pushToStack(requireActivity().supportFragmentManager, newFragment, fromMainPage = false, withLatency = needsViewLoadLatency)
-            needsViewLoadLatency = false
+            // 尝试增加延迟来减缓动画卡顿
+            pushToStack(
+                requireActivity().supportFragmentManager,
+                newFragment,
+                fromMainPage = false,
+                this.requireActivity().asMainActivity().viewCachePolicy
+            )
         }
     }
 }

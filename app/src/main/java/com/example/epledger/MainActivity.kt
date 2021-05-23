@@ -1,7 +1,9 @@
 package com.example.epledger
 
+import android.app.Activity
 import android.os.Bundle
 import android.util.Log
+import android.util.SparseArray
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.annotation.IdRes
@@ -11,6 +13,7 @@ import androidx.viewpager.widget.ViewPager
 import com.example.epledger.db.DatabaseModel
 import com.example.epledger.db.ImportDataFromExcel
 import com.example.epledger.inbox.event.item.EventItemFragment
+import com.example.epledger.inbox.event.list.EventFragment
 import com.example.epledger.nav.MainPagerAdapter
 import com.example.epledger.nav.MainScreen
 import com.example.epledger.nav.getMainScreenForMenuItem
@@ -18,6 +21,7 @@ import com.example.epledger.qaction.loadQuickActionModule
 import com.example.epledger.util.loadNotificationModule
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomnavigation.LabelVisibilityMode
+import java.lang.RuntimeException
 
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
@@ -25,6 +29,12 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     private lateinit var viewPager: ViewPager
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var mainPagerAdapter: MainPagerAdapter
+
+    // 用于帮助设置延迟，和nav.NavigationFragment一起使用
+    val viewCachePolicy = hashMapOf<String, Boolean>(
+        Pair(EventItemFragment::class.java.name, true),
+        Pair(EventFragment::class.java.name, true)
+    )
 
     /**
      * 由于EventItem页面打开很卡，所以需要事先缓存。
@@ -165,3 +175,9 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     }
 }
 
+fun Activity.asMainActivity(): MainActivity {
+    if (this is MainActivity) {
+        return (this as MainActivity)
+    }
+    throw RuntimeException("This activity is not MainActivity so the cast failed.")
+}

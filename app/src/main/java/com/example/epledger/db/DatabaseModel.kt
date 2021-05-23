@@ -5,10 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.epledger.R
 import com.example.epledger.db.model.AppDatabase
-import com.example.epledger.db.model.LedgerDatabase
 import com.example.epledger.home.SectionAdapter
 import com.example.epledger.model.Record
 import com.example.epledger.model.Category
+import com.example.epledger.model.RecordGroup
 import com.example.epledger.model.Source
 import kotlinx.coroutines.*
 import java.util.*
@@ -19,14 +19,14 @@ class DatabaseModel: ViewModel() {
     // TODO: 把接口中的ArrayList去掉
     val sources = MutableLiveData<ArrayList<Source>>(ArrayList(0))
     val categories = MutableLiveData<ArrayList<Category>>(ArrayList(0))
-    val groupedRecords = MutableLiveData<MutableCollection<LedgerDatabase.RecordGroup>>(ArrayList(0))
+//    val groupedRecords = MutableLiveData<MutableCollection<RecordGroup>>(ArrayList(0))
+    val groupedRecords = MutableLiveData<MutableList<RecordGroup>>(ArrayList(0))
 
     // 所有的记录
-
 //    private val records = MutableLiveData<ArrayList<Record>>(ArrayList(0))
 
     // 反向排序的treeMap
-    private var groupedRecordsWithDate = TreeMap<Date, LedgerDatabase.RecordGroup>(Collections.reverseOrder())
+//    private var groupedRecordsWithDate = TreeMap<Date, RecordGroup>(Collections.reverseOrder())
 
 //    val dueEvents = MutableLiveData<ArrayList<EventItem>>(ArrayList(0))
 //    val incompleteRecords = MutableLiveData<ArrayList<DetailRecord>>(ArrayList(0))
@@ -44,9 +44,9 @@ class DatabaseModel: ViewModel() {
 //        records.postValue(ArrayList(0))
 
         // 非ViewModel的数据是可以在IO线程更新的，也不必post到主线程
-        GlobalScope.launch(Dispatchers.IO) {
-            groupedRecordsWithDate.clear()
-        }
+//        GlobalScope.launch(Dispatchers.IO) {
+//            groupedRecordsWithDate.clear()
+//        }
     }
 
     /**
@@ -69,12 +69,11 @@ class DatabaseModel: ViewModel() {
             )
 
             val records = AppDatabase.getRecordsOrderByDate()
-            this@DatabaseModel.groupedRecordsWithDate = groupRecordsByDate(records)
-            val groups = this@DatabaseModel.groupedRecordsWithDate.values
+            val groupResult = groupRecordsByDate(records)
 
             sources.postValue(srcList)
             categories.postValue(cateList)
-            groupedRecords.postValue(groups)
+            groupedRecords.postValue(groupResult)
         }
     }
 
@@ -86,33 +85,9 @@ class DatabaseModel: ViewModel() {
         return categories.value!!
     }
 
-    fun requireGroupedRecords(): MutableCollection<LedgerDatabase.RecordGroup> {
+    fun requireGroupedRecords(): MutableList<RecordGroup> {
         return groupedRecords.value!!
     }
-
-//    fun requireRecords(): ArrayList<DetailRecord> {
-//        return this.records.value!!
-//    }
-
-//    fun requireDueEvents(): ArrayList<EventItem> {
-//        return dueEvents.value!!
-//    }
-//
-//    fun requireIncompleteRecords(): ArrayList<DetailRecord> {
-//        return incompleteRecords.value!!
-//    }
-//
-//    fun requireShotsIncludedRecords(): ArrayList<DetailRecord> {
-//        return shotsIncludedRecords.value!!
-//    }
-//
-//    fun requireStarredRecords(): ArrayList<DetailRecord> {
-//        return starredRecords.value!!
-//    }
-
-//    private fun requireRecords(): ArrayList<Record> {
-//        return records.value!!
-//    }
 
     fun deleteRecord(section: Int, position: Int, sectionAdapter: SectionAdapter) {
         val groupedRecords = requireGroupedRecords()
@@ -120,7 +95,6 @@ class DatabaseModel: ViewModel() {
             // 在内存中找到数据，取出其ID
             val group = groupedRecords.elementAt(section)
             val recordID = group.records[position].ID!!
-            val groupKey = group.date
 
             // 在外存中删除
             AppDatabase.deleteRecordByID(recordID)
@@ -128,31 +102,21 @@ class DatabaseModel: ViewModel() {
             // 如果该组有多个元素则删除单个元素即可
             if (group.records.size > 1) {
                 // 在内存中删除
-                // 注意：由于使用的records是引用，因此不要重复删除树结构中的记录
+                // 注意：由于使用的records是引用，因此不要重复删除结构中的记录
                 group.records.removeAt(position)
 
                 // 通知视图变更（不要更新value，否则整个视图都会刷新）
                 withContext(Dispatchers.Main) {
-                    // 2021年5月21日10:59:40
-                    // 因为嵌套的关系，不使用额外接口只能够让一个section整体刷新，不过因为一个section数据小
-                    // 所以应该不会出现性能问题，只是动画会是通用动画（而不是删除的专属动画）
-                    // TODO: 考虑动画？
-                    sectionAdapter.notifyItemChanged(section)
+                    sectionAdapter.notifySingleItemRemoved(section, position, group.records.size)
                 }
             } else { // 如果该组只有一个元素，则应该删除整个组而不是单个元素
                 // 在内存中删除
-                groupedRecords.remove(group)
-                groupedRecordsWithDate.remove(groupKey)
+                // 注意：由于sections是引用关系，因此不需要再删除一次，否则会出现异常
+                groupedRecords.removeAt(section)
                 // 通知视图变更
                 withContext(Dispatchers.Main) {
-                    // TODO: 2021/5/21
-                    // 由于List没有关联性，因此需要显式调用删掉整个section
-                    sectionAdapter.sections.removeAt(section)
                     sectionAdapter.notifyItemRemoved(section)
                     sectionAdapter.notifyItemRangeChanged(section, sectionAdapter.sections.size)
-//                    sectionAdapter.notifyItemRemoved(section)
-//                    Log.i("Model", "groupedRecords.size = ${groupedRecords.size}")
-//                    sectionAdapter.notifyItemRangeChanged(section - 1, groupedRecords.size)
                 }
             }
         }
@@ -168,28 +132,27 @@ class DatabaseModel: ViewModel() {
             record.ID = newID
 
             // 插入数据到主存并更新信息
-            // 1. 更新records
-            // records记录好像没有用
-//            requireRecords().add(record)
-
-            // 2. 更新groupedRecordsWithDate
             val roundedDate = roundToDay(record.mDate)
-            try {
-                val recordsWithDate = this@DatabaseModel.groupedRecordsWithDate.getValue(roundedDate)
-                // 如果能够找到这样的组，则直接加入
-                recordsWithDate.records.apply {
+            val groupedRecords = requireGroupedRecords()
+
+            val indexToInsert = groupedRecords.binarySearch(
+                RecordGroup(roundedDate, ArrayList()),
+                RecordGroup.dateReverseComparator
+            )
+
+            // 在记录中找到了，直接插入组中
+            if (indexToInsert >= 0) {
+                groupedRecords[indexToInsert].records.apply {
                     add(record)
-                    // 加入后排序，由于每一天的记录不会太多，排序是很快的，用列表就足够
                     sortWith(Record.dateReverseComparator)
                 }
-            } catch (e: NoSuchElementException) {
-                // 找不到这样的组则新建一个组加入
-                val newGroup = LedgerDatabase.RecordGroup(roundedDate, arrayListOf(record))
-                this@DatabaseModel.groupedRecordsWithDate[roundedDate] = newGroup
+            } else { // 找不到这样的组则新建一个组加入
+                val newGroup = RecordGroup(roundedDate, arrayListOf(record))
+                val realIndexToInsert = -(indexToInsert + 1)
+                groupedRecords.add(realIndexToInsert, newGroup)
             }
 
-            // 3. 更新groupedRecords
-            groupedRecords.postValue(groupedRecordsWithDate.values)
+            this@DatabaseModel.groupedRecords.postValue(groupedRecords)
 
             // TODO: 检查其他相关信息，目前只做了首页
         }
@@ -200,8 +163,9 @@ class DatabaseModel: ViewModel() {
      * @param recordsOrderByDate 必须是已经按照date排序好的records
      * 注意，此方法会过滤掉那些不完整的记录。
      */
-    private fun groupRecordsByDate(recordsOrderByDate: List<Record>): TreeMap<Date, LedgerDatabase.RecordGroup> {
-        val map = TreeMap<Date, LedgerDatabase.RecordGroup>(reverseOrder())
+    private fun groupRecordsByDate(recordsOrderByDate: List<Record>): MutableList<RecordGroup> {
+//        val map = TreeMap<Date, RecordGroup>(reverseOrder())
+        val groupResult = ArrayList<RecordGroup>()
         var group = ArrayList<Record>()
 
         recordsOrderByDate.forEach {
@@ -216,7 +180,7 @@ class DatabaseModel: ViewModel() {
                 // Not on the same day
                 // 分组里面的时间必须抹除小时、分钟、秒
                 val groupDate = roundToDay(group.first().mDate)
-                map[groupDate] = LedgerDatabase.RecordGroup(groupDate, group)
+                groupResult.add(RecordGroup(groupDate, group))
                 group = ArrayList()
                 group.add(it.getCopy())
             }
@@ -225,10 +189,10 @@ class DatabaseModel: ViewModel() {
         // After iteration, we check for the leftover
         if (group.isNotEmpty()) {
             val groupDate = roundToDay(group.first().mDate)
-            map[groupDate] = LedgerDatabase.RecordGroup(groupDate, group)
+            groupResult.add(RecordGroup(groupDate, group))
         }
 
-        return map
+        return groupResult
     }
 
     // 把日期保留到天

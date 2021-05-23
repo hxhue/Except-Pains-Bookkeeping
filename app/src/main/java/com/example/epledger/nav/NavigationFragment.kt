@@ -130,7 +130,19 @@ open class NavigationFragment: Fragment() {
 
     companion object {
         fun pushToStack(fragmentManager: FragmentManager, fragment: NavigationFragment,
-                        fromMainPage: Boolean = false, withLatency: Boolean = false) {
+                        fromMainPage: Boolean = false, animLatencyPolicy: HashMap<String, Boolean>? = null) {
+            // 默认不延迟
+            var withLatency = false
+            // 查找提供的延迟策略
+            if (animLatencyPolicy != null) {
+                val className = fragment.javaClass.name
+                if (animLatencyPolicy.getOrDefault(className, false)) {
+                    withLatency = true
+                    // 对每个类在活动实例化好之后只延迟一次
+                    animLatencyPolicy[className] = false
+                }
+            }
+
             val transaction: FragmentTransaction = fragmentManager.beginTransaction()
             transaction.setCustomAnimations(
                 if (withLatency) R.anim.slide_in_with_latency else R.anim.slide_in,

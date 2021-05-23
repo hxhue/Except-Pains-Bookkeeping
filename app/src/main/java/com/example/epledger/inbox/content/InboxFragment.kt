@@ -9,18 +9,18 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.epledger.MainActivity
 import com.example.epledger.R
+import com.example.epledger.asMainActivity
 import com.example.epledger.nav.NavigationFragment
 import com.xwray.groupie.ExpandableGroup
 import com.xwray.groupie.GroupieAdapter
 import com.example.epledger.inbox.event.list.EventFragment
 import com.example.epledger.db.DatabaseModel
 import com.example.epledger.model.Record
-import com.example.epledger.model.Section
+import com.example.epledger.model.RecordGroup
 
 class InboxFragment : Fragment() {
     private val dbModel: DatabaseModel by activityViewModels()
     private var cachedEventFragment: EventFragment? = EventFragment()
-    private var needsViewLoadLatency: Boolean = true
 
 //    var numOfStarredItems = 0
 //        set(value) {
@@ -100,32 +100,32 @@ class InboxFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val sections = dbModel.requireGroupedRecords().map { group ->
-            Section(group.date, group.records as List<Record>?)
-        }
-        val recyclerView = view.findViewById<RecyclerView>(R.id.inbox_recycler_view)
-        recyclerView.layoutManager = LinearLayoutManager(view.context)
-        recyclerView.itemAnimator = DefaultItemAnimator()
-
-        val adapter = GroupieAdapter()
-
-        // TODO: delete this
-        val sectionTitles = arrayOf(
-            Section.SectionType.EVENTS,
-            Section.SectionType.STARRED,
-            Section.SectionType.SCREENSHOTS
-        )
-        for (i in 0 until sections.size) {
-            val entryList = sections[i].entryList
-            val header = InboxExpandableHeaderItem(sectionTitles[i], entryList)
-            val group = ExpandableGroup(header, true)
-            for (j in 0 until entryList.size) {
-                group.add(InboxEntryItem(entryList[j]))
-            }
-            adapter.add(group)
-        }
-
-        recyclerView.adapter = adapter
+//        val sections = dbModel.requireGroupedRecords().map { group ->
+//            RecordGroup(group.date, group.records)
+//        }
+//        val recyclerView = view.findViewById<RecyclerView>(R.id.inbox_recycler_view)
+//        recyclerView.layoutManager = LinearLayoutManager(view.context)
+//        recyclerView.itemAnimator = DefaultItemAnimator()
+//
+//        val adapter = GroupieAdapter()
+//
+//        // TODO: delete this
+//        val sectionTitles = arrayOf(
+//            RecordGroup.SectionType.EVENTS,
+//            RecordGroup.SectionType.STARRED,
+//            RecordGroup.SectionType.SCREENSHOTS
+//        )
+//        for (i in sections.indices) {
+//            val entryList = sections[i].entries
+//            val header = InboxExpandableHeaderItem(sectionTitles[i], entryList)
+//            val group = ExpandableGroup(header, true)
+//            for (j in 0 until entryList.size) {
+//                group.add(InboxEntryItem(entryList[j]))
+//            }
+//            adapter.add(group)
+//        }
+//
+//        recyclerView.adapter = adapter
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -137,9 +137,12 @@ class InboxFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_item_inbox_notification -> {
-                NavigationFragment.pushToStack(requireActivity().supportFragmentManager, cachedEventFragment!!, true, needsViewLoadLatency)
-                // 多次加载之后就不需要延迟了
-                needsViewLoadLatency = false
+                NavigationFragment.pushToStack(
+                    requireActivity().supportFragmentManager,
+                    cachedEventFragment!!,
+                    true,
+                    this.requireActivity().asMainActivity().viewCachePolicy
+                )
                 true
             }
             else -> false
