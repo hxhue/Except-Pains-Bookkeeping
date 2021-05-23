@@ -1,6 +1,5 @@
 package com.example.epledger.home;
 
-import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,19 +14,21 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.epledger.R;
 import com.example.epledger.db.DatabaseModel;
 import com.example.epledger.model.Record;
-import com.example.epledger.model.Section;
+import com.example.epledger.model.RecordGroup;
 import com.example.epledger.util.Fmt;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ViewHolder> {
     public class ViewHolder extends RecyclerView.ViewHolder {
         private TextView textDate;
-        private RecyclerView rv;
+        private RecyclerView innerRecyclerView;
         private DateFormat ft;
         private DatabaseModel dbModel;
 
@@ -36,9 +37,9 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ViewHold
             this.dbModel = dbModel;
 
             textDate = itemView.findViewById(R.id.textDate);
-            rv = itemView.findViewById(R.id.section_rv);
-            rv.setLayoutManager(new LinearLayoutManager(itemView.getContext()));
-            rv.setItemAnimator(new DefaultItemAnimator());
+            innerRecyclerView = itemView.findViewById(R.id.section_rv);
+            innerRecyclerView.setLayoutManager(new LinearLayoutManager(itemView.getContext()));
+            innerRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
             ft = Fmt.INSTANCE.getDate();
         }
@@ -62,40 +63,75 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ViewHold
                     .show();
                 }
             });
-            rv.setAdapter(entryAdapter);
+            innerRecyclerView.setAdapter(entryAdapter);
         }
     }
 
-    private List<Section> mSections;
+    private List<RecordGroup> mRecordGroups;
     private final DatabaseModel dbModel;
 
-    public SectionAdapter(List<Section> mSections, DatabaseModel dbModel) {
-        this.mSections = mSections;
+    public SectionAdapter(List<RecordGroup> mRecordGroups, DatabaseModel dbModel) {
+        this.mRecordGroups = mRecordGroups;
         this.dbModel = dbModel;
     }
 
-    public void setSections(List<Section> mSections) {
-        this.mSections = mSections;
+    public void setSections(List<RecordGroup> mRecordGroups) {
+        this.mRecordGroups = mRecordGroups;
     }
 
-    public List<Section> getSections() {
-        return mSections;
+    public List<RecordGroup> getSections() {
+        return mRecordGroups;
+    }
+
+    public void notifySingleItemRemoved(int section, int position, int sectionSizeAfterRemoval) {
+        if (recyclerView == null) {
+            throw new IllegalStateException();
+        }
+        SectionAdapter.ViewHolder viewHolder = (ViewHolder) recyclerView.findViewHolderForAdapterPosition(section);
+        if (viewHolder != null) {
+            EntryAdapter adapter = (EntryAdapter) Objects.requireNonNull(viewHolder.innerRecyclerView.getAdapter());
+            adapter.notifyItemRemoved(position);
+            adapter.notifyItemRangeChanged(position, sectionSizeAfterRemoval);
+        }
+        // viewHolder为空时没有必要在视图上删除，因为还没有创建这个视图
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.section_item, parent, false), dbModel);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.section_item, parent, false);
+
+        // 设置嵌套在内部的recyclerView以防止奇怪的动画出现
+        // https://stackoverflow.com/a/45579654/13785815
+        RecyclerView innerRecyclerView = view.findViewById(R.id.section_rv);
+        innerRecyclerView.setHasFixedSize(true);
+
+        return new ViewHolder(view, dbModel);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Section section = mSections.get(position);
-        holder.bind(section.getDate(), section.getEntryList(), position);
+        RecordGroup recordGroup = mRecordGroups.get(position);
+        holder.bind(recordGroup.getDate(), recordGroup.getRecords(), position);
+//        holder.innerRecyclerView.getAdapter().notifyDataSetChanged();
     }
 
     @Override
     public int getItemCount() {
-        return mSections.size();
+        return mRecordGroups.size();
+    }
+
+    private RecyclerView recyclerView = null;
+
+    @Override
+    public void onAttachedToRecyclerView(@NonNull @NotNull RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        this.recyclerView = recyclerView;
+    }
+
+    @Override
+    public void onDetachedFromRecyclerView(@NonNull @NotNull RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+        this.recyclerView = null;
     }
 }

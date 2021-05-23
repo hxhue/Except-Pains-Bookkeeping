@@ -200,6 +200,6 @@
     <string name="discard_changes_confirm">Are you sure about discarding all the changes?</string>
     <string name="restore_prev_state">Previous state restored.</string>
     <string name="source_name_empty_prompt">You can\'t create a source whose name is empty. Please input some useful information.</string>
-    <string name="record_incomplete_prompt">This record is considered incomplete and cannot be submitted. Please at least provide information about money and category.</string>
+    <string name="record_incomplete_prompt">This record is considered incomplete and cannot be submitted. Please at least provide information about money (which cannot be 0.0 or -0.0) and category.</string>
 
 </resources>

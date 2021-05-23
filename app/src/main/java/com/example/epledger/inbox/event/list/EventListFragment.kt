@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.epledger.MainActivity
 import com.example.epledger.R
+import com.example.epledger.asMainActivity
 import com.example.epledger.inbox.event.viewmodel.EventViewModel
 import com.example.epledger.inbox.event.item.EventItemFragment
 import com.example.epledger.nav.NavigationFragment
@@ -25,7 +26,6 @@ class EventListFragment: PreferenceFragmentCompat(), EventAdapter.OnPositionClic
         adapter
     }
     lateinit var recyclerView: RecyclerView
-    private var needsViewLoadLatency: Boolean = true
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_event_list, container, false)
@@ -91,9 +91,8 @@ class EventListFragment: PreferenceFragmentCompat(), EventAdapter.OnPositionClic
             requireActivity().supportFragmentManager,
             newFragment,
             fromMainPage = false,
-            withLatency = needsViewLoadLatency
+            requireActivity().asMainActivity().viewCachePolicy
         )
-        needsViewLoadLatency = false
     }
 
 }

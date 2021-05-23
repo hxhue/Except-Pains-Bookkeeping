@@ -12,7 +12,7 @@ import com.example.epledger.model.Record
 import com.example.epledger.detail.RecordDetailFragment
 import com.example.epledger.db.DatabaseModel
 //import com.example.epledger.model.Record
-import com.example.epledger.model.Section
+import com.example.epledger.model.RecordGroup
 import com.example.epledger.nav.NavigationFragment.Companion.pushToStack
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.lang.RuntimeException
@@ -51,27 +51,28 @@ class HomeFragment : Fragment() {
                     throw RuntimeException("This page is used for creation so deletion is not allowed")
                 }
             })
-            pushToStack(
-                requireActivity().supportFragmentManager,
-                frag, true
-            )
+            pushToStack(requireActivity().supportFragmentManager, frag, true)
         }
         updateUI()
 
         // Register observers
         dbModel.groupedRecords.observeForever {
-            val groupedEntries = it.map { group ->
-                Section(group.date, group.records as List<Record>?)
-            }
-            mSectionAdapter!!.setSections(groupedEntries)
+//            val groupedEntries = it.map { group ->
+//                Section(group.date, group.records as List<Record>?)
+//            }
+            mSectionAdapter!!.sections = it
             mSectionAdapter!!.notifyDataSetChanged()
         }
     }
 
     private fun updateUI() {
-        val sections = dbModel.requireGroupedRecords().map { group ->
-            Section(group.date, group.records as List<Record>?)
-        }
+//        val sections = dbModel.requireGroupedRecords().map { group ->
+//            RecordGroup(
+//                group.date,
+//                group.records as List<Record>?
+//            )
+//        }
+        val sections = dbModel.requireGroupedRecords()
         mSectionAdapter = SectionAdapter(sections, dbModel)
         mRecyclerView!!.adapter = mSectionAdapter
         mRecyclerView!!.itemAnimator = DefaultItemAnimator()
