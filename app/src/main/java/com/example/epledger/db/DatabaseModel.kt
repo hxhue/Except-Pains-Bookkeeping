@@ -122,7 +122,7 @@ class DatabaseModel: ViewModel() {
         }
     }
 
-    fun insertNewRecord(record: Record) {
+    fun insertRecord(record: Record) {
         GlobalScope.launch(Dispatchers.IO) {
             // 获取拷贝
             val record = record.getCopy()
@@ -155,6 +155,20 @@ class DatabaseModel: ViewModel() {
             this@DatabaseModel.groupedRecords.postValue(groupedRecords)
 
             // TODO: 检查其他相关信息，目前只做了首页
+        }
+    }
+
+    fun updateRecord(section: Int, position: Int, sectionAdapter: SectionAdapter) {
+        val groupedRecords = requireGroupedRecords()
+        GlobalScope.launch(Dispatchers.IO) {
+            val group = groupedRecords[section]
+            val recordToUpdate = group.records[position]
+            // Update database
+            AppDatabase.updateRecord(recordToUpdate)
+            // Update view
+            withContext(Dispatchers.Main) {
+                sectionAdapter.notifySingleItemChanged(section, position)
+            }
         }
     }
 

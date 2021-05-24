@@ -384,7 +384,6 @@ class RecordDetailFragment:
                 // 拉取更改
                 prepareRecord()
 
-                // TODO: 提交数据库
                 Log.d("************************ Submit record", "$bindingRecord")
 
                 if (bindingRecord!!.isComplete()) {
