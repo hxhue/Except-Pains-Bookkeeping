@@ -12,7 +12,6 @@ import com.example.epledger.model.Record
 import com.example.epledger.detail.RecordDetailFragment
 import com.example.epledger.db.DatabaseModel
 //import com.example.epledger.model.Record
-import com.example.epledger.model.RecordGroup
 import com.example.epledger.nav.NavigationFragment.Companion.pushToStack
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.lang.RuntimeException
@@ -44,7 +43,7 @@ class HomeFragment : Fragment() {
             frag.bindRecord(Record())
             frag.setDetailRecordMsgReceiver(object : RecordDetailFragment.DetailRecordMsgReceiver {
                 override fun onDetailRecordSubmit(record: Record) {
-                    dbModel.insertNewRecord(record)
+                    dbModel.insertRecord(record)
                 }
 
                 override fun onDetailRecordDelete(record: Record) {

@@ -4,22 +4,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.epledger.R;
 import com.example.epledger.db.DatabaseModel;
+import com.example.epledger.detail.RecordDetailFragment;
 import com.example.epledger.model.Record;
 import com.example.epledger.model.RecordGroup;
+import com.example.epledger.nav.NavigationFragment;
 import com.example.epledger.util.Fmt;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-
 import org.jetbrains.annotations.NotNull;
-
+import static com.example.epledger.util.ViewsKt.*;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
@@ -44,14 +44,32 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ViewHold
             ft = Fmt.INSTANCE.getDate();
         }
 
-        public void bind(Date date, List<Record> entryList, final int sectionPosition) {
+        public void bind(Date date, List<Record> records, final int sectionPosition) {
             textDate.setText(ft.format(date));
 
-            EntryAdapter entryAdapter = new EntryAdapter(entryList, dbModel);
+            EntryAdapter entryAdapter = new EntryAdapter(records, dbModel);
             entryAdapter.setOnItemClickListener(new EntryAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(View view, int position) {
-                    Toast.makeText(view.getContext(), "click " + sectionPosition + " section " + position + " item", Toast.LENGTH_SHORT).show();
+                    // Set up fragment
+                    RecordDetailFragment fragment = new RecordDetailFragment();
+                    fragment.bindRecord(records.get(position));
+                    fragment.setDetailRecordMsgReceiver(new RecordDetailFragment.DetailRecordMsgReceiver() {
+                        @Override
+                        public void onDetailRecordSubmit(@NotNull Record record) {
+                            dbModel.updateRecord(sectionPosition, position, SectionAdapter.this);
+                        }
+
+                        @Override
+                        public void onDetailRecordDelete(@NotNull Record record) {
+                            dbModel.deleteRecord(sectionPosition, position, SectionAdapter.this);
+                        }
+                    });
+                    // Open fragment
+                    NavigationFragment.Companion.pushToStack(
+                            ((AppCompatActivity) Objects.requireNonNull(getActivity(view))).getSupportFragmentManager(),
+                            fragment, true, null
+                    );
                 }
 
                 @Override
@@ -83,6 +101,28 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ViewHold
         return mRecordGroups;
     }
 
+    /**
+     * 补充方法。用来实现内部二级RecyclerView中一个项目的改变通知。
+     * @param section 在主列表中的位置
+     * @param position 在二级列表中的位置
+     */
+    public void notifySingleItemChanged(int section, int position) {
+        if (recyclerView == null) {
+            throw new IllegalStateException();
+        }
+        SectionAdapter.ViewHolder viewHolder = (ViewHolder) recyclerView.findViewHolderForAdapterPosition(section);
+        if (viewHolder != null) {
+            EntryAdapter adapter = (EntryAdapter) Objects.requireNonNull(viewHolder.innerRecyclerView.getAdapter());
+            adapter.notifyItemChanged(position);
+        }
+    }
+
+    /**
+     * 补充方法。用来实现内部二级RecyclerView中一个项目的删除通知。
+     * 注意：当二级列表仅有一个元素时不得调用此函数，因为此函数不会进行异常检查。
+     * @param section 在主列表中的位置
+     * @param position 在二级列表中的位置
+     */
     public void notifySingleItemRemoved(int section, int position, int sectionSizeAfterRemoval) {
         if (recyclerView == null) {
             throw new IllegalStateException();

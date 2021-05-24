@@ -4,21 +4,48 @@ import com.example.epledger.model.Record
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * 数据库的接口。
+ * TODO: 增加Context参数
+ * 下面接口的实现中不必考虑异步问题，只需给出同步实现，异步部分在接口外做。
+ * 默认的排序方式是时间的倒序：时间越大越靠前。
+ */
 interface LedgerDatabase {
-//    data class RecordGroup(val date: Date, val records: MutableList<Record>)
-
     /**
      * 从数据库中获取按照日期排序的记录。时间越靠近现在，排序后的位置越靠前。
+     * 查询结果中不包含不完整的记录。
      */
     fun getRecordsOrderByDate(): List<Record>
 
     /**
-     * 向数据库中插入一条记录，插入后返回id。
-     * 建议：根据是否完整插入考虑插入到不同的位置以提高之后查找的效率。
+     * 类似getRecordsOrderByDate，但结果中只包含不完整的记录。
+     */
+    fun getIncompleteRecordsOrderByDate(): List<Record>
+
+    /**
+     * 找出所有标星的记录，按照时间排列（排列规则同上）。
+     */
+    fun getStarredRecords(): List<Record>
+
+    /**
+     * 找出所有含有截图的记录，按照时间排列。
+     */
+    fun getRecordsWithPic(): List<Record>
+
+    /**
+     * 向数据库中插入一条记录，插入后返回id。由于指针有引用性，不要对这个参数做任何修改。
      */
     fun insertRecord(record: Record): Long
 
+    /**
+     * 通过给定的ID删除一条记录。
+     */
     fun deleteRecordByID(id: Long)
+
+    /**
+     * 更新一条记录。id就是传入参数中的id。由于指针有引用性，不要对这个参数做任何修改。
+     */
+    fun updateRecord(record: Record)
 }
 
 /**
@@ -64,7 +91,19 @@ class MemoryDatabase : LedgerDatabase {
     }
 
     override fun getRecordsOrderByDate(): List<Record> {
-        return records.sortedWith(Record.dateReverseComparator)
+        return records.filter { it.isComplete() }.sortedWith(Record.dateReverseComparator)
+    }
+
+    override fun getIncompleteRecordsOrderByDate(): List<Record> {
+        return records.filter { !it.isComplete() }.sortedWith(Record.dateReverseComparator)
+    }
+
+    override fun getStarredRecords(): List<Record> {
+        return records.filter { it.starred }.sortedWith(Record.dateReverseComparator)
+    }
+
+    override fun getRecordsWithPic(): List<Record> {
+        return records.filter { !it.screenshotPath.isNullOrBlank() }.sortedWith(Record.dateReverseComparator)
     }
 
     override fun insertRecord(record: Record): Long {
@@ -77,6 +116,12 @@ class MemoryDatabase : LedgerDatabase {
     override fun deleteRecordByID(id: Long) {
         records.removeIf {
             it.ID == id
+        }
+    }
+
+    override fun updateRecord(record: Record) {
+        records.find { it.ID == record.ID }?.apply {
+            record.copyTo(this)
         }
     }
 }
