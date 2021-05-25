@@ -1,7 +1,9 @@
 package com.example.epledger.inbox.content
 
 import android.os.Bundle
+import android.telecom.Call
 import android.view.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -15,117 +17,38 @@ import com.xwray.groupie.ExpandableGroup
 import com.xwray.groupie.GroupieAdapter
 import com.example.epledger.inbox.event.list.EventFragment
 import com.example.epledger.db.DatabaseModel
+import com.example.epledger.db.model.AppDatabase
+import com.example.epledger.detail.RecordDetailFragment
+import com.example.epledger.home.EntryAdapter
+import com.example.epledger.home.SectionAdapter
 import com.example.epledger.model.Record
 import com.example.epledger.model.RecordGroup
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.android.synthetic.main.page_inbox.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.lang.RuntimeException
+import java.util.concurrent.Callable
 
 class InboxFragment : Fragment() {
     private val dbModel: DatabaseModel by activityViewModels()
     private var cachedEventFragment: EventFragment? = EventFragment()
 
-//    var numOfStarredItems = 0
-//        set(value) {
-//            view?.let {
-//                val starLabel = it.findViewById<TextView>(R.id.inbox_star_label)
-//                starLabel.text = String.format("%s (%d)", getString(R.string.inbox_label_star), value)
-//            }
-//            field = value
-//        }
-//
-//    var numOfIncompleteItems = 0
-//        set(value) {
-//            // 数量标识
-//            view?.let {
-//                val starLabel = it.findViewById<TextView>(R.id.inbox_incomplete_label)
-//                starLabel.text = String.format("%s (%d)", getString(R.string.inbox_label_incomplete), value)
-//            }
-//            field = value
-//            // 更新徽章
-//            val mainActivity = this.activity as MainActivity
-//            mainActivity.setInboxBadge(value)
-//        }
-//
-//    var numOfScreenshotItems = 0
-//        set(value) {
-//            view?.let {
-//                val starLabel = it.findViewById<TextView>(R.id.inbox_shot_label)
-//                starLabel.text = String.format("%s (%d)", getString(R.string.inbox_label_screenshot), value)
-//            }
-//            field = value
-//        }
-
-//    // 缓存的待提交的提醒时间
-//    var cachedMinuteOfHour = 0
-//    var cachedHourOfDay = 0
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.page_inbox, container, false)
 
+        setUpView(view);
+
         // Turn on option menu
         setHasOptionsMenu(true)
-
-        // TODO: remove this debug section
-//        val button = view.findViewById<Button>(R.id.inbox_button_debug_create)
-//        button.setOnClickListener {
-//            GlobalScope.launch {
-//                withContext(Dispatchers.IO) {
-//                    val rec = DetailRecord()
-//                    rec.ID = 11
-//                    rec.amount = 123.0
-//                    rec.source = "Alipay"
-//                    rec.date = Date()
-//                    rec.hourOfDay = 12
-//                    rec.starred = true
-//                    rec.minuteOfHour = 13
-//                    rec.note = "Happy birthday!"
-//                    try {
-////                        rec.screenshot = ScreenshotUtils.loadBitmap(
-////                                requireContext(),
-////                                "/storage/emulated/0/Android/data/com.example.epledger/files/Pictures/1619754991133.jpg"
-////                        )
-//                    } catch (e: Exception) {
-//                        rec.screenshot = null
-//                    }
-//                    withContext(Dispatchers.Main) {
-//                        val newFragment = RecordDetailFragment()
-//                        newFragment.bindRecord(rec)
-//                        NavigationFragment.pushToStack(requireActivity().supportFragmentManager, newFragment, true)
-//                    }
-//                }
-//            }
-//        }
 
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-//        val sections = dbModel.requireGroupedRecords().map { group ->
-//            RecordGroup(group.date, group.records)
-//        }
-//        val recyclerView = view.findViewById<RecyclerView>(R.id.inbox_recycler_view)
-//        recyclerView.layoutManager = LinearLayoutManager(view.context)
-//        recyclerView.itemAnimator = DefaultItemAnimator()
-//
-//        val adapter = GroupieAdapter()
-//
-//        // TODO: delete this
-//        val sectionTitles = arrayOf(
-//            RecordGroup.SectionType.EVENTS,
-//            RecordGroup.SectionType.STARRED,
-//            RecordGroup.SectionType.SCREENSHOTS
-//        )
-//        for (i in sections.indices) {
-//            val entryList = sections[i].entries
-//            val header = InboxExpandableHeaderItem(sectionTitles[i], entryList)
-//            val group = ExpandableGroup(header, true)
-//            for (j in 0 until entryList.size) {
-//                group.add(InboxEntryItem(entryList[j]))
-//            }
-//            adapter.add(group)
-//        }
-//
-//        recyclerView.adapter = adapter
+        registerObservers(view)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -149,17 +72,100 @@ class InboxFragment : Fragment() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        // TODO: Remove this debug code
-//        numOfStarredItems = 1
-//        numOfIncompleteItems = 13
-//        numOfScreenshotItems = 7
-        // TODO: Remove this debug code
-        // TODO: 实际上在刚加载好数据库时这个已经需要加载，否则会有延迟感
-    }
-
     fun setInBoxBadge(number: Int) {
         (this.activity as MainActivity).setInboxBadge(num = number)
+    }
+
+    private fun setUpView(view: View) {
+        val initialIncompleteEntries = ArrayList<Record>(0)
+        view.inbox_incomplete_recycler_view.apply {
+            val entryAdapter = EntryAdapter(initialIncompleteEntries, dbModel)
+            // Do not capture entryList too early, cause it may change
+            // Capturing the adapter is then the wise choice
+            // val entryList = entryAdapter.entries
+
+            // 用于删除该位置的元素
+            val deleteEntryRunnable = object : Runnable {
+                var entryPos: Int? = null
+
+                override fun run() {
+                    if (entryPos == null) {
+                        throw RuntimeException("setEntryPos() not called before run()")
+                    }
+                    val entryPos = entryPos!!
+                    val entryList = entryAdapter.entries
+                    // Capture it before it's too late to get the record ID
+                    val recordIDToDelete = entryList[entryPos].ID!!
+
+                    // Manage database
+                    GlobalScope.launch(Dispatchers.IO) {
+                        // 由于list是直接关联的，因此不应该由dbModel再删除一次，这样会出现异常
+                        // dbModel.deleteIncompleteRecord(entryPos)
+                        AppDatabase.deleteRecordByID(recordIDToDelete)
+                    }
+                    // Manage view
+                    entryList.removeAt(entryPos)
+                    entryAdapter.notifyItemRemoved(entryPos)
+                    entryAdapter.notifyItemRangeChanged(entryPos, entryList.size)
+                    // Manage badge
+                    setInBoxBadge(entryList.size)
+                }
+
+                fun setEntryPosition(newPos: Int): Runnable {
+                    this.entryPos = newPos
+                    return this
+                }
+            }
+
+            entryAdapter.setOnItemClickListener(object : EntryAdapter.OnItemClickListener {
+                // Modifying an incomplete record
+                override fun onItemClick(view: View?, position: Int) {
+                    val newFragment = RecordDetailFragment()
+                    newFragment.bindRecord(entryAdapter.entries[position])
+                    newFragment.setDetailRecordMsgReceiver(object : RecordDetailFragment.DetailRecordMsgReceiver {
+                        override fun onDetailRecordDelete(record: Record) {
+                            deleteEntryRunnable.setEntryPosition(position).run()
+                        }
+
+                        override fun onDetailRecordSubmit(record: Record) {
+                            // When submitted, this record must have become complete
+                            // 1. Insert it into global records
+                            dbModel.insertRecord(record)
+                            // 2. Remove it from current incomplete records
+                            deleteEntryRunnable.setEntryPosition(position).run()
+                        }
+                    })
+                    NavigationFragment.pushToStack(
+                        (requireActivity() as AppCompatActivity).supportFragmentManager,
+                        newFragment, true
+                    )
+                }
+
+                override fun onItemLongClick(view: View?, position: Int) {
+                    val context = view!!.context
+                    val dialog = MaterialAlertDialogBuilder(context)
+                        .setMessage(context.getString(R.string.incomplete_item_removal_confirm))
+                        .setNegativeButton(R.string.no) { _, _ -> }
+                        .setPositiveButton(R.string.ok) { _, _ ->
+                            deleteEntryRunnable.setEntryPosition(position).run()
+                        }
+                    dialog.show()
+                }
+            })
+            adapter = entryAdapter
+            layoutManager = LinearLayoutManager(view.context)
+        }
+    }
+
+    private fun registerObservers(rootView: View) {
+        dbModel.incompleteRecords.observe(viewLifecycleOwner, {
+            val incompleteRV = rootView.inbox_incomplete_recycler_view
+            val adapter = (incompleteRV.adapter as EntryAdapter)
+            adapter.entries = it
+            adapter.notifyDataSetChanged()
+
+            // Refresh badge of inbox page
+            setInBoxBadge(it.size)
+        })
     }
 }

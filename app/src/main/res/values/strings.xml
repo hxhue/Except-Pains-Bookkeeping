@@ -185,7 +185,8 @@
     <string name="management">Management</string>
     <string name="manage_categories">Manage categories</string>
     <string name="manage_sources">Manage sources</string>
-    <string name="no_info_prompt"><i>(No note provided.)</i></string>
+    <string name="no_info_provided"><i>(No note provided)</i></string>
+    <string name="no_category_provided">(No category provided)</string>
     <string name="sources">Sources</string>
     <string name="modify_name">Modify Name</string>
     <string name="new_source">New Source</string>
@@ -201,5 +202,6 @@
     <string name="restore_prev_state">Previous state restored.</string>
     <string name="source_name_empty_prompt">You can\'t create a source whose name is empty. Please input some useful information.</string>
     <string name="record_incomplete_prompt">This record is considered incomplete and cannot be submitted. Please at least provide information about money (which cannot be 0.0 or -0.0) and category.</string>
+    <string name="incomplete_item_removal_confirm">Are you sure about deleting this item? It is an incomplete item, which means you might have decided to create a placeholder record.</string>
 
 </resources>
