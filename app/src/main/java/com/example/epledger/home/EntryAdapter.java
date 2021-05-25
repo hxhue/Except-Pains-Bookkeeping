@@ -1,6 +1,7 @@
 package com.example.epledger.home;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,26 +42,33 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
 
         public void bind(Record entry) {
             mEntry = entry;
-            // Get a context
             Context ctx = itemView.getContext();
-            // Set image (**Testing**)
-//            int choice = Random.Default.nextInt();
-//            if (choice % 3 == 0)
-//                labelImage.setImageDrawable(ContextCompat.getDrawable(ctx, R.drawable.u_sports_basketball));
-//            else if (choice % 3 == 1)
-//                labelImage.setImageDrawable(ContextCompat.getDrawable(ctx, R.drawable.ic_fas_car));
-//            else
-//                labelImage.setImageDrawable(null);
-            labelImage.setImageDrawable(null);
+
+            Drawable newImage = null;
             for (Category category: dbModel.requireCategories()) {
                 if (category.getName().equals(entry.getCategory())) {
-                    labelImage.setImageDrawable(ContextCompat.getDrawable(ctx, category.getIconResID()));
+                    newImage = ContextCompat.getDrawable(ctx, category.getIconResID());
                     break;
                 }
             }
+            if (newImage == null) {
+                newImage = ContextCompat.getDrawable(ctx, R.drawable.ic_fas_question_circle);
+            }
+            labelImage.setImageDrawable(newImage);
 
-            labelText.setText(mEntry.getCategory());
-            if (mEntry.getMoneyAmount() >= 0) {
+            // Show category
+            final String categoryOfItem = mEntry.getCategory();
+            if (categoryOfItem != null && !categoryOfItem.trim().isEmpty()) {
+                labelText.setText(categoryOfItem);
+            } else {
+                labelText.setText(R.string.no_category_provided);
+            }
+
+            // Show money
+            if (mEntry.getMoneyAmount() == 0 || mEntry.getMoneyAmount() == -0) {
+                amountText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.lightColorPrimary));
+                amountText.setText("￥??");
+            } else if (mEntry.getMoneyAmount() > 0) {
                 amountText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.amount_income_color));
                 amountText.setText("+￥" + String.format("%.2f", Math.abs(mEntry.getMoneyAmount())));
             } else  {
@@ -68,13 +76,13 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
                 amountText.setText("-￥" + String.format("%.2f", Math.abs(mEntry.getMoneyAmount())));
             }
 
-            // Set info
+            // Show info(or attached note)
             final String infoStr = mEntry.getNote();
             // Check if it's empty
             if (infoStr != null && !infoStr.trim().isEmpty()) {
                 infoText.setText(mEntry.getNote());
             } else {
-                infoText.setText(R.string.no_info_prompt);
+                infoText.setText(R.string.no_info_provided);
             }
 
             categoryText.setText(mEntry.getSource());
@@ -93,6 +101,14 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
     public EntryAdapter(List<Record> entryList, DatabaseModel model) {
         this.mEntryList = entryList;
         dbModel = model;
+    }
+
+    public void setEntries(List<Record> entries) {
+        this.mEntryList = entries;
+    }
+
+    public List<Record> getEntries() {
+        return this.mEntryList;
     }
 
     @NonNull

@@ -19,34 +19,17 @@ class DatabaseModel: ViewModel() {
     // TODO: 把接口中的ArrayList去掉
     val sources = MutableLiveData<ArrayList<Source>>(ArrayList(0))
     val categories = MutableLiveData<ArrayList<Category>>(ArrayList(0))
-//    val groupedRecords = MutableLiveData<MutableCollection<RecordGroup>>(ArrayList(0))
     val groupedRecords = MutableLiveData<MutableList<RecordGroup>>(ArrayList(0))
+    val incompleteRecords = MutableLiveData<MutableList<Record>>(ArrayList(0))
 
-    // 所有的记录
-//    private val records = MutableLiveData<ArrayList<Record>>(ArrayList(0))
-
-    // 反向排序的treeMap
-//    private var groupedRecordsWithDate = TreeMap<Date, RecordGroup>(Collections.reverseOrder())
-
-//    val dueEvents = MutableLiveData<ArrayList<EventItem>>(ArrayList(0))
-//    val incompleteRecords = MutableLiveData<ArrayList<DetailRecord>>(ArrayList(0))
-//    val shotsIncludedRecords = MutableLiveData<ArrayList<DetailRecord>>(ArrayList(0))
-//    val starredRecords = MutableLiveData<ArrayList<DetailRecord>>(ArrayList(0))
-
-    /**
-     * 清空所有记录，释放存储。但必须已经初始化了之后才能够调用这个函数。
+    /**初始化了之后才能够调用这个函数。
      * （2021年5月20日13:43:15）Harmful，但是不知道原因
      */
     fun clearDatabase() {
         sources.postValue(ArrayList(0))
         categories.postValue(ArrayList(0))
         groupedRecords.postValue(ArrayList(0))
-//        records.postValue(ArrayList(0))
-
-        // 非ViewModel的数据是可以在IO线程更新的，也不必post到主线程
-//        GlobalScope.launch(Dispatchers.IO) {
-//            groupedRecordsWithDate.clear()
-//        }
+        // todo: 更多数据
     }
 
     /**
@@ -71,9 +54,12 @@ class DatabaseModel: ViewModel() {
             val records = AppDatabase.getRecordsOrderByDate()
             val groupResult = groupRecordsByDate(records)
 
+            val incompleteRecordsToPost = AppDatabase.getIncompleteRecordsOrderByDate()
+
             sources.postValue(srcList)
             categories.postValue(cateList)
             groupedRecords.postValue(groupResult)
+            incompleteRecords.postValue(incompleteRecordsToPost)
         }
     }
 
@@ -88,6 +74,18 @@ class DatabaseModel: ViewModel() {
     fun requireGroupedRecords(): MutableList<RecordGroup> {
         return groupedRecords.value!!
     }
+
+//    /**
+//     * 删除不完整的记录。
+//     * @param index 不完整记录在列表中的index，配合RecyclerView使用。
+//     */
+//    fun deleteIncompleteRecord(index: Int) {
+//        GlobalScope.launch(Dispatchers.IO) {
+//            val incompleteRecords = incompleteRecords.value!!
+//            AppDatabase.deleteRecordByID(incompleteRecords[index].ID!!)
+//            incompleteRecords.removeAt(index)
+//        }
+//    }
 
     fun deleteRecord(section: Int, position: Int, sectionAdapter: SectionAdapter) {
         val groupedRecords = requireGroupedRecords()
@@ -178,7 +176,6 @@ class DatabaseModel: ViewModel() {
      * 注意，此方法会过滤掉那些不完整的记录。
      */
     private fun groupRecordsByDate(recordsOrderByDate: List<Record>): MutableList<RecordGroup> {
-//        val map = TreeMap<Date, RecordGroup>(reverseOrder())
         val groupResult = ArrayList<RecordGroup>()
         var group = ArrayList<Record>()
 

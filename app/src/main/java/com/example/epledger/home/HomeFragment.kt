@@ -56,21 +56,12 @@ class HomeFragment : Fragment() {
 
         // Register observers
         dbModel.groupedRecords.observeForever {
-//            val groupedEntries = it.map { group ->
-//                Section(group.date, group.records as List<Record>?)
-//            }
             mSectionAdapter!!.sections = it
             mSectionAdapter!!.notifyDataSetChanged()
         }
     }
 
     private fun updateUI() {
-//        val sections = dbModel.requireGroupedRecords().map { group ->
-//            RecordGroup(
-//                group.date,
-//                group.records as List<Record>?
-//            )
-//        }
         val sections = dbModel.requireGroupedRecords()
         mSectionAdapter = SectionAdapter(sections, dbModel)
         mRecyclerView!!.adapter = mSectionAdapter

@@ -3,6 +3,7 @@ package com.example.epledger.db.model
 import com.example.epledger.model.Record
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * 数据库的接口。
@@ -20,17 +21,17 @@ interface LedgerDatabase {
     /**
      * 类似getRecordsOrderByDate，但结果中只包含不完整的记录。
      */
-    fun getIncompleteRecordsOrderByDate(): List<Record>
+    fun getIncompleteRecordsOrderByDate(): MutableList<Record>
 
     /**
      * 找出所有标星的记录，按照时间排列（排列规则同上）。
      */
-    fun getStarredRecords(): List<Record>
+    fun getStarredRecords(): MutableList<Record>
 
     /**
      * 找出所有含有截图的记录，按照时间排列。
      */
-    fun getRecordsWithPic(): List<Record>
+    fun getRecordsWithPic(): MutableList<Record>
 
     /**
      * 向数据库中插入一条记录，插入后返回id。由于指针有引用性，不要对这个参数做任何修改。
@@ -87,23 +88,37 @@ class MemoryDatabase : LedgerDatabase {
         }
         val rec4 = rec3.getCopy().apply { ID = 17 }
         val rec5 = rec4.getCopy().apply { ID = 18 }
-        arrayListOf(rec1, rec2, rec3, rec4, rec5)
+        // 不完整的记录也是有ID的，因为已经记录在数据库中了
+        val incompleteRec1 = Record().apply { ID = 20 }
+        arrayListOf(rec1, rec2, rec3, rec4, rec5, incompleteRec1)
     }
 
     override fun getRecordsOrderByDate(): List<Record> {
         return records.filter { it.isComplete() }.sortedWith(Record.dateReverseComparator)
     }
 
-    override fun getIncompleteRecordsOrderByDate(): List<Record> {
-        return records.filter { !it.isComplete() }.sortedWith(Record.dateReverseComparator)
+    override fun getIncompleteRecordsOrderByDate(): MutableList<Record> {
+        val result = ArrayList<Record>(0)
+        records.filter { !it.isComplete() }
+            .sortedWith(Record.dateReverseComparator)
+            .forEach { result.add(it) }
+        return result
     }
 
-    override fun getStarredRecords(): List<Record> {
-        return records.filter { it.starred }.sortedWith(Record.dateReverseComparator)
+    override fun getStarredRecords(): MutableList<Record> {
+        val result = ArrayList<Record>(0)
+        records.filter { it.starred }
+            .sortedWith(Record.dateReverseComparator)
+            .forEach { result.add(it) }
+        return result
     }
 
-    override fun getRecordsWithPic(): List<Record> {
-        return records.filter { !it.screenshotPath.isNullOrBlank() }.sortedWith(Record.dateReverseComparator)
+    override fun getRecordsWithPic(): MutableList<Record> {
+        val result = ArrayList<Record>(0)
+        records.filter { !it.screenshotPath.isNullOrBlank() }
+            .sortedWith(Record.dateReverseComparator)
+            .forEach { result.add(it) }
+        return result
     }
 
     override fun insertRecord(record: Record): Long {

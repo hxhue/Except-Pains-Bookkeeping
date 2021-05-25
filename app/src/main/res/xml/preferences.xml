@@ -81,19 +81,19 @@
             />
     </PreferenceCategory>
 
-    <PreferenceCategory
-        app:title="Debug"
-        app:key="debug_category"
-        android:icon="@drawable/ic_fas_bug"
-        >
-        <SwitchPreferenceCompat
-            app:key="display_show_empty_data"
-            app:defaultValue="true"
-            app:title="Show empty data"/>
-        <Preference app:key="reload_db"
-            android:icon="@drawable/ic_fas_redo_alt"
-            app:title="Reload database" />
-    </PreferenceCategory>
+<!--    <PreferenceCategory-->
+<!--        app:title="Debug"-->
+<!--        app:key="debug_category"-->
+<!--        android:icon="@drawable/ic_fas_bug"-->
+<!--        >-->
+<!--        <SwitchPreferenceCompat-->
+<!--            app:key="display_show_empty_data"-->
+<!--            app:defaultValue="true"-->
+<!--            app:title="Show empty data"/>-->
+<!--        <Preference app:key="reload_db"-->
+<!--            android:icon="@drawable/ic_fas_redo_alt"-->
+<!--            app:title="Reload database" />-->
+<!--    </PreferenceCategory>-->
 
 <!--    <PreferenceCategory-->
 <!--        app:key="notification_category"-->
