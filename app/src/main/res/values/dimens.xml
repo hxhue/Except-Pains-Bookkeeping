@@ -9,4 +9,5 @@
     <dimen name="detail_spinner_left_padding">100dp</dimen>
     <dimen name="detail_label_vertical_space">28dp</dimen>
     <dimen name="icon_recycler_view_space">8dp</dimen>
+    <dimen name="inbox_section_title_icon_width">18dp</dimen>
 </resources>

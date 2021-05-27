@@ -20,6 +20,7 @@
 <!--        android:windowSoftInputMode="adjustPan"-->
         <activity
             android:name=".MainActivity"
+            android:windowSoftInputMode="adjustPan"
             android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

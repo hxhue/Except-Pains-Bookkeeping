@@ -121,7 +121,7 @@
     <string name="detail_src">来源</string>
     <string name="detail_type">种类</string>
     <string name="detail_money">金额</string>
-    <string name="detail_note">附注</string>
+    <string name="detail_memo">附注</string>
     <string name="detail_screenshot">快照</string>
     <string name="detail_screenshot_remove">移除</string>
     <string name="detail_screenshot_for_this_record">这个记录的截图</string>
@@ -160,8 +160,8 @@
     <string name="management">管理</string>
     <string name="manage_categories">管理种类</string>
     <string name="manage_sources">管理来源</string>
-    <string name="no_info_provided"><i>（没有提供备注）</i></string>
-    <string name="no_category_provided">（没有提供种类）</string>
+    <string name="no_memo_provided"><i>（没有提供备注）</i></string>
+    <string name="no_category_provided">(...)</string>
     <string name="sources">来源</string>
     <string name="modify_name">修改名称</string>
     <string name="new_source">新建来源</string>
@@ -182,4 +182,5 @@
     <string name="source_name_empty_prompt">您不能创建一个名称为空的来源。请输入一些有用的信息。</string>
     <string name="record_incomplete_prompt">这条记录不完整因而不能够被提交。请至少提供金额（不能是0.0或-0.0）和种类信息。</string>
     <string name="incomplete_item_removal_confirm">您确定要删除该项吗？它是一个不完整项，可能是您过去有意创建的占位项。</string>
+    <string name="no_unhandled_records">没有待处理的记录。</string>
 </resources>

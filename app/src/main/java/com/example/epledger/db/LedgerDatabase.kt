@@ -77,6 +77,7 @@ class MemoryDatabase : LedgerDatabase {
             category = "Study"
             mDate = simpleFormat.parse("2021/01/01 14:37")!!
             note = "这是黄冈密卷，妈妈说这是她对我的爱。"
+            starred = true
         }
         val rec3 = rec1.getCopy().apply {
             ID = 12
@@ -84,7 +85,7 @@ class MemoryDatabase : LedgerDatabase {
             source = "Wechat"
             mDate = simpleFormat.parse("2020/12/31 08:19")!!
             starred = true
-            note = "我是有钱人，我又买了一个新球拍。但这次是用微信支付。"
+            note = "我是有钱人。"
         }
         val rec4 = rec3.getCopy().apply { ID = 17 }
         val rec5 = rec4.getCopy().apply { ID = 18 }

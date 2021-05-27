@@ -3,7 +3,6 @@ package com.example.epledger
 import android.app.Activity
 import android.os.Bundle
 import android.util.Log
-import android.util.SparseArray
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.annotation.IdRes
@@ -11,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.viewpager.widget.ViewPager
 import com.example.epledger.db.DatabaseModel
-import com.example.epledger.db.ImportDataFromExcel
+import com.example.epledger.home.SectionAdapter
 import com.example.epledger.inbox.event.item.EventItemFragment
 import com.example.epledger.inbox.event.list.EventFragment
 import com.example.epledger.nav.MainPagerAdapter
@@ -66,11 +65,11 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         mainPagerAdapter = MainPagerAdapter(supportFragmentManager)
 
         // 设置图标的可见度
-        bottomNavigationView.labelVisibilityMode = LabelVisibilityMode.LABEL_VISIBILITY_UNLABELED
+        bottomNavigationView.labelVisibilityMode = LabelVisibilityMode.LABEL_VISIBILITY_AUTO
 
         // Set items to be displayed
         mainPagerAdapter.setItems(arrayListOf(MainScreen.MAIN, MainScreen.CHARTS,
-                MainScreen.OTHERS, MainScreen.SETTINGS))
+                MainScreen.INBOX, MainScreen.SETTINGS))
 
         // Default page
         val defaultPage = MainScreen.MAIN
@@ -173,6 +172,8 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             bottomNavigationView.removeBadge(R.id.nav_inbox)
         }
     }
+
+    var homeSectionAdapter: SectionAdapter? = null
 }
 
 fun Activity.asMainActivity(): MainActivity {

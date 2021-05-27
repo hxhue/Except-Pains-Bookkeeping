@@ -157,7 +157,7 @@ class CategoryItemDialogFragment: DialogFragment(), IconItemAdapter.OnPositionCl
             dialogContent.category_name_edittext.clearFocus()
 
             // Wait some time and set set recyclerView visible
-            // 通过Post运行能够延缓一段时间
+            // 通过Post运行能够延缓一段时间，但在有些机器上卡顿
             Handler(Looper.getMainLooper()).post {
                 setIconRecyclerViewVisibility(true)
             }
@@ -194,17 +194,17 @@ class CategoryItemDialogFragment: DialogFragment(), IconItemAdapter.OnPositionCl
         super.onViewCreated(view, savedInstanceState)
 
         // Add observer
-        mModel.categoryIconResID.observe(viewLifecycleOwner, {
+        mModel.categoryIconResID.observe(viewLifecycleOwner) {
             view.category_icon_imageview.setImageDrawable(ContextCompat.getDrawable(view.context, it))
-        })
+        }
 
-        mModel.categoryName.observe(viewLifecycleOwner, {
+        mModel.categoryName.observe(viewLifecycleOwner) {
             view.category_name_edittext.apply {
                 setText(it)
                 // 将光标位置移动到末尾
                 setSelection(it.length)
             }
-        })
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.epledger.R
+import com.example.epledger.asMainActivity
 import com.example.epledger.model.Record
 import com.example.epledger.detail.RecordDetailFragment
 import com.example.epledger.db.DatabaseModel
@@ -63,9 +64,13 @@ class HomeFragment : Fragment() {
 
     private fun updateUI() {
         val sections = dbModel.requireGroupedRecords()
-        mSectionAdapter = SectionAdapter(sections, dbModel)
+        val sectionAdapter = SectionAdapter(sections, dbModel)
+        mSectionAdapter = sectionAdapter
         mRecyclerView!!.adapter = mSectionAdapter
         mRecyclerView!!.itemAnimator = DefaultItemAnimator()
+
+        // Save reference in Activity
+        requireActivity().asMainActivity().homeSectionAdapter = mSectionAdapter
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
