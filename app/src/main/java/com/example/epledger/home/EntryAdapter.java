@@ -66,7 +66,7 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
 
             // Show money
             if (mEntry.getMoneyAmount() == 0 || mEntry.getMoneyAmount() == -0) {
-                amountText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.lightColorPrimary));
+                amountText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.amount_not_provided_color));
                 amountText.setText("￥??");
             } else if (mEntry.getMoneyAmount() > 0) {
                 amountText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.amount_income_color));
@@ -82,7 +82,7 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
             if (infoStr != null && !infoStr.trim().isEmpty()) {
                 infoText.setText(mEntry.getNote());
             } else {
-                infoText.setText(R.string.no_info_provided);
+                infoText.setText(R.string.no_memo_provided);
             }
 
             categoryText.setText(mEntry.getSource());

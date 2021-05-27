@@ -57,7 +57,7 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ViewHold
                     fragment.setDetailRecordMsgReceiver(new RecordDetailFragment.DetailRecordMsgReceiver() {
                         @Override
                         public void onDetailRecordSubmit(@NotNull Record record) {
-                            dbModel.updateRecord(sectionPosition, position, SectionAdapter.this);
+                            dbModel.updateRecord(sectionPosition, position, SectionAdapter.this, null);
                         }
 
                         @Override

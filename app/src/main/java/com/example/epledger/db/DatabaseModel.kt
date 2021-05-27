@@ -6,11 +6,14 @@ import androidx.lifecycle.ViewModel
 import com.example.epledger.R
 import com.example.epledger.db.model.AppDatabase
 import com.example.epledger.home.SectionAdapter
+import com.example.epledger.inbox.InboxFragment
 import com.example.epledger.model.Record
 import com.example.epledger.model.Category
 import com.example.epledger.model.RecordGroup
 import com.example.epledger.model.Source
+import com.example.epledger.nav.MainScreen
 import kotlinx.coroutines.*
+import java.lang.RuntimeException
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -21,6 +24,7 @@ class DatabaseModel: ViewModel() {
     val categories = MutableLiveData<ArrayList<Category>>(ArrayList(0))
     val groupedRecords = MutableLiveData<MutableList<RecordGroup>>(ArrayList(0))
     val incompleteRecords = MutableLiveData<MutableList<Record>>(ArrayList(0))
+    val starredRecords = MutableLiveData<MutableList<Record>>(ArrayList(0))
 
     /**初始化了之后才能够调用这个函数。
      * （2021年5月20日13:43:15）Harmful，但是不知道原因
@@ -55,11 +59,13 @@ class DatabaseModel: ViewModel() {
             val groupResult = groupRecordsByDate(records)
 
             val incompleteRecordsToPost = AppDatabase.getIncompleteRecordsOrderByDate()
+            val starredRecordsToPost = AppDatabase.getStarredRecords()
 
             sources.postValue(srcList)
             categories.postValue(cateList)
             groupedRecords.postValue(groupResult)
             incompleteRecords.postValue(incompleteRecordsToPost)
+            starredRecords.postValue(starredRecordsToPost)
         }
     }
 
@@ -75,27 +81,98 @@ class DatabaseModel: ViewModel() {
         return groupedRecords.value!!
     }
 
-//    /**
-//     * 删除不完整的记录。
-//     * @param index 不完整记录在列表中的index，配合RecyclerView使用。
-//     */
-//    fun deleteIncompleteRecord(index: Int) {
-//        GlobalScope.launch(Dispatchers.IO) {
-//            val incompleteRecords = incompleteRecords.value!!
-//            AppDatabase.deleteRecordByID(incompleteRecords[index].ID!!)
-//            incompleteRecords.removeAt(index)
-//        }
-//    }
+    enum class DataModificationMethod {
+        INSERT, UPDATE, DELETE
+    }
+
+    /**
+     * 检查和更新对应的sections。注意已经更新的sections不要传入，此函数不保证幂等调用。
+     * 可能只能在主线程中调用？2021年05月27日：好像不需要。
+     */
+    private fun checkModificationEffectsOnInboxSections(record: Record,
+                                                method: DataModificationMethod,
+                                                sectionsToCheck: EnumSet<InboxFragment.InboxSectionType> = EnumSet.allOf(
+                                                    InboxFragment.InboxSectionType::class.java)) {
+        val inboxFragment = MainScreen.INBOX.fragment as InboxFragment
+
+        InboxFragment.InboxSectionType.values().forEach { enumValue ->
+            if (enumValue in sectionsToCheck) {
+                when (enumValue) {
+                    InboxFragment.InboxSectionType.INCOMPLETE -> {
+                        when (method) {
+                            DataModificationMethod.INSERT -> inboxFragment.checkIncompleteSectionOnInsertion(record)
+                            DataModificationMethod.UPDATE -> inboxFragment.checkIncompleteSectionOnUpdate(record)
+                            DataModificationMethod.DELETE -> inboxFragment.checkIncompleteSectionOnRemoval(record)
+                        }
+                    }
+
+                    InboxFragment.InboxSectionType.STARRED -> {
+                        when (method) {
+                            DataModificationMethod.INSERT -> inboxFragment.checkStarredSectionOnInsertion(record)
+                            DataModificationMethod.UPDATE -> inboxFragment.checkStarredSectionOnUpdate(record)
+                            DataModificationMethod.DELETE -> inboxFragment.checkStarredSectionOnRemoval(record)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 找到record在组中的位置。要求record必须存在于组中，且list按照时间排序好。而判断record的依据是ID相等。
+     * @return Pair<index_of_section, position_in_section>
+     */
+    private fun requireRecordIndex(record: Record, list: MutableList<RecordGroup>): Pair<Int, Int> {
+        val roundedDateOfRecord = roundToDay(record.mDate)
+        val index = list.binarySearch(
+            RecordGroup(roundedDateOfRecord, ArrayList(0)),
+            RecordGroup.dateReverseComparator
+        )
+        if (index < 0) {
+            throw RuntimeException("The record to be deleted is not in the list.")
+        }
+
+        val currentGroup = list[index].records
+        var recordIsFound = false
+        var positionInSection = 0
+
+        // 由于组内数量少，所以这里的还是很快的
+        currentGroup.forEachIndexed { thisIndex, thisRecord ->
+            if (thisRecord.ID!! == record.ID!!) {
+                recordIsFound = true
+                positionInSection = thisIndex
+                return@forEachIndexed
+            }
+        }
+        if (!recordIsFound) {
+            throw RuntimeException("The record to be deleted is not in the list.")
+        }
+
+        return Pair(index, positionInSection)
+    }
+
+    /**
+     * 搜索并删除record。性能会比另一种重载低一点，但是也能log(n)?
+     */
+    fun deleteRecord(record: Record, sectionAdapter: SectionAdapter) {
+        GlobalScope.launch(Dispatchers.IO) {
+            val groupedRecords = requireGroupedRecords()
+            val (index, positionInSection) = requireRecordIndex(record, groupedRecords)
+
+            // 因为下面这个重载调用了数据库接口，因此这里不用操作数据库
+            deleteRecord(index, positionInSection, sectionAdapter)
+        }
+    }
 
     fun deleteRecord(section: Int, position: Int, sectionAdapter: SectionAdapter) {
-        val groupedRecords = requireGroupedRecords()
         GlobalScope.launch(Dispatchers.IO) {
+            val groupedRecords = requireGroupedRecords()
             // 在内存中找到数据，取出其ID
             val group = groupedRecords.elementAt(section)
-            val recordID = group.records[position].ID!!
+            val record = group.records[position]
 
             // 在外存中删除
-            AppDatabase.deleteRecordByID(recordID)
+            AppDatabase.deleteRecordByID(record.ID!!)
 
             // 如果该组有多个元素则删除单个元素即可
             if (group.records.size > 1) {
@@ -117,6 +194,9 @@ class DatabaseModel: ViewModel() {
                     sectionAdapter.notifyItemRangeChanged(section, sectionAdapter.sections.size)
                 }
             }
+
+            // 是否需要在主线程中呢？(似乎不需要？)
+            checkModificationEffectsOnInboxSections(record, DataModificationMethod.DELETE)
         }
     }
 
@@ -152,20 +232,45 @@ class DatabaseModel: ViewModel() {
 
             this@DatabaseModel.groupedRecords.postValue(groupedRecords)
 
-            // TODO: 检查其他相关信息，目前只做了首页
+            withContext(Dispatchers.Main) {
+                checkModificationEffectsOnInboxSections(record, DataModificationMethod.INSERT)
+            }
         }
     }
 
-    fun updateRecord(section: Int, position: Int, sectionAdapter: SectionAdapter) {
-        val groupedRecords = requireGroupedRecords()
+    /**
+     * 大概是log(n)
+     */
+    fun updateRecord(record: Record, sectionAdapter: SectionAdapter) {
         GlobalScope.launch(Dispatchers.IO) {
+            val groupedRecords = requireGroupedRecords()
+            val (section, position) = requireRecordIndex(record, groupedRecords)
+            updateRecord(section, position, sectionAdapter, newRecord = record)
+        }
+    }
+
+    /**
+     * 更新主页面中的record记录。如果有newRecord则需要替换，否则单纯进行刷新。
+     */
+    fun updateRecord(section: Int, position: Int, sectionAdapter: SectionAdapter, newRecord: Record? = null) {
+        GlobalScope.launch(Dispatchers.IO) {
+            val groupedRecords = requireGroupedRecords()
             val group = groupedRecords[section]
+
+            if (newRecord != null) {
+                group.records[position] = newRecord
+            }
+
             val recordToUpdate = group.records[position]
+
             // Update database
             AppDatabase.updateRecord(recordToUpdate)
+
             // Update view
             withContext(Dispatchers.Main) {
                 sectionAdapter.notifySingleItemChanged(section, position)
+                // 2021年05月27日09:26:10 可能是因为这里的record不一样，导致更新被这个老的record又覆盖了一次
+                checkModificationEffectsOnInboxSections(recordToUpdate, DataModificationMethod.UPDATE)
             }
         }
     }
