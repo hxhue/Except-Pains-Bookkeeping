@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment
 import com.example.epledger.R
 import com.example.epledger.chart.ChartsFragment
 import com.example.epledger.home.HomeFragment
-import com.example.epledger.inbox.InboxFragment
+import com.example.epledger.inbox.content.InboxFragment
 import com.example.epledger.settings.SettingsFragment
 
 /**
@@ -18,9 +18,7 @@ enum class MainScreen(@IdRes val menuItemId: Int,
                       val fragment: Fragment) {
     MAIN(R.id.nav_home, R.string.nav_home, HomeFragment()),
     CHARTS(R.id.nav_charts, R.string.nav_charts, ChartsFragment()),
-    INBOX(R.id.nav_inbox, R.string.nav_inbox,
-        InboxFragment()
-    ),
+    OTHERS(R.id.nav_inbox, R.string.nav_inbox, InboxFragment()),
     SETTINGS(R.id.nav_settings, R.string.nav_settings, SettingsFragment()),
 }
 

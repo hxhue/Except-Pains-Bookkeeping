@@ -168,7 +168,6 @@
 <!--        app:layout_constraintBottom_toBottomOf="parent"-->
 <!--        app:layout_constraintTop_toBottomOf="@id/event_item_icon_label">-->
         <androidx.recyclerview.widget.RecyclerView
-            android:alpha="0.0"
             android:layout_width="0dp"
             android:paddingStart="0dp"
             android:paddingEnd="0dp"

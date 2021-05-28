@@ -43,6 +43,7 @@ dependencies {
     implementation files('libs\\poi-ooxml-5.0.0.jar')
     implementation files('libs\\poi-ooxml-full-5.0.0.jar')
     implementation files('libs\\jxl.jar')
+    implementation files('org.apache.poi')
     def nav_version = "2.3.5"
 
     // Java language implementation

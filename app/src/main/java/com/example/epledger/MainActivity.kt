@@ -1,53 +1,31 @@
 package com.example.epledger
 
-import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
-import androidx.activity.viewModels
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.viewpager.widget.ViewPager
-import com.example.epledger.db.DatabaseModel
-import com.example.epledger.home.SectionAdapter
-import com.example.epledger.inbox.event.item.EventItemFragment
-import com.example.epledger.inbox.event.list.EventFragment
 import com.example.epledger.nav.MainPagerAdapter
 import com.example.epledger.nav.MainScreen
+import com.example.epledger.nav.NavigationFragment
 import com.example.epledger.nav.getMainScreenForMenuItem
 import com.example.epledger.qaction.loadQuickActionModule
 import com.example.epledger.util.loadNotificationModule
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomnavigation.LabelVisibilityMode
-import java.lang.RuntimeException
 
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
-    private val dbModel by viewModels<DatabaseModel>()
     private lateinit var viewPager: ViewPager
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var mainPagerAdapter: MainPagerAdapter
-
-    // 用于帮助设置延迟，和nav.NavigationFragment一起使用
-    val viewCachePolicy = hashMapOf<String, Boolean>(
-        Pair(EventItemFragment::class.java.name, true),
-        Pair(EventFragment::class.java.name, true)
-    )
-
-    /**
-     * 由于EventItem页面打开很卡，所以需要事先缓存。
-     */
-    private var cachedEventItemFragment: EventItemFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // 禁用黑暗模式
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-
-        // 2021年5月22日17:17:23 [Simon Yu]
-        // Doubt if the following line is useful.
-//        val it=ImportDataFromExcel();
 
         // 界面初始化
         // Handler.post may fix the problem of frame skipping?
@@ -65,11 +43,11 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         mainPagerAdapter = MainPagerAdapter(supportFragmentManager)
 
         // 设置图标的可见度
-        bottomNavigationView.labelVisibilityMode = LabelVisibilityMode.LABEL_VISIBILITY_AUTO
+        bottomNavigationView.labelVisibilityMode = LabelVisibilityMode.LABEL_VISIBILITY_UNLABELED
 
         // Set items to be displayed
         mainPagerAdapter.setItems(arrayListOf(MainScreen.MAIN, MainScreen.CHARTS,
-                MainScreen.INBOX, MainScreen.SETTINGS))
+                MainScreen.OTHERS, MainScreen.SETTINGS))
 
         // Default page
         val defaultPage = MainScreen.MAIN
@@ -90,15 +68,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                 supportActionBar?.setTitle(selectedScreen.titleStringId)
             }
         })
-
-        // Set offscreen limit to pages of APP to avoid lag of reloading
-        // https://stackoverflow.com/a/16781845/13785815
-        viewPager.offscreenPageLimit = 4
-    }
-
-    override fun onResume() {
-        super.onResume()
-        dbModel.reloadDatabase()
     }
 
     /**
@@ -124,20 +93,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         val ctx = this.applicationContext
         loadNotificationModule(ctx)
         loadQuickActionModule(ctx)
-        // 创建cache的视图
-        createViewCache()
-    }
-
-    private fun createViewCache() {
-        cachedEventItemFragment = EventItemFragment()
-    }
-
-    private fun invalidateCachedViews() {
-        cachedEventItemFragment = null
-    }
-
-    fun requireCachedEventItemFragment(): EventItemFragment {
-        return cachedEventItemFragment!!
     }
 
     override fun onStop() {
@@ -147,9 +102,17 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     override fun onDestroy() {
         super.onDestroy()
-        invalidateCachedViews()
-//        dbModel.clearDatabase()
         Log.d("MainActivity", "onDestroy")
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+//        try {
+//            val cur = supportFragmentManager.fragments.last()
+//            if (cur is NavigationFragment) {
+//                cur.onBackPressed()
+//            }
+//        } catch (e: Exception) {}
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -172,13 +135,5 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             bottomNavigationView.removeBadge(R.id.nav_inbox)
         }
     }
-
-    var homeSectionAdapter: SectionAdapter? = null
 }
 
-fun Activity.asMainActivity(): MainActivity {
-    if (this is MainActivity) {
-        return (this as MainActivity)
-    }
-    throw RuntimeException("This activity is not MainActivity so the cast failed.")
-}

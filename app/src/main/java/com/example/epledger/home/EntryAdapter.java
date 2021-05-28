@@ -1,7 +1,6 @@
 package com.example.epledger.home;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,17 +9,21 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModel;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.epledger.R;
-import com.example.epledger.db.DatabaseModel;
-import com.example.epledger.model.Record;
-import com.example.epledger.model.Category;
+import com.example.epledger.detail.DetailRecord;
+import com.example.epledger.model.DatabaseViewModel;
+import com.example.epledger.model.entry.Entry;
+import com.example.epledger.settings.datamgr.Category;
 
 import java.util.List;
 
+import kotlin.random.Random;
+
 public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> {
-    private DatabaseModel dbModel;
+    private DatabaseViewModel dbModel;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private final ImageView labelImage;
@@ -29,7 +32,7 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
         private final TextView infoText;
         private final TextView categoryText;
 
-        private Record mEntry;
+        private Entry mEntry;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -40,52 +43,46 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
             categoryText = itemView.findViewById(R.id.pay_source);
         }
 
-        public void bind(Record entry) {
+        public void bind(Entry entry) {
             mEntry = entry;
-            Context ctx = itemView.getContext();
 
-            Drawable newImage = null;
+            // Get a context
+            Context ctx = itemView.getContext();
+            // Set image (**Testing**)
+//            int choice = Random.Default.nextInt();
+//            if (choice % 3 == 0)
+//                labelImage.setImageDrawable(ContextCompat.getDrawable(ctx, R.drawable.u_sports_basketball));
+//            else if (choice % 3 == 1)
+//                labelImage.setImageDrawable(ContextCompat.getDrawable(ctx, R.drawable.ic_fas_car));
+//            else
+//                labelImage.setImageDrawable(null);
+            labelImage.setImageDrawable(null);
             for (Category category: dbModel.requireCategories()) {
-                if (category.getName().equals(entry.getCategory())) {
-                    newImage = ContextCompat.getDrawable(ctx, category.getIconResID());
+                if (category.getName().equals(entry.getEntryCategory())) {
+                    labelImage.setImageDrawable(ContextCompat.getDrawable(ctx, category.getIconResID()));
                     break;
                 }
             }
-            if (newImage == null) {
-                newImage = ContextCompat.getDrawable(ctx, R.drawable.ic_fas_question_circle);
-            }
-            labelImage.setImageDrawable(newImage);
 
-            // Show category
-            final String categoryOfItem = mEntry.getCategory();
-            if (categoryOfItem != null && !categoryOfItem.trim().isEmpty()) {
-                labelText.setText(categoryOfItem);
-            } else {
-                labelText.setText(R.string.no_category_provided);
-            }
-
-            // Show money
-            if (mEntry.getMoneyAmount() == 0 || mEntry.getMoneyAmount() == -0) {
-                amountText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.amount_not_provided_color));
-                amountText.setText("￥??");
-            } else if (mEntry.getMoneyAmount() > 0) {
+            labelText.setText(mEntry.getLabel());
+            if (mEntry.getAmount() >= 0) {
                 amountText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.amount_income_color));
-                amountText.setText("+￥" + String.format("%.2f", Math.abs(mEntry.getMoneyAmount())));
+                amountText.setText("+￥" + String.format("%.2f", Math.abs(mEntry.getAmount())));
             } else  {
                 amountText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.amount_expand_color));
-                amountText.setText("-￥" + String.format("%.2f", Math.abs(mEntry.getMoneyAmount())));
+                amountText.setText("-￥" + String.format("%.2f", Math.abs(mEntry.getAmount())));
             }
 
-            // Show info(or attached note)
-            final String infoStr = mEntry.getNote();
+            // Set info
+            final String infoStr = mEntry.getInfo();
             // Check if it's empty
             if (infoStr != null && !infoStr.trim().isEmpty()) {
-                infoText.setText(mEntry.getNote());
+                infoText.setText(mEntry.getInfo());
             } else {
-                infoText.setText(R.string.no_memo_provided);
+                infoText.setText(R.string.no_info_prompt);
             }
 
-            categoryText.setText(mEntry.getSource());
+            categoryText.setText(mEntry.getEntrySource());
         }
     }
 
@@ -94,21 +91,13 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
         void onItemLongClick(View view, int position);
     }
 
-    private List<Record> mEntryList;
+    private List<Entry> mEntryList;
     // 事件回调监听
     private EntryAdapter.OnItemClickListener onItemClickListener;
 
-    public EntryAdapter(List<Record> entryList, DatabaseModel model) {
+    public EntryAdapter(List<Entry> entryList, DatabaseViewModel model) {
         this.mEntryList = entryList;
         dbModel = model;
-    }
-
-    public void setEntries(List<Record> entries) {
-        this.mEntryList = entries;
-    }
-
-    public List<Record> getEntries() {
-        return this.mEntryList;
     }
 
     @NonNull
@@ -120,7 +109,7 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
-        Record entry = mEntryList.get(position);
+        Entry entry = mEntryList.get(position);
         holder.bind(entry);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {

@@ -9,11 +9,9 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.activityViewModels
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.example.epledger.R
-import com.example.epledger.db.DatabaseModel
 import com.example.epledger.nav.NavigationFragment
 import com.example.epledger.qaction.loadQuickActionModule
 import com.example.epledger.settings.datamgr.CategoryManagerFragment
@@ -22,8 +20,6 @@ import com.example.epledger.settings.datamgr.SourceManagerFragment
 
 class SettingsFragment: PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
     var alertDialog: AlertDialog? = null
-
-    private val dbModel by activityViewModels<DatabaseModel>()
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences, rootKey)
@@ -36,14 +32,14 @@ class SettingsFragment: PreferenceFragmentCompat(), SharedPreferences.OnSharedPr
         val sourceManagement = preferenceScreen.findPreference<Preference>("manage_sources")
         sourceManagement?.setOnPreferenceClickListener {
             val newFragment = SourceManagerFragment()
-            NavigationFragment.pushToStack(this.requireActivity().supportFragmentManager, newFragment, true)
+            NavigationFragment.pushToStack(this.requireActivity().supportFragmentManager, newFragment)
             true
         }
 
         val categoryManagement = preferenceScreen.findPreference<Preference>("manage_tags")
         categoryManagement?.setOnPreferenceClickListener {
             val newFragment = CategoryManagerFragment()
-            NavigationFragment.pushToStack(this.requireActivity().supportFragmentManager, newFragment, true)
+            NavigationFragment.pushToStack(this.requireActivity().supportFragmentManager, newFragment)
             true
         }
 
@@ -78,17 +74,9 @@ class SettingsFragment: PreferenceFragmentCompat(), SharedPreferences.OnSharedPr
             Toast.makeText(requireContext(), "data_import_wechat", Toast.LENGTH_SHORT).show()
             true
         }
-
-        // Debug
-        val reloadDB = preferenceScreen.findPreference<Preference>("reload_db")
-        reloadDB?.setOnPreferenceClickListener {
-            dbModel.reloadDatabase()
-            true
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        menu.clear()
         inflater.inflate(R.menu.settings_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }

@@ -5,14 +5,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.observe
 import androidx.preference.PreferenceFragmentCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.epledger.MainActivity
 import com.example.epledger.R
-import com.example.epledger.asMainActivity
 import com.example.epledger.inbox.event.viewmodel.EventViewModel
 import com.example.epledger.inbox.event.item.EventItemFragment
 import com.example.epledger.nav.NavigationFragment
@@ -20,11 +18,11 @@ import kotlinx.android.synthetic.main.fragment_event_list.view.*
 
 class EventListFragment: PreferenceFragmentCompat(), EventAdapter.OnPositionClickListener {
     private val eventsModel: EventViewModel by activityViewModels()
-    private val eventAdapter = run {
+    private val eventAdapter = {
         val adapter = EventAdapter()
         adapter.onPositionClickListener = this
         adapter
-    }
+    }()
     lateinit var recyclerView: RecyclerView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -78,21 +76,15 @@ class EventListFragment: PreferenceFragmentCompat(), EventAdapter.OnPositionClic
     }
 
     override fun onClick(position: Int) {
-        val newFragment = (this.activity as MainActivity).requireCachedEventItemFragment()
-        newFragment.shouldCopyItem = true
-
+        val newFragment = EventItemFragment()
         eventsModel.setNewEvent(false)
         val curEvent = eventsModel.events.value!![position]
         eventsModel.eventIndex = position
         eventsModel.setEditing(false)
-        eventsModel.setCurrentEvent(curEvent)
 
-        NavigationFragment.pushToStack(
-            requireActivity().supportFragmentManager,
-            newFragment,
-            fromMainPage = false,
-            requireActivity().asMainActivity().viewCachePolicy
-        )
+        // TODO: 在Item页面构建一个副本，在需要提交的时候才会更新
+        eventsModel.setCurrentEvent(curEvent)
+        NavigationFragment.pushToStack(requireActivity().supportFragmentManager, newFragment)
     }
 
 }

@@ -1,4 +1,4 @@
-package com.example.epledger.model
+package com.example.epledger.settings.datamgr
 
 import com.example.epledger.R
 

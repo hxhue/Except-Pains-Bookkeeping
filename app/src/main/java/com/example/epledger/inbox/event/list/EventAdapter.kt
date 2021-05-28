@@ -8,7 +8,6 @@ import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.epledger.R
 import com.example.epledger.inbox.event.item.EventItem
-import com.example.epledger.util.Fmt
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.view_event_item_row.view.*
 import java.text.SimpleDateFormat
@@ -70,7 +69,8 @@ class EventAdapter: RecyclerView.Adapter<EventAdapter.ViewHolder>() {
 
         holder.title.setText(item.name)
 
-        val dateStr = Fmt.date.format(item.startingDate)
+        val simpleFormat = SimpleDateFormat("yyyy/MM/dd", Locale.US)
+        val dateStr = simpleFormat.format(item.startingDate)
         val cycleAmount = item.cycle
         val cycleUnit = when(item.unit) {
             EventItem.CycleUnit.DAY -> ctx.getString(R.string.unit_day)
@@ -87,6 +87,8 @@ class EventAdapter: RecyclerView.Adapter<EventAdapter.ViewHolder>() {
             val dialog = MaterialAlertDialogBuilder(ctx)
                     .setMessage(ctx.getString(R.string.event_del_comfirm))
                     .setPositiveButton(ctx.getString(R.string.ok)) { d, i ->
+                        Toast.makeText(ctx, "Should remove!", Toast.LENGTH_SHORT).show()
+
                         // 列表视图的删除
                         eventItems.removeAt(position)
                         this.notifyItemRemoved(position)

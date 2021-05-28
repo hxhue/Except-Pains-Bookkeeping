@@ -67,8 +67,8 @@ open class NavigationFragment: Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        menu.clear()
         super.onCreateOptionsMenu(menu, inflater)
+        menu.clear()
     }
 
     override fun onStop() {
@@ -130,30 +130,34 @@ open class NavigationFragment: Fragment() {
 
     companion object {
         fun pushToStack(fragmentManager: FragmentManager, fragment: NavigationFragment,
-                        fromMainPage: Boolean = false, animLatencyPolicy: HashMap<String, Boolean>? = null) {
-            // 默认不延迟
-            var withLatency = false
-            // 查找提供的延迟策略
-            if (animLatencyPolicy != null) {
-                val className = fragment.javaClass.name
-                if (animLatencyPolicy.getOrDefault(className, false)) {
-                    withLatency = true
-                    // 对每个类在活动实例化好之后只延迟一次
-                    animLatencyPolicy[className] = false
-                }
-            }
-
+                        fromMainPage: Boolean = false) {
             val transaction: FragmentTransaction = fragmentManager.beginTransaction()
-            transaction.setCustomAnimations(
-                if (withLatency) R.anim.slide_in_with_latency else R.anim.slide_in,
-                R.anim.fade_out,
-                R.anim.fade_in,
-                R.anim.slide_out
-            )
-            // Use **replace to get animation to work.
-            // Or: use add to ignore bottom-layer animation.
-            // 由于静态的layout不能够被替代，所以如果要使用replace并提供退出效果，
-            // 需要主活动的布局包含一个FrameLayout，并把主活动的布局设置都独立在Fragment中
+            // Set transition animations
+            if (fromMainPage) {
+                transaction.setCustomAnimations(
+                        R.anim.fade_in,
+                        R.anim.fade_out,
+                        R.anim.fade_in,
+                        R.anim.fade_out
+                )
+            } else {
+                // Somewhat ugly...
+//                transaction.setCustomAnimations(
+//                        R.anim.slide_in,
+//                        R.anim.slide_out_below,
+//                        R.anim.slide_in_below,
+//                        R.anim.slide_out
+//                )
+                transaction.setCustomAnimations(
+                        R.anim.fade_in,
+                        R.anim.fade_out,
+                        R.anim.fade_in,
+                        R.anim.fade_out
+                )
+            }
+            // Use replace to get animation to work
+//            transaction.replace(android.R.id.content, fragment)
+            // Use add to ignore bottom-layer animation
             transaction.add(android.R.id.content, fragment)
             // Commit
             transaction.addToBackStack(null).commit()

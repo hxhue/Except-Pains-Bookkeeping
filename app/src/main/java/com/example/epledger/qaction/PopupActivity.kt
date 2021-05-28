@@ -11,7 +11,6 @@ import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.view.Window
-import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.activity.viewModels
@@ -20,17 +19,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
 import com.example.epledger.R
-import com.example.epledger.db.model.AppDatabase
-import com.example.epledger.model.Record
-import com.example.epledger.detail.RecordDetailFragment
+import com.example.epledger.detail.DetailRecord
 import com.example.epledger.qaction.tool.PairTask
 import com.example.epledger.qaction.tool.Store
 import com.example.epledger.qaction.screenshot.ScreenshotUtils
-import com.example.epledger.util.Fmt
+import com.example.epledger.util.ThemeColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.switchmaterial.SwitchMaterial
 import java.math.RoundingMode
 import java.text.DecimalFormat
+import java.text.SimpleDateFormat
 import java.util.*
 
 /**
@@ -45,8 +43,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
     private var shown = false
     private var noPermissionAlert: AlertDialog? = null
 
-    private var ledgerRecord = Record()
-
+    private var ledgerRecord = DetailRecord()
     // 用户的偏好设置
     private var briefMode = true
     private var screenshotAtStart = false
@@ -88,7 +85,6 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         cardViewModel.categories.observeForever {
             types.clear()
             types.add(getString(R.string.unspecified))
-//            types.add("")
             types.addAll(it.map { category -> category.name })
             typesSpinnerAdapter.notifyDataSetChanged()
         }
@@ -96,7 +92,6 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         cardViewModel.sources.observeForever {
             sources.clear()
             sources.add(getString(R.string.unspecified))
-//            sources.add("")
             sources.addAll(it.map { source -> source.name })
             sourcesSpinnerAdapter.notifyDataSetChanged()
         }
@@ -251,16 +246,6 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         // Save reference
         noteEditText = findViewById<EditText>(R.id.qa_note_text)
         moneyEditText = findViewById<EditText>(R.id.qa_money_text)
-        moneyEditText.apply {
-            setText("-0.0")
-            setSelection(text.length)
-        }
-        // 让moneyEditText获取焦点
-        window.apply {
-            clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
-            setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-        }
-        moneyEditText.requestFocus()
     }
 
     private fun setupSpinners() {
@@ -289,20 +274,11 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         if (parent.id == R.id.qa_src_spinner) {
             Log.d("qaction.PopupActivity",
                     "onItemSelected(): sourceSpinner has (${sources[position]}) selected.")
-            if (position == RecordDetailFragment.UNSPECIFIED_ITEM_POSITION) {
-                ledgerRecord.source = null
-            } else {
-                ledgerRecord.source = sources[position]
-            }
+            ledgerRecord.source = sources[position]
         } else if (parent.id == R.id.qa_type_spinner) {
             Log.d("qaction.PopupActivity",
                     "onItemSelected(): typeSpinner has (${types[position]}) selected.")
-
-            if (position == RecordDetailFragment.UNSPECIFIED_ITEM_POSITION) {
-                ledgerRecord.category = null
-            } else {
-                ledgerRecord.category = types[position]
-            }
+            ledgerRecord.category = types[position]
         }
     }
 
@@ -313,7 +289,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
 
     private fun discardDatePickerWidget() {
         // Set data
-        ledgerRecord.mDate = Date()
+        ledgerRecord.startingDate = Date()
 
         // Set the view
         val view = findViewById<View>(R.id.qa_date_compo)
@@ -332,17 +308,11 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
 
     private fun discardTimePickerWidget() {
         // Set data
-        ledgerRecord.mDate.let { date ->
-            val cal = Calendar.getInstance()
-            val h = cal.get(Calendar.HOUR_OF_DAY)
-            val m = cal.get(Calendar.MINUTE)
-
-            // After fetching current time, calendar can be reset
-            cal.timeInMillis = date.time
-            cal.set(Calendar.HOUR_OF_DAY, h)
-            cal.set(Calendar.MINUTE, m)
-            date.time = cal.timeInMillis
-        }
+        val cal = Calendar.getInstance()
+        val h = cal.get(Calendar.HOUR_OF_DAY)
+        val m = cal.get(Calendar.MINUTE)
+        ledgerRecord.hourOfDay = h
+        ledgerRecord.minuteOfHour = m
 
         // Set the view
         val view = findViewById<View>(R.id.qa_time_compo)
@@ -390,40 +360,26 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         val hour = cal.get(Calendar.HOUR_OF_DAY)
         val minute = cal.get(Calendar.MINUTE)
         val formatString = "%02d:%02d"
-        timeText.setText(String.format(formatString, hour, minute))
-
-        ledgerRecord.mDate.let { date ->
-            // hour和minute已经取得，因此cal可以重用了
-            cal.timeInMillis = date.time
-            cal.set(Calendar.HOUR_OF_DAY, hour)
-            cal.set(Calendar.MINUTE, minute)
-            date.time = cal.timeInMillis
-        }
-//        ledgerRecord.hourOfDay = hour
-//        ledgerRecord.minuteOfHour = minute
+        val str = String.format(formatString, hour, minute)
+        timeText.setText(str)
+        ledgerRecord.hourOfDay = hour
+        ledgerRecord.minuteOfHour = minute
 
         // Create a dialog and add it into callback
-        val dialog = TimePickerDialog(this, R.style.Theme_Dialog_WithOurColors, { picker, h, m ->
+        val dialog = TimePickerDialog(this, { picker, h, m ->
             // Save the time
-            ledgerRecord.mDate.let { date ->
-                val tempCalender = Calendar.getInstance()
-                tempCalender.timeInMillis = date.time
-                tempCalender.set(Calendar.HOUR_OF_DAY, h)
-                tempCalender.set(Calendar.MINUTE, m)
-                date.time = tempCalender.timeInMillis
-            }
-//            ledgerRecord.hourOfDay = h
-//            ledgerRecord.minuteOfHour = m
-
+            ledgerRecord.hourOfDay = h
+            ledgerRecord.minuteOfHour = m
             // Format the string
-            timeText.setText(String.format(formatString, h, m))
+            val str = String.format(formatString, h, m)
+            timeText.setText(str)
         }, hour, minute, true)
 
-        dialog.setOnShowListener {
-            val color = getColor(R.color.lightColorPrimary)
-            dialog.getButton(TimePickerDialog.BUTTON_POSITIVE).setTextColor(color)
-            dialog.getButton(TimePickerDialog.BUTTON_NEGATIVE).setTextColor(color)
-        }
+//        dialog.setOnShowListener {
+//            val color = getColor(R.color.lightColorSecondary)
+//            dialog.getButton(TimePickerDialog.BUTTON_POSITIVE).setTextColor(color)
+//            dialog.getButton(TimePickerDialog.BUTTON_NEGATIVE).setTextColor(color)
+//        }
 
         timePickerButton.setOnClickListener {
             dialog.show()
@@ -437,23 +393,25 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         val datePickerButton = findViewById<Button>(R.id.qa_date_button)
 
         // 设置默认日期为今日
+        val simpleFormat = SimpleDateFormat("yyyy/MM/dd", Locale.US)
         val dateOfNow = Date()
-        ledgerRecord.mDate = dateOfNow
-        dateText.setText(Fmt.date.format(dateOfNow))
+        ledgerRecord.startingDate = dateOfNow
+        dateText.setText(simpleFormat.format(dateOfNow))
 
         // 添加按钮回调
-        val dialog = DatePickerDialog(this, R.style.Theme_Dialog_WithOurColors)
-        dialog.setOnDateSetListener { _, year, month, dayOfMonth ->
+        val dialog = DatePickerDialog(this)
+        dialog.setOnDateSetListener { view, year, month, dayOfMonth ->
             val cal = Calendar.getInstance()
-            cal.timeInMillis = ledgerRecord.mDate.time
             cal.set(year, month, dayOfMonth)
-            ledgerRecord.mDate.time = cal.timeInMillis
-            dateText.setText(Fmt.date.format(ledgerRecord.mDate))
+            val date = Date(cal.timeInMillis)
+            ledgerRecord.startingDate = date
+            dateText.setText(simpleFormat.format(date))
         }
 
         dialog.setOnShowListener {
+            // 只有show之后才能访问button，才不会报null
             // 调整button颜色
-            val color = getColor(R.color.lightColorPrimary)
+            val color = ThemeColors.getColorPrimary(theme)
             dialog.getButton(DatePickerDialog.BUTTON_POSITIVE).setTextColor(color)
             dialog.getButton(DatePickerDialog.BUTTON_NEGATIVE).setTextColor(color)
         }
@@ -487,35 +445,30 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
 
         // Get all data from widgets
         rec.note = noteEditText.text.toString()
-
         // Money amount
         try {
-            rec.moneyAmount = moneyEditText.text.toString().toDouble()
-            if (rec.moneyAmount == 0.0) {
-                rec.moneyAmount = -0.0
+            rec.amount = moneyEditText.text.toString().toDouble()
+            if (rec.amount == 0.0) {
+                rec.amount = null
             } else {
                 // 格式化金额
                 val format = DecimalFormat("0.##")
                 format.roundingMode = RoundingMode.FLOOR
-                rec.moneyAmount = format.format(rec.moneyAmount).toDouble()
+                rec.amount = format.format(rec.amount!!).toDouble()
             }
         } catch (e: Exception) {
-            rec.moneyAmount = -0.0
+            rec.amount = null
         }
-
         // Star status
         rec.starred = starToggleButton.isChecked
 
         // Print the record to trace and debug the procedure
-        Log.d("************************ Save record", "$ledgerRecord")
+        Log.d("==> Save record", "$ledgerRecord")
 
         rec.screenshot?.let {
             ScreenshotUtils.saveToSandbox(this, it)
             rec.screenshot = null
         }
-
-        // 同步插入数据库（因为这个活动马上就要停止，如果不同步插入可能会插入失败）
-        AppDatabase.insertRecord(rec)
     }
 
     /**

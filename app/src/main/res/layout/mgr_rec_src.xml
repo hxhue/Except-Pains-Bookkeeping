@@ -9,8 +9,6 @@
         android:id="@+id/mgr_rec_src_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="80dp"
-        android:clipToPadding="false"
         tools:layout_editor_absoluteX="84dp"
         tools:layout_editor_absoluteY="96dp" />
 
@@ -20,6 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
+        android:paddingBottom="80dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

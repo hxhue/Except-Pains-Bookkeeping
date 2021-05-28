@@ -4,12 +4,12 @@
 
     <PreferenceCategory
         app:key="quick_actions_category"
-        app:icon="@drawable/sp_ic_fas_bolt"
         app:title="@string/prefer_cate_qa">
 
         <SwitchPreferenceCompat
             app:key="qa_notification"
             app:title="@string/prefer_item_qa_noti"
+            app:icon="@drawable/ic_baseline_extension"
             app:summary="@string/prefer_item_qa_noti_sum"
             app:defaultValue="false"/>
 
@@ -27,7 +27,6 @@
 
     <PreferenceCategory
         app:key="manage_category"
-        app:icon="@drawable/u_build"
         app:title="@string/management">
 <!--        app:icon="@drawable/ic_fas_tag"-->
         <Preference
@@ -44,7 +43,6 @@
 
     <PreferenceCategory
         app:key="data_category"
-        app:icon="@drawable/sp_ic_fas_database"
         app:title="@string/prefer_cate_data">
 
 <!--        app:icon="@drawable/ic_fas_upload"-->
@@ -81,19 +79,14 @@
             />
     </PreferenceCategory>
 
-<!--    <PreferenceCategory-->
-<!--        app:title="Debug"-->
-<!--        app:key="debug_category"-->
-<!--        android:icon="@drawable/ic_fas_bug"-->
-<!--        >-->
-<!--        <SwitchPreferenceCompat-->
-<!--            app:key="display_show_empty_data"-->
-<!--            app:defaultValue="true"-->
-<!--            app:title="Show empty data"/>-->
-<!--        <Preference app:key="reload_db"-->
-<!--            android:icon="@drawable/ic_fas_redo_alt"-->
-<!--            app:title="Reload database" />-->
-<!--    </PreferenceCategory>-->
+    <PreferenceCategory
+        app:title="Display"
+        app:key="display_category"
+        >
+        <SwitchPreferenceCompat app:key="display_show_empty_data"
+            app:defaultValue="true"
+            app:title="Show empty data"/>
+    </PreferenceCategory>
 
 <!--    <PreferenceCategory-->
 <!--        app:key="notification_category"-->

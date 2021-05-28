@@ -116,6 +116,17 @@
                         android:paddingEnd="0dp"
                         android:text="@string/expense_type" />
 
+                    <Button
+                        android:id="@+id/clearAllBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/expenseTypeTextView"
+                        android:layout_marginStart="20dp"
+                        android:layout_alignTop="@id/expenseTypeTextView"
+                        android:text="@string/clear_all_btn"
+                        />
+
+
                     <com.google.android.material.chip.ChipGroup
                         android:id="@+id/expenseTypeChipGroup"
                         android:layout_width="match_parent"
@@ -124,7 +135,8 @@
                         android:layout_alignParentStart="true"
                         android:layout_alignParentEnd="true"
                         app:singleLine="false"
-                        app:singleSelection="true">
+                        app:singleSelection="false"
+                        >
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/eatTypeChip"
@@ -139,7 +151,7 @@
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="false"
+                            android:checked="true"
                             android:text="@string/shopping_type_chip" />
 
                         <com.google.android.material.chip.Chip
@@ -147,7 +159,7 @@
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="false"
+                            android:checked="true"
                             android:text="@string/transport_type_chip" />
 
                         <com.google.android.material.chip.Chip
@@ -155,7 +167,7 @@
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="false"
+                            android:checked="true"
                             android:text="@string/entertainment_type_chip" />
 
                         <com.google.android.material.chip.Chip
@@ -163,7 +175,7 @@
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="false"
+                            android:checked="true"
                             android:text="@string/book_type_chip" />
 
                         <com.google.android.material.chip.Chip
@@ -171,7 +183,7 @@
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="false"
+                            android:checked="true"
                             android:text="@string/clothes_type_chip" />
 
                         <com.google.android.material.chip.Chip
@@ -179,7 +191,7 @@
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="false"
+                            android:checked="true"
                             android:text="@string/digital_type_chip" />
 
                         <com.google.android.material.chip.Chip
@@ -187,7 +199,7 @@
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="false"
+                            android:checked="true"
                             android:text="@string/study_type_chip" />
 
                         <com.google.android.material.chip.Chip
@@ -195,7 +207,7 @@
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="false"
+                            android:checked="true"
                             android:text="@string/daily_necessity_type_chip" />
 
                         <com.google.android.material.chip.Chip
@@ -203,7 +215,7 @@
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="false"
+                            android:checked="true"
                             android:text="@string/phone_bill_type_chip" />
 
                         <com.google.android.material.chip.Chip
@@ -211,7 +223,7 @@
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="false"
+                            android:checked="true"
                             android:text="@string/makeup_type_chip" />
 
                         <com.google.android.material.chip.Chip
@@ -219,7 +231,7 @@
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="false"
+                            android:checked="true"
                             android:text="@string/medical_type_chip" />
 
                         <com.google.android.material.chip.Chip
@@ -227,7 +239,7 @@
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="false"
+                            android:checked="true"
                             android:text="@string/travel_type_chip" />
 
                         <com.google.android.material.chip.Chip
@@ -235,7 +247,7 @@
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="false"
+                            android:checked="true"
                             android:text="@string/water_electricity_type_chip" />
 
                         <com.google.android.material.chip.Chip
@@ -243,7 +255,7 @@
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="false"
+                            android:checked="true"
                             android:text="@string/sport_type_chip" />
 
                         <com.google.android.material.chip.Chip
@@ -251,7 +263,7 @@
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="false"
+                            android:checked="true"
                             android:text="@string/gift_type_chip" />
 
                         <com.google.android.material.chip.Chip
@@ -259,7 +271,7 @@
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="false"
+                            android:checked="true"
                             android:text="@string/red_envelope_type_chip" />
 
                         <com.google.android.material.chip.Chip
@@ -267,7 +279,7 @@
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="false"
+                            android:checked="true"
                             android:text="@string/donate_type_chip" />
                     </com.google.android.material.chip.ChipGroup>
 
@@ -278,6 +290,15 @@
                         android:layout_below="@id/expenseTypeChipGroup"
                         android:text="@string/set_date_range_button"
 
+                        />
+                    <Button
+                        android:id="@+id/siftBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/setDateRangeButton"
+                        android:layout_marginStart="20dp"
+                        android:layout_alignTop="@id/setDateRangeButton"
+                        android:text="@string/confirm"
                         />
                 </RelativeLayout>
                 <com.github.mikephil.charting.charts.PieChart

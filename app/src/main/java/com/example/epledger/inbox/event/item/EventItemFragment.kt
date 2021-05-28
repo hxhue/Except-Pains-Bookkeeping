@@ -7,20 +7,16 @@ import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.EditText
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
-import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.observe
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.epledger.R
 import com.example.epledger.inbox.event.viewmodel.EventItemViewModel
 import com.example.epledger.inbox.event.viewmodel.EventViewModel
 import com.example.epledger.nav.NavigationFragment
-import com.example.epledger.inbox.event.item.SpaceItemDecoration
 import com.example.epledger.util.IconAsset
 import com.example.epledger.util.ScreenMetrics
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -30,10 +26,7 @@ import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 
-/**
- * 每次进入之前都应该设置shouldCopyItem为true。
- * 因为这个类是可以缓存下来的，因此要设置额外的标志。
- */
+
 class EventItemFragment: NavigationFragment(),
         AdapterView.OnItemSelectedListener, IconItemAdapter.OnPositionClickListener {
     private val eventsModel: EventViewModel by activityViewModels()
@@ -45,12 +38,12 @@ class EventItemFragment: NavigationFragment(),
             getString(R.string.unit_year)
         )
     }
-
     private var firstTimeForIcons = true
-    var shouldCopyItem = true
 
     // TODO: move to another place
-    private val iconIDs = IconAsset.assets
+    private val iconIDs = {
+        IconAsset.assets
+    }()
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         menu.clear()
@@ -64,22 +57,7 @@ class EventItemFragment: NavigationFragment(),
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            // Somewhat useless? (API 30)
-            android.R.id.home -> {
-                if (eventsModel.isEditing()) {
-                    val dialog = MaterialAlertDialogBuilder(requireContext())
-                        .setMessage(getString(R.string.discard_changes_confirm))
-                        .setNegativeButton(R.string.no) {_, _ -> }
-                        .setPositiveButton(R.string.ok) {_, _ ->
-                            exitNavigationFragment()
-                        }
-                    dialog.show()
-                } else {
-                    exitNavigationFragment()
-                }
-                true
-            }
+        return super.onOptionsItemSelected(item) or when (item.itemId) {
             R.id.menu_item_delete -> {
                 if (!eventsModel.isNewEvent() && eventsModel.eventIndex >= 0) {
                     val dialog = MaterialAlertDialogBuilder(requireContext())
@@ -108,9 +86,6 @@ class EventItemFragment: NavigationFragment(),
                     eventsModel.setEditing(false)
                     // Resume previous status && no need to prepare
                     itemModel.item.value = eventsModel.getCurrentEvent().copy()
-                    Toast.makeText(requireContext(), getString(R.string.restore_prev_state), Toast.LENGTH_SHORT).show()
-                } else {
-                    throw java.lang.IllegalStateException()
                 }
                 true
             }
@@ -139,14 +114,10 @@ class EventItemFragment: NavigationFragment(),
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (shouldCopyItem) {
-            // Copy EventItem
-            itemModel.item.value = eventsModel.getCurrentEvent().copy()
-            shouldCopyItem = false
-            firstTimeForIcons = true
-        }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Copy EventItem
+        itemModel.item.value = eventsModel.getCurrentEvent().copy()
     }
 
     override fun onCreateView(
@@ -208,9 +179,12 @@ class EventItemFragment: NavigationFragment(),
             view.event_item_name_text.isEnabled = editing
             view.event_item_icon_recycler_view.apply {
                 if (firstTimeForIcons and !editing) {
-                    this.alpha = 0.0f
+                    alpha = 0.0f
                 } else {
                     animate().alpha(if (editing) 1.0f else 0.0f).setDuration(100)
+                }
+                itemModel.viewModelScope.launch {
+                    setAllEnabled(editing)
                 }
                 firstTimeForIcons = false
             }
@@ -297,12 +271,6 @@ class EventItemFragment: NavigationFragment(),
     }
 
     override fun onPositionClick(position: Int) {
-        // Do not perform change when view is not being edited
-        if (!eventsModel.isEditing()) {
-            return
-        }
-
-        // Change iconResID
         val e = itemModel.getCurrentEvent()
         e.iconResID = iconIDs[position]
         prepareItemRebind()
@@ -310,7 +278,7 @@ class EventItemFragment: NavigationFragment(),
     }
 }
 
-//fun View.setAllEnabled(enabled: Boolean) {
-//    isEnabled = enabled
-//    if (this is ViewGroup) this.children.forEach { child -> child.setAllEnabled(enabled) }
-//}
+fun View.setAllEnabled(enabled: Boolean) {
+    isEnabled = enabled
+    if (this is ViewGroup) this.children.forEach { child -> child.setAllEnabled(enabled) }
+}

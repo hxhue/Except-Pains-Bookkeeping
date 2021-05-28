@@ -9,6 +9,7 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.epledger.R
+import com.example.epledger.db.ImportDataFromExcel
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.AxisBase
@@ -18,17 +19,32 @@ import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.chip.ChipGroup
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener
+import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
 import java.util.*
+
 
 class ChartsFragment: Fragment() {
     private lateinit var siftLayout:RelativeLayout
     private lateinit var pieChart: PieChart
     private lateinit var lineChart: LineChart
+    var dateRangePicker=
+            MaterialDatePicker.Builder.dateRangePicker()
+                    .setTitleText("Select dates")
+                    .setSelection(
+                            androidx.core.util.Pair<Long, Long>(
+                                    MaterialDatePicker.thisMonthInUtcMilliseconds(),
+                                    MaterialDatePicker.todayInUtcMilliseconds()
+                            )
+                    )
+                    .build()
+    val im = ImportDataFromExcel()
     @SuppressLint("ResourceAsColor")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.activity_show_chart, container, false)
+        val expenseTypeChipGroup=view.findViewById<View>(R.id.expenseTypeChipGroup) as ChipGroup
         setHasOptionsMenu(true) // Turn on option menu
         siftLayout=view.findViewById<View>(R.id.siftLayout) as RelativeLayout
 
@@ -175,25 +191,31 @@ class ChartsFragment: Fragment() {
 
 
         //add date picker
-        val dateRangePicker=
-                MaterialDatePicker.Builder.dateRangePicker()
-                        .setTitleText("请选择日期范围")
-                        .setSelection(
-                                androidx.core.util.Pair<Long,Long>(
-                                        MaterialDatePicker.thisMonthInUtcMilliseconds(),
-                                        MaterialDatePicker.todayInUtcMilliseconds()
-                                )
-                        )
-                        .build()
 
-        dateRangePicker.addOnPositiveButtonClickListener{
 
-        }
-
+//        dateRangePicker.addOnPositiveButtonClickListener{
+//
+//        }
+        //设置按钮回调函数
         val setDateRangeBtn= view.findViewById<View>(R.id.setDateRangeButton) as Button
-        setDateRangeBtn.setOnClickListener(object :View.OnClickListener{
+        setDateRangeBtn.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
-                activity?.supportFragmentManager?.let { dateRangePicker.show(it,"DATE_RANGE_PICKER") }
+                activity?.supportFragmentManager?.let { dateRangePicker.show(it, "DATE_RANGE_PICKER") }
+            }
+        })
+
+        val clearAllBtn=view.findViewById<View>(R.id.clearAllBtn) as Button
+        clearAllBtn.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(v: View?) {
+                expenseTypeChipGroup.clearCheck()
+                Toast.makeText(context,"clear all tags",Toast.LENGTH_SHORT).show()
+            }
+        })
+
+        val siftBtn=view.findViewById<View>(R.id.siftBtn) as Button
+        siftBtn.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(v: View?) {
+                siftItems()
             }
         })
 
@@ -202,14 +224,36 @@ class ChartsFragment: Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        menu.clear()
         inflater.inflate(R.menu.top_app_bar, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
     override fun onResume() {
         super.onResume()
-        Toast.makeText(context,"Hello World",Toast.LENGTH_SHORT)
+        Toast.makeText(context, "Hello World", Toast.LENGTH_SHORT)
     }
+
+    fun siftItems():List<bill>{
+        val dateRange=dateRangePicker.selection
+        val dateStart= dateRange?.first?.let { UTC2Str(it) }
+        val dateEnd=dateRange?.second?.let { UTC2Str(it) }
+        if (dateStart != null&&dateEnd!=null) {
+            Toast.makeText(context,dateStart+"   "+dateEnd,Toast.LENGTH_SHORT).show()
+        }
+        
+
+//        im.find_date_from()
+//        val startDate=
+//        im.find_date_from()
+    }
+
+
+    fun UTC2Str(utc:Long): String {
+        val sdf=SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+        val date=Date(utc)
+        val str=sdf.format(date)
+        return str
+    }
+
 
 
 

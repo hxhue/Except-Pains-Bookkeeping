@@ -1,4 +1,4 @@
-package com.example.epledger.util.tag;
+package com.example.epledger.model.tag;
 
 public class BaseTag {
     private String name;

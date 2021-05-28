@@ -142,7 +142,7 @@
     <string name="detail_src">Source</string>
     <string name="detail_type">Category</string>
     <string name="detail_money">Money</string>
-    <string name="detail_memo">Memo</string>
+    <string name="detail_note">Note</string>
     <string name="detail_screenshot">Snap</string>
     <string name="detail_screenshot_remove">Remove</string>
     <string name="detail_screenshot_for_this_record">Screenshot for this Record</string>
@@ -163,7 +163,7 @@
     <string name="unit_year">" year(s)"</string>
     <string name="event_info_fmt">From %s. Cycle: %d%s.</string>
     <string name="unconditionally_remind">Remind me unconditionally</string>
-    <string name="unconditionally_remind_sum">even if no events have expired</string>
+    <string name="unconditionally_remind_sum">even if no recurring events have expired</string>
     <string name="alert">Alert</string>
     <string name="recurring_events">Recurring Events</string>
     <string name="stop_ck_prompt">Stopping foreground service</string>
@@ -171,7 +171,7 @@
     <string name="no_events_prompt">You have no events here.</string>
     <string name="alert_time">Alert time</string>
     <string name="noti_time_sum_fmt">Current: %s (24-hour clock)</string>
-    <string name="have_not_set_time_prompt">You haven\'t set the time yet</string>
+    <string name="have_not_set_time_prompt">You haven\'t set the time yet.</string>
     <string name="event_del_comfirm">Are you sure about deleting this event?</string>
     <string name="create_event">Create Event</string>
     <string name="modify_event">Modify Event</string>
@@ -185,8 +185,7 @@
     <string name="management">Management</string>
     <string name="manage_categories">Manage categories</string>
     <string name="manage_sources">Manage sources</string>
-    <string name="no_memo_provided"><i>(No memo provided)</i></string>
-    <string name="no_category_provided">(...)</string>
+    <string name="no_info_prompt"><i>(No note provided.)</i></string>
     <string name="sources">Sources</string>
     <string name="modify_name">Modify Name</string>
     <string name="new_source">New Source</string>
@@ -198,11 +197,8 @@
     <string name="category_number_too_large_prompt">Your categories are too many. We strongly suggest keeping only a few of them.</string>
     <string name="unspecified"><i>(Unspecified)</i></string>
     <string name="new_category">New Category</string>
-    <string name="discard_changes_confirm">Are you sure about discarding all the changes?</string>
-    <string name="restore_prev_state">Previous state restored.</string>
-    <string name="source_name_empty_prompt">You can\'t create a source whose name is empty. Please input some useful information.</string>
-    <string name="record_incomplete_prompt">This record is considered incomplete and cannot be submitted. Please at least provide information about money (which cannot be 0.0 or -0.0) and category.</string>
-    <string name="incomplete_item_removal_confirm">Are you sure about deleting this item? It is an incomplete item, which means you might have decided to create a placeholder record.</string>
-    <string name="no_unhandled_records">No unhandled records.</string>
+    <string name="select_all_btn">全选</string>
+    <string name="clear_all_btn">清空</string>
+    <string name="confirm">确认</string>
 
 </resources>
