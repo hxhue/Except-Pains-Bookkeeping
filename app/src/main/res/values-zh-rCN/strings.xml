@@ -183,4 +183,6 @@
     <string name="record_incomplete_prompt">这条记录不完整因而不能够被提交。请至少提供金额（不能是0.0或-0.0）和种类信息。</string>
     <string name="incomplete_item_removal_confirm">您确定要删除该项吗？它是一个不完整项，可能是您过去有意创建的占位项。</string>
     <string name="no_unhandled_records">没有待处理的记录。</string>
+    <string name="clear_all_btn">全部清除</string>
+    <string name="confirm">确认</string>
 </resources>

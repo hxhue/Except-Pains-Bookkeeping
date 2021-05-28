@@ -204,5 +204,7 @@
     <string name="record_incomplete_prompt">This record is considered incomplete and cannot be submitted. Please at least provide information about money (which cannot be 0.0 or -0.0) and category.</string>
     <string name="incomplete_item_removal_confirm">Are you sure about deleting this item? It is an incomplete item, which means you might have decided to create a placeholder record.</string>
     <string name="no_unhandled_records">No unhandled records.</string>
+    <string name="clear_all_btn">全部清除</string>
+    <string name="confirm">确认</string>
 
 </resources>

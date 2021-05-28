@@ -232,7 +232,7 @@ class ChartsFragment: Fragment() {
         Toast.makeText(context, "Hello World", Toast.LENGTH_SHORT)
     }
 
-    fun siftItems():List<bill>{
+    fun siftItems(){
         val dateRange=dateRangePicker.selection
         val dateStart= dateRange?.first?.let { UTC2Str(it) }
         val dateEnd=dateRange?.second?.let { UTC2Str(it) }
