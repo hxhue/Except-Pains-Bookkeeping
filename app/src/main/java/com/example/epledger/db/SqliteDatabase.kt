@@ -2,7 +2,6 @@ package com.example.epledger.db
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import androidx.core.database.getStringOrNull
-import com.example.epledger.R
 import com.example.epledger.model.Category
 import com.example.epledger.model.Record
 import com.example.epledger.model.Source
@@ -257,7 +256,7 @@ class SqliteDatabase : LedgerDatabase {
         val res =ArrayList<String>()
         if (cursor != null && cursor.count > 0) {
             while (cursor.moveToNext()) {
-                val from1=cursor.getString(cursor.getColumnIndex(MySQLiteOpenHelper.type_id))
+                val from1=cursor.getString(cursor.getColumnIndex(MySQLiteOpenHelper.type1))
                 res.add(from1)
             }
             cursor.close()
@@ -268,9 +267,9 @@ class SqliteDatabase : LedgerDatabase {
     override fun siftRecords(
             dateStart:Date,
             dateEnd: Date,
-            sources: List<Source>,
-            categories: List<Category>
-    ): List<Record> {
+            sources: ArrayList<String>,
+            categories: ArrayList<String>
+    ): ArrayList<Record> {
         // 2021-05-29 15:20:56 [Simon Yu]
         // After merging 2d10d9c
         // 编译错误：Class 'MemoryDatabase' is not abstract and does not implement abstract member public abstract fun siftRecords(dateStart: String, dateEnd: String, sources: List<Source>, categories: List<Category>): List<Record> defined in com.example.epledger.db.LedgerDatabase
@@ -278,9 +277,10 @@ class SqliteDatabase : LedgerDatabase {
         //TODO("Not yet implemented")
         val im=ImportDataFromExcel();
         val sqLiteDatabase: SQLiteDatabase = im.dbHelper.getReadableDatabase()
-        val simpleFormat = SimpleDateFormat("yyyy/MM/dd hh:mm", Locale.US)
+        val simpleFormat = SimpleDateFormat("yyyy/MM/dd")
         val start=simpleFormat.format(dateStart)
-        val end=simpleFormat.format(dateEnd)
+        val rectifiedDateEnd=Date(dateEnd.time+24*60*60*1000)
+        val end=simpleFormat.format(rectifiedDateEnd)
         val res=im.FindTimeFrom(sqLiteDatabase,start,end,sources, categories)
         return res
     }
