@@ -9,9 +9,9 @@
     <application
         android:allowBackup="true"
         android:name=".db.MainApplication"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/nic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/nic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ExceptPains">
 
@@ -49,7 +49,7 @@
         <!-- TODO: icon需要修改 -->
         <service
             android:name=".qaction.NewRecordTileService"
-            android:icon="@drawable/ic_launcher_foreground"
+            android:icon="@drawable/nic_service"
             android:label="@string/tile_service_label"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
