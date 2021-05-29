@@ -76,7 +76,7 @@ interface LedgerDatabase {
 /**
  * 应用使用的数据库。
  */
-val AppDatabase: LedgerDatabase = MemoryDatabase()
+val AppDatabase: LedgerDatabase = SqliteDatabase()
 
 /**
  * 内存中数据库的模拟。有相同的接口。
