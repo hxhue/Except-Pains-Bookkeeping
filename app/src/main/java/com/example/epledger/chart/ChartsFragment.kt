@@ -129,10 +129,6 @@ class ChartsFragment: Fragment() {
             }
         }
 
-
-        //add date picker
-
-
 //        dateRangePicker.addOnPositiveButtonClickListener{
 //
 //        }
@@ -187,6 +183,9 @@ class ChartsFragment: Fragment() {
     fun getSiftedBills():List<bill>{
         //get date range
         val dateRange=dateRangePicker.selection
+        val dateBegin= dateRange?.let { Date(it.first) }
+        val dateEnd= dateRange?.let { Date(it.second) }
+
         val checkedAccountIds=accountChipGroup.checkedChipIds as ArrayList<Int>
         val checkedExpenseTypeIds=expenseTypeChipGroup.checkedChipIds as ArrayList<Int>
 //        val bills= im.siftRecords(Date(dateRange.first),Date(dateRange.second),checkedAccountIds,checkedExpenseTypeIds)
