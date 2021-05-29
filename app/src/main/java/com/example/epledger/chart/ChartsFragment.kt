@@ -28,7 +28,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import com.example.epledger.db.ImportDataFromExcel.bill
-import com.example.epledger.db.MemoryDatabase
+import com.example.epledger.db.SqliteDatabase
+import com.example.epledger.model.Record
 import kotlin.collections.HashMap
 
 class ChartsFragment: Fragment() {
@@ -40,11 +41,11 @@ class ChartsFragment: Fragment() {
     val expenseTypeChipList=ArrayList<Chip>()
     private lateinit var accountChipGroup:ChipGroup
     private lateinit var expenseTypeChipGroup: ChipGroup
-    private lateinit var billList:List<bill>
+    private lateinit var billList:List<Record>
     private lateinit var siftBtn:Button
     private lateinit var catNames:List<String>
     private lateinit var srcNames:List<String>
-    val im = MemoryDatabase()
+    val im = SqliteDatabase()
     var dateRangePicker=
             MaterialDatePicker.Builder.dateRangePicker()
                     .setTitleText("Select dates")
@@ -74,7 +75,7 @@ class ChartsFragment: Fragment() {
         for(id in expenseTypeIdList){
             expenseTypeChipList.add(view.findViewById<View>(id) as Chip)
         }
-        billList=ArrayList<bill>()
+        billList=ArrayList<Record>()
         setHasOptionsMenu(true) // Turn on option menu
         siftLayout=view.findViewById<View>(R.id.siftLayout) as RelativeLayout
 
@@ -159,7 +160,7 @@ class ChartsFragment: Fragment() {
         val siftBtn=view.findViewById<View>(R.id.siftBtn) as Button
         siftBtn.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
-                billList=getSiftedBills()
+                billList=getSiftedBills(view)
                 drawLineChart(view)
                 drawPieChart(view)
 
@@ -180,17 +181,37 @@ class ChartsFragment: Fragment() {
         Toast.makeText(context, "Hello World", Toast.LENGTH_SHORT)
     }
 
-    fun getSiftedBills():List<bill>{
+    fun getSiftedBills(view: View):ArrayList<Record>{
         //get date range
         val dateRange=dateRangePicker.selection
         val dateBegin= dateRange?.let { Date(it.first) }
         val dateEnd= dateRange?.let { Date(it.second) }
 
-        val checkedAccountIds=accountChipGroup.checkedChipIds as ArrayList<Int>
-        val checkedExpenseTypeIds=expenseTypeChipGroup.checkedChipIds as ArrayList<Int>
-//        val bills= im.siftRecords(Date(dateRange.first),Date(dateRange.second),checkedAccountIds,checkedExpenseTypeIds)
-//        return bills
-        return ArrayList<bill>()
+        val srcList=ArrayList<String>()
+        for(id in accountChipGroup.checkedChipIds) {
+            val chip = view.findViewById<View>(id) as Chip
+            srcList.add(chip.text.toString())
+        }
+        val catList=ArrayList<String>()
+        for(id in expenseTypeChipGroup.checkedChipIds) {
+            val chip = view.findViewById<View>(id) as Chip
+            catList.add(chip.text.toString())
+        }
+
+        var bills= ArrayList<Record>()
+        if(dateBegin!=null&&dateEnd!=null){
+            System.out.println(dateBegin)
+            System.out.println(dateEnd)
+            for (src in srcList){
+                System.out.println(src)
+            }
+            for(cat in catList){
+                System.out.println(cat)
+            }
+
+            bills= im.siftRecords(dateBegin,dateEnd,srcList,catList)
+        }
+        return bills
     }
 
     fun UTC2Str(utc:Long): String {
@@ -204,14 +225,14 @@ class ChartsFragment: Fragment() {
         //pie chart
         //准备数据
         Toast.makeText(context,billList.size.toString(),Toast.LENGTH_SHORT).show()
-        val typeSumMap=HashMap<String,Float>()
+        val typeSumMap=HashMap<String,Double>()
         for(bill in billList){
-            typeSumMap.put(bill.type1,typeSumMap.getOrDefault(bill.type1, 0F)?.plus(bill.account))
+            bill.category?.let { typeSumMap.put(it,typeSumMap.getOrDefault(bill.category!!, 0.0)?.plus(bill.moneyAmount)) }
         }
 
         val entries: MutableList<PieEntry> = ArrayList()
         for(entry in typeSumMap){
-            entries.add(PieEntry(entry.value,entry.key))
+            entries.add(PieEntry(entry.value.toFloat(),entry.key))
         }
         val set = PieDataSet(entries, "type proportion")
 //        set.setColors(

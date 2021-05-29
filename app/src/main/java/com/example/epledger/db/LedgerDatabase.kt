@@ -65,7 +65,7 @@ interface LedgerDatabase {
     /**
      *  根据开始日期、结束日期、Source和Category查询Records，用于chart模块
      */
-    fun siftRecords(dateStart:Date,dateEnd:Date,sources:List<Source>,categories:List<Category>): List<Record>
+    fun siftRecords(dateStart:Date,dateEnd:Date,sources:ArrayList<String>,categories:ArrayList<String>): MutableList<Record>
 
     fun getAllSourceNames(): MutableList<String>
 
@@ -186,16 +186,18 @@ class MemoryDatabase : LedgerDatabase {
         )
     }
 
-    override fun siftRecords(dateStart: Date, dateEnd: Date, sources: List<Source>, categories: List<Category>): List<Record> {
-        val sourceStrs=HashSet<String>()
-        val categoryStrs=HashSet<String>()
-        for(src in sources)
-            sourceStrs.add(src.name)
-        for(cat in categories)
-            categoryStrs.add(cat.name)
-        return records
-                .filter { it.mDate>dateStart&&it.mDate<dateEnd&&sourceStrs.contains(it.source)&&categoryStrs.contains(it.category)}
+    override fun siftRecords(dateStart: Date, dateEnd: Date, sources: ArrayList<String>, categories: ArrayList<String>): ArrayList<Record> {
+//        val sourceStrs=HashSet<String>()
+//        val categoryStrs=HashSet<String>()
+//        for(src in sources)
+//            sourceStrs.add(src.name)
+//        for(cat in categories)
+//            categoryStrs.add(cat.name)
+        val result=ArrayList<Record>()
+        records.filter { it.mDate>dateStart&&it.mDate<dateEnd&&sources.contains(it.source)&&categories.contains(it.category)}
                 .sortedWith(Record.dateReverseComparator)
+                .forEach { result.add(it) }
+        return result
     }
 
     override fun getAllSourceNames(): MutableList<String> {

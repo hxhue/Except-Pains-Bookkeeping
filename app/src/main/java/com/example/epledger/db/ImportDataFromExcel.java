@@ -74,20 +74,21 @@ public class ImportDataFromExcel{
         contentValues.put(MySQLiteOpenHelper.from1, from1);
         db.insert(MySQLiteOpenHelper.TABLE_NAME5, null, contentValues);
     }
-    public List<Record> FindTimeFrom(SQLiteDatabase sqLiteDatabase, String start, String end, List<Source>s, List<Category>c) throws ParseException {
+    public ArrayList<Record> FindTimeFrom(SQLiteDatabase sqLiteDatabase, String start, String end, List<String>s, List<String>c) throws ParseException {
         //SQLiteDatabase sqLiteDatabase=dbHelper.getReadableDatabase();
-        List<Record> sum=new ArrayList<>();
+        ArrayList<Record> sum=new ArrayList<>();
         for(int i=0;i<s.size();i++)
         {
             for(int j=0;j<c.size();j++)
             {
-                List<Record> h=query_date(sqLiteDatabase,start,end,s.get(i).getID(),c.get(j).getID());
+                List<Record> h=query_date(sqLiteDatabase,start,end,SelectFromId(s.get(i),sqLiteDatabase),SelectTypeId(c.get(j),sqLiteDatabase));
                 if(h!=null) sum.addAll(h);
             }
         }
         sqLiteDatabase.close();
         return sum;
     }
+
     public void base_excel()
     {
         java.util.List<bill> b = query(dbHelper.getReadableDatabase());
@@ -239,7 +240,7 @@ public class ImportDataFromExcel{
         java.util.List<Record> bills =new ArrayList<>();
         SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm");
 
-        android.database.Cursor cursor = db.rawQuery("SELECT * FROM " + MySQLiteOpenHelper.TABLE_NAME+" WHERE "+MySQLiteOpenHelper.from_id+"= ? AND "+MySQLiteOpenHelper.type_id+"= ? AND "+MySQLiteOpenHelper.date1+" <= ? AND "+MySQLiteOpenHelper.date1+" >= ? AND istemplate=0",new String[]{Integer.toString(from), Integer.toString(type),end,start}, null);
+        android.database.Cursor cursor = db.rawQuery("SELECT * FROM " + MySQLiteOpenHelper.TABLE_NAME+" WHERE "+MySQLiteOpenHelper.from_id+"= ? AND "+MySQLiteOpenHelper.type_id+"= ? AND "+MySQLiteOpenHelper.date1+" < ? AND "+MySQLiteOpenHelper.date1+" >= ? AND istemplate=0",new String[]{Integer.toString(from), Integer.toString(type),end,start}, null);
         if (cursor != null && cursor.getCount() > 0) {
 
 
