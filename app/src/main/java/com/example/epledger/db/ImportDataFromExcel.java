@@ -6,6 +6,10 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 //import android.support.v7.app.AppCompatActivity;
+import com.example.epledger.model.Category;
+import com.example.epledger.model.Record;
+import com.example.epledger.model.Source;
+
 import java.io.File;
 
 import org.apache.poi.ss.usermodel.Row;
@@ -20,7 +24,10 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 //import jxl.Sheet;
@@ -28,7 +35,7 @@ import java.util.List;
 
 /**
  */
-public class ImportDataFromExcel {
+public class ImportDataFromExcel{
     public MySQLiteOpenHelper dbHelper;
 
     private SharedPreferences sharedPreferences;
@@ -37,13 +44,7 @@ public class ImportDataFromExcel {
         //super.onCreate(savedInstanceState);
         Context c=MainApplication.getCustomApplicationContext();
         dbHelper  = new MySQLiteOpenHelper(c,"test");
-        /*SQLiteDatabase sqLiteDatabase=dbHelper.getWritableDatabase();
-        AddNewType(sqLiteDatabase,"吃饭");
-        AddNewType(sqLiteDatabase,"娱乐");
-        AddNewFrom(sqLiteDatabase,"支付宝");
-        AddNewFrom(sqLiteDatabase,"微信");
-        sqLiteDatabase.close();
-        SQLiteDatabase db=dbHelper.getWritableDatabase();
+        /*SQLiteDatabase db=dbHelper.getWritableDatabase();
         ContentValues contentValues=getContentValues("2021/5/21",100,1,1,"没有备注");
         db.insert(MySQLiteOpenHelper.TABLE_NAME, null, contentValues);
         contentValues=getContentValues("2021/5/22",100,2,1,"备注2");
@@ -60,10 +61,11 @@ public class ImportDataFromExcel {
         /*ContentValues contentValues=getContentValues(b.date1,b.account,b.type1,b.from1,b.beizhu);
         db.insert(MySQLiteOpenHelper.TABLE_NAME, null, contentValues);*/
     }
-    public void AddNewType(SQLiteDatabase db,String type)
+    public void AddNewType(SQLiteDatabase db,String type,int id)
     {
         ContentValues contentValues = new ContentValues();
         contentValues.put(MySQLiteOpenHelper.type1, type);
+        contentValues.put(MySQLiteOpenHelper.iconresid, id);
         db.insert(MySQLiteOpenHelper.TABLE_NAME2, null, contentValues);
     }
     public void AddNewFrom(SQLiteDatabase db,String from1)
@@ -72,16 +74,14 @@ public class ImportDataFromExcel {
         contentValues.put(MySQLiteOpenHelper.from1, from1);
         db.insert(MySQLiteOpenHelper.TABLE_NAME5, null, contentValues);
     }
-    public List<bill> FindTimeFrom(String start, String end, ArrayList<Integer> from, ArrayList<Integer>type)
-    {
-
-        SQLiteDatabase sqLiteDatabase=dbHelper.getReadableDatabase();
-        List<bill> sum=new ArrayList<>();
-        for(int i=0;i<from.size();i++)
+    public List<Record> FindTimeFrom(SQLiteDatabase sqLiteDatabase, String start, String end, List<Source>s, List<Category>c) throws ParseException {
+        //SQLiteDatabase sqLiteDatabase=dbHelper.getReadableDatabase();
+        List<Record> sum=new ArrayList<>();
+        for(int i=0;i<s.size();i++)
         {
-            for(int j=0;j<type.size();j++)
+            for(int j=0;j<c.size();j++)
             {
-                List<bill> h=query_date(sqLiteDatabase,start,end,from.get(i),type.get(j));
+                List<Record> h=query_date(sqLiteDatabase,start,end,s.get(i).getID(),c.get(j).getID());
                 if(h!=null) sum.addAll(h);
             }
         }
@@ -97,8 +97,8 @@ public class ImportDataFromExcel {
         SQLiteDatabase sqLiteDatabase=dbHelper.getReadableDatabase();
         for (bill t : b) {
             //System.out.println(student.id + "," + student.name + "," + student.gender + "," + student.age)
-           String m=get_id_type(t.id,sqLiteDatabase);
-            createCell(t.id,t.date1, t.account,m, t.from1, t.beizhu,mSheet);
+            //String m=get_id_type(t.,sqLiteDatabase);
+            createCell(t.id,t.date1, t.account,t.type1, t.from1, t.beizhu,mSheet);
         }
 
         File xlsFile = new File(Environment.getExternalStorageDirectory(), "excel.xls");
@@ -150,23 +150,23 @@ public class ImportDataFromExcel {
                 {
                     if(r.getCell(10).toString()=="支出")
                     {
-                        ContentValues contentValues1 = getContentValues(r.getCell(3).toString(),-m, -1,SelectFromId(r.getCell(7).toString(),sqLiteDatabase),null);
+                        ContentValues contentValues1 = getContentValues(r.getCell(3).toString(),-m, -1,SelectFromId(r.getCell(7).toString(),sqLiteDatabase),null,null,0);
                         sqLiteDatabase.insert(MySQLiteOpenHelper.TABLE_NAME, null, contentValues1);
                     }
                     else
                     {
-                        ContentValues contentValues1 = getContentValues(r.getCell(3).toString(),m, -1,SelectFromId(r.getCell(7).toString(),sqLiteDatabase),null);
+                        ContentValues contentValues1 = getContentValues(r.getCell(3).toString(),m, -1,SelectFromId(r.getCell(7).toString(),sqLiteDatabase),null,null,0);
                         sqLiteDatabase.insert(MySQLiteOpenHelper.TABLE_NAME, null, contentValues1);
 
                     }
                 }
-                }
+            }
 
             sqLiteDatabase.close();
 
 
-            }
         }
+    }
     public void weixin_base(String s) throws IOException {
         SQLiteDatabase sqLiteDatabase=dbHelper.getWritableDatabase();
         File xlsFile = new File(s);
@@ -202,12 +202,12 @@ public class ImportDataFromExcel {
                 {
                     if(r.getCell(4).toString()=="支出")
                     {
-                        ContentValues contentValues1 = getContentValues(r.getCell(0).toString(),-m, -1,SelectFromId(r.getCell(2).toString(),sqLiteDatabase),null);
+                        ContentValues contentValues1 = getContentValues(r.getCell(0).toString(),-m, -1,SelectFromId(r.getCell(2).toString(),sqLiteDatabase),null,null,0);
                         sqLiteDatabase.insert(MySQLiteOpenHelper.TABLE_NAME, null, contentValues1);
                     }
                     else
                     {
-                        ContentValues contentValues1 = getContentValues(r.getCell(0).toString(),-m, -1,SelectFromId(r.getCell(2).toString(),sqLiteDatabase),null);
+                        ContentValues contentValues1 = getContentValues(r.getCell(0).toString(),-m, -1,SelectFromId(r.getCell(2).toString(),sqLiteDatabase),null,null,0);
                         sqLiteDatabase.insert(MySQLiteOpenHelper.TABLE_NAME, null, contentValues1);
 
                     }
@@ -222,34 +222,41 @@ public class ImportDataFromExcel {
 
 
 
-    private ContentValues getContentValues(String date1, int account, int type_id,int from_id,String beizhu) {
+    public ContentValues getContentValues(String date1, double account, int type_id, int from_id, String beizhu, String bitmap,int s) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(MySQLiteOpenHelper.date1, date1);
         contentValues.put(MySQLiteOpenHelper.account,account);
         if(type_id!=-1) contentValues.put(MySQLiteOpenHelper.type_id, type_id);
         contentValues.put(MySQLiteOpenHelper.from_id, from_id);
         contentValues.put(MySQLiteOpenHelper.beizhu, beizhu);
+        contentValues.put(MySQLiteOpenHelper.bitmap, bitmap);
+        contentValues.put(MySQLiteOpenHelper.star, s);
         return contentValues;
     }
 
-    private java.util.List<bill> query_date(SQLiteDatabase db, String start, String end, int from, int type) {
-        java.util.List<bill> bills = null;
+
+    private java.util.List<Record> query_date(SQLiteDatabase db, String start, String end, int from, int type) throws ParseException {
+        java.util.List<Record> bills =new ArrayList<>();
+        SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm");
 
         android.database.Cursor cursor = db.rawQuery("SELECT * FROM " + MySQLiteOpenHelper.TABLE_NAME+" WHERE "+MySQLiteOpenHelper.from_id+"= ? AND "+MySQLiteOpenHelper.type_id+"= ? AND "+MySQLiteOpenHelper.date1+" <= ? AND "+MySQLiteOpenHelper.date1+" >= ? AND istemplate=0",new String[]{Integer.toString(from), Integer.toString(type),end,start}, null);
         if (cursor != null && cursor.getCount() > 0) {
 
-            bills = new ArrayList<>();
 
             while (cursor.moveToNext()) {
-                bill b = new bill();
-                b.id=cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.record_id));
-                b.date1 = cursor.getString(cursor.getColumnIndex(MySQLiteOpenHelper.date1));
-                b.account = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.account));
+                Record b = new Record();
+                b.setID((long)cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.record_id)));
+                Date tmp=simpleFormat.parse(cursor.getString(cursor.getColumnIndex(MySQLiteOpenHelper.date1)));
+                b.setMDate( tmp);
+                b.setMoneyAmount(cursor.getDouble(cursor.getColumnIndex(MySQLiteOpenHelper.account)));
                 int type_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.type_id));
                 int from_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.from_id));
-                b.type1 = get_id_type(type_id,db);
-                b.from1 = get_id_from(from_id,db);
-
+                b.setSource( get_id_from(from_id,db));
+                b.setCategory(get_id_type(type_id,db));
+                b.setNote(cursor.getString(cursor.getColumnIndex(MySQLiteOpenHelper.beizhu)));
+                int isstar=cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.star));
+                b.setStarred(isstar==1);
+                b.setScreenshotPath(cursor.getString(cursor.getColumnIndex(MySQLiteOpenHelper.bitmap)));
                 bills.add(b);
             }
 
@@ -315,6 +322,28 @@ public class ImportDataFromExcel {
         }
         return res;
     }
+    public Long FindRecordID(int fromid,int typeid,double account,SQLiteDatabase db)
+    {
+        Long res= Long.valueOf(-1);
+        String a=""+account;
+        android.database.Cursor cursor = db.rawQuery("SELECT record_id FROM " + MySQLiteOpenHelper.TABLE_NAME+" WHERE from_id=? AND type_id=? AND account=?  ", new String[]{Integer.toString(fromid),Integer.toString(typeid),a},null);
+        if (cursor != null && cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+                res=cursor.getLong(cursor.getColumnIndex(MySQLiteOpenHelper.record_id));
+            }
+
+            cursor.close();
+        }
+        return res;
+    }
+    public  void DeleteID(Long rid,SQLiteDatabase db)
+    {
+        db.delete(MySQLiteOpenHelper.TABLE_NAME,"record_id=?",new String[]{Long.toString(rid)});
+    }
+    public void Update(Long rid,ContentValues c,SQLiteDatabase db)
+    {
+        db.update(MySQLiteOpenHelper.TABLE_NAME, c, "record_id=?",new String[]{Long.toString(rid)});
+    }
     //查询SQLite数据库。读出所有数据内容。
     private java.util.List<bill> query(SQLiteDatabase db) {
         java.util.List<bill> bills = null;
@@ -326,7 +355,7 @@ public class ImportDataFromExcel {
 
             while (cursor.moveToNext()) {
                 bill b = new bill();
-                b.id=cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.record_id));
+                b.id=cursor.getLong(cursor.getColumnIndex(MySQLiteOpenHelper.record_id));
                 b.date1 = cursor.getString(cursor.getColumnIndex(MySQLiteOpenHelper.date1));
                 b.account = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.account));
                 int type_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.type_id));
@@ -346,7 +375,7 @@ public class ImportDataFromExcel {
 
     //数据容器，装载从数据库中读出的数据内容。
     public class bill {
-        public int id;
+        public Long id;
         public String date1;
         public int account;
         public String type1;
@@ -370,7 +399,7 @@ public class ImportDataFromExcel {
     }
 
     // 创建Excel的一行数据。
-    private static void createCell(int id2,String date1, int account,String type1, String from1, String beizhu,HSSFSheet sheet) {
+    private static void createCell(Long id2,String date1, int account,String type1, String from1, String beizhu,HSSFSheet sheet) {
         HSSFRow dataRow = sheet.createRow(sheet.getLastRowNum() + 1);
         dataRow.createCell(0).setCellValue(id2);
         dataRow.createCell(1).setCellValue(date1);

@@ -62,7 +62,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class MySQLiteOpenHelper extends SQLiteOpenHelper {
 
     private String sql_create_table = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +istemplate+" int DEFAULT 0, "+record_id+" INTEGER PRIMARY KEY AUTOINCREMENT,"+date1 + " date," + account + " int," + type_id + " int," + from_id + " int,"+ beizhu + " varchar(300), " + star + " int DEFAULT 0, "+ bitmap + " varchar(300),"+iconresid+" int" +")";
-    private String sql_create_type = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME2 + " (" +type_id+" INTEGER PRIMARY KEY AUTOINCREMENT,"+type1 + " varchar(200)" +")";
+    private String sql_create_type = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME2 + " (" +type_id+" INTEGER PRIMARY KEY AUTOINCREMENT,"+type1 + " varchar(200), " +iconresid+" int"+")";
     private String sql_create_from = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME5 + " (" +from_id+" INTEGER PRIMARY KEY AUTOINCREMENT,"+from1 + " varchar(200)" +")";
     private String sql_create_id_type = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME3 + " (" +record_id+" int ,"+type_id + " int" +")";
     private String sql_create_id_from = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME6 + " (" +from_id+" int ,"+record_id + " int" +")";

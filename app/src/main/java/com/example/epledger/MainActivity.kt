@@ -1,6 +1,7 @@
 package com.example.epledger
 
 import android.app.Activity
+import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -10,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.viewpager.widget.ViewPager
 import com.example.epledger.db.DatabaseModel
+import com.example.epledger.db.ImportDataFromExcel
 import com.example.epledger.home.SectionAdapter
 import com.example.epledger.inbox.event.item.EventItemFragment
 import com.example.epledger.inbox.event.list.EventFragment
@@ -20,7 +22,6 @@ import com.example.epledger.qaction.loadQuickActionModule
 import com.example.epledger.util.loadNotificationModule
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomnavigation.LabelVisibilityMode
-import java.lang.RuntimeException
 
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
@@ -43,6 +44,13 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // 禁用黑暗模式
+        val im=ImportDataFromExcel()
+        val sqLiteDatabase: SQLiteDatabase = im.dbHelper.getWritableDatabase()
+        im.AddNewType(sqLiteDatabase, "吃饭",R.drawable.ic_far_bookmark)
+        im.AddNewType(sqLiteDatabase, "娱乐",2)
+        im.AddNewFrom(sqLiteDatabase, "支付宝")
+        im.AddNewFrom(sqLiteDatabase, "微信")
+        sqLiteDatabase.close()
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
         // 2021年5月22日17:17:23 [Simon Yu]

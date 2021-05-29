@@ -30,6 +30,7 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.ArrayList
 import com.example.epledger.db.ImportDataFromExcel.bill
+import com.example.epledger.db.MemoryDatabase
 import kotlin.collections.HashMap
 
 class ChartsFragment: Fragment() {
@@ -44,7 +45,10 @@ class ChartsFragment: Fragment() {
     val expenseTypeChipList=ArrayList<Chip>()
     private lateinit var accountChipGroup:ChipGroup
     private lateinit var billList:List<bill>
-    val im = ImportDataFromExcel()
+    private lateinit var siftBtn:Button
+    private lateinit var catNames:List<String>
+    private lateinit var srcNames:List<String>
+    val im = MemoryDatabase()
     var dateRangePicker=
             MaterialDatePicker.Builder.dateRangePicker()
                     .setTitleText("Select dates")
@@ -61,11 +65,17 @@ class ChartsFragment: Fragment() {
     @SuppressLint("ResourceAsColor")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.activity_show_chart, container, false)
+        siftBtn=view.findViewById(R.id.siftBtn)
+        dateRangePicker.addOnPositiveButtonClickListener {
+            siftBtn.isEnabled=true
+        }
         val expenseTypeChipGroup=view.findViewById<View>(R.id.expenseTypeChipGroup) as ChipGroup
         accountChipGroup=view.findViewById(R.id.accountChipGroup)
+
         accountChip1=view.findViewById<Chip>(R.id.wechatAccountChip)
         accountChip2=view.findViewById<Chip>(R.id.alipayAccountChip)
         accountChip3=view.findViewById<Chip>(R.id.campusCardAccountChip)
+        System.out.println(accountChip1.text.toString())
 //        accountChipList.add(accountChip1)
 //        accountChipList.add(accountChip2)
 //        accountChipList.add(accountChip3)
@@ -79,6 +89,9 @@ class ChartsFragment: Fragment() {
         billList=ArrayList<bill>()
         setHasOptionsMenu(true) // Turn on option menu
         siftLayout=view.findViewById<View>(R.id.siftLayout) as RelativeLayout
+
+        catNames=im.getAllCategoryNames()
+        srcNames=im.getAllSourceNames()
 
         drawPieChart(view)
 
@@ -257,15 +270,11 @@ class ChartsFragment: Fragment() {
     fun getSiftedBills():List<bill>{
         //get date range
         val dateRange=dateRangePicker.selection
-        val dateStart= dateRange?.first?.let { UTC2Str(it) }
-        val dateEnd=dateRange?.second?.let { UTC2Str(it) }
         val checkedAccountIds=accountChipGroup.checkedChipIds as ArrayList<Int>
         val checkedExpenseTypeIds=expenseTypeChipGroup.checkedChipIds as ArrayList<Int>
-        val bills=im.FindTimeFrom(dateStart,dateEnd,checkedAccountIds,checkedExpenseTypeIds)
-
-//        for(bill in bills) System.out.println(bill.id)
-
-        return bills
+//        val bills= im.siftRecords(Date(dateRange.first),Date(dateRange.second),checkedAccountIds,checkedExpenseTypeIds)
+//        return bills
+        return ArrayList<bill>()
     }
 
     fun UTC2Str(utc:Long): String {
