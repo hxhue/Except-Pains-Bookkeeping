@@ -1,8 +1,5 @@
 package com.example.epledger.db
 
-import android.database.Cursor
-import android.database.sqlite.SQLiteDatabase
-import androidx.core.database.getStringOrNull
 import com.example.epledger.R
 import com.example.epledger.model.Category
 import com.example.epledger.model.Record
@@ -60,17 +57,20 @@ interface LedgerDatabase {
      */
     fun getAllSources(): MutableList<Source>
 
-    fun getAllSourceNames(): MutableList<String>
     /**
      * 获取所有的种类记录。
      */
     fun getAllCategories(): MutableList<Category>
-    fun getAllCategoryNames(): MutableList<String>
 
     /**
      *  根据开始日期、结束日期、Source和Category查询Records，用于chart模块
      */
-    fun siftRecords(dateStart:Date, dateEnd:Date, sources:List<Source>, categories:List<Category>): List<Record>
+    fun siftRecords(dateStart:Date,dateEnd:Date,sources:List<Source>,categories:List<Category>): List<Record>
+
+    fun getAllSourceNames(): MutableList<String>
+
+    fun getAllCategoryNames(): MutableList<String>
+
 }
 
 /**
@@ -173,10 +173,6 @@ class MemoryDatabase : LedgerDatabase {
         )
     }
 
-    override fun getAllSourceNames(): MutableList<String> {
-        TODO("Not yet implemented")
-    }
-
     override fun getAllCategories(): MutableList<Category> {
         return arrayListOf(
                 Category("Emergency", R.drawable.ic_fas_asterisk, 2),
@@ -190,25 +186,24 @@ class MemoryDatabase : LedgerDatabase {
         )
     }
 
-    override fun getAllCategoryNames(): MutableList<String> {
-        TODO("Not yet implemented")
-    }
-
     override fun siftRecords(dateStart: Date, dateEnd: Date, sources: List<Source>, categories: List<Category>): List<Record> {
-        TODO("Not yet implemented")
+        val sourceStrs=HashSet<String>()
+        val categoryStrs=HashSet<String>()
+        for(src in sources)
+            sourceStrs.add(src.name)
+        for(cat in categories)
+            categoryStrs.add(cat.name)
+        return records
+                .filter { it.mDate>dateStart&&it.mDate<dateEnd&&sourceStrs.contains(it.source)&&categoryStrs.contains(it.category)}
+                .sortedWith(Record.dateReverseComparator)
     }
 
-    /*override fun siftRecords(
-            dateStart: String,
-            dateEnd: String,
-            sources: List<Source>,
-            categories: List<Category>
-    ): List<Record> {
+    override fun getAllSourceNames(): MutableList<String> {
+        return arrayListOf("Alipay","Wechat","Cash")
+    }
 
-        // 2021-05-29 15:20:56 [Simon Yu]
-        // After merging 2d10d9c
-        // 编译错误：Class 'MemoryDatabase' is not abstract and does not implement abstract member public abstract fun siftRecords(dateStart: String, dateEnd: String, sources: List<Source>, categories: List<Category>): List<Record> defined in com.example.epledger.db.LedgerDatabase
-        // 解决方式：补充了空实现以通过编译。请检查是否有实现没有被commit。
-        TODO("Not yet implemented")
-    }*/
+    override fun getAllCategoryNames(): MutableList<String> {
+        return arrayListOf("Emergency", "Study", "Food", "Shopping", "Transportation"
+                , "Digital", "Coffee", "Present")
+    }
 }
