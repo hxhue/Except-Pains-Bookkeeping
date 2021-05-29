@@ -174,4 +174,5 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ViewHold
         super.onDetachedFromRecyclerView(recyclerView);
         this.recyclerView = null;
     }
+
 }

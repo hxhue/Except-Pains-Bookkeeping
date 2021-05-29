@@ -52,7 +52,8 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
                 }
             }
             if (newImage == null) {
-                newImage = ContextCompat.getDrawable(ctx, R.drawable.ic_fas_question_circle);
+                // 没有设置种类时
+                newImage = ContextCompat.getDrawable(ctx, R.drawable.ic_fas_times_circle);
             }
             labelImage.setImageDrawable(newImage);
 
@@ -67,7 +68,7 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
             // Show money
             if (mEntry.getMoneyAmount() == 0 || mEntry.getMoneyAmount() == -0) {
                 amountText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.amount_not_provided_color));
-                amountText.setText("￥??");
+                amountText.setText("￥0.00");
             } else if (mEntry.getMoneyAmount() > 0) {
                 amountText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.amount_income_color));
                 amountText.setText("+￥" + String.format("%.2f", Math.abs(mEntry.getMoneyAmount())));

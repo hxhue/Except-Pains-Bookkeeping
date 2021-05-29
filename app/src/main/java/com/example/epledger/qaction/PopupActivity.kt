@@ -20,7 +20,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
 import com.example.epledger.R
-import com.example.epledger.db.model.AppDatabase
+import com.example.epledger.db.AppDatabase
 import com.example.epledger.model.Record
 import com.example.epledger.detail.RecordDetailFragment
 import com.example.epledger.qaction.tool.PairTask
@@ -88,7 +88,6 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         cardViewModel.categories.observeForever {
             types.clear()
             types.add(getString(R.string.unspecified))
-//            types.add("")
             types.addAll(it.map { category -> category.name })
             typesSpinnerAdapter.notifyDataSetChanged()
         }
@@ -96,7 +95,6 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         cardViewModel.sources.observeForever {
             sources.clear()
             sources.add(getString(R.string.unspecified))
-//            sources.add("")
             sources.addAll(it.map { source -> source.name })
             sourcesSpinnerAdapter.notifyDataSetChanged()
         }
