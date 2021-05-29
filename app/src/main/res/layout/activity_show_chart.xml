@@ -74,30 +74,6 @@
                             android:layout_height="match_parent"
                             app:singleLine="true">
 
-                            <com.google.android.material.chip.Chip
-                                android:id="@+id/wechatAccountChip"
-                                style="@style/Widget.MaterialComponents.Chip.Choice"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:checked="true"
-                                android:text="@string/wechat_account_chip" />
-
-                            <com.google.android.material.chip.Chip
-                                android:id="@+id/alipayAccountChip"
-                                style="@style/Widget.MaterialComponents.Chip.Choice"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:checked="true"
-                                android:text="@string/alipay_account_chip" />
-
-                            <com.google.android.material.chip.Chip
-                                android:id="@+id/campusCardAccountChip"
-                                style="@style/Widget.MaterialComponents.Chip.Choice"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:checked="true"
-                                android:text="@string/campus_card_account_chip" />
-
                         </com.google.android.material.chip.ChipGroup>
 
 
@@ -139,149 +115,6 @@
                         app:singleSelection="false"
                         >
 
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/eatTypeChip"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="true"
-                            android:text="@string/eat_type_chip" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/shoppingTypeChip"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="true"
-                            android:text="@string/shopping_type_chip" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/transportTypeChip"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="true"
-                            android:text="@string/transport_type_chip" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/entertainmentTypeChip"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="true"
-                            android:text="@string/entertainment_type_chip" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/bookTypeChip"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="true"
-                            android:text="@string/book_type_chip" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/clothesTypeChip"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="true"
-                            android:text="@string/clothes_type_chip" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/digitalTypeChip"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="true"
-                            android:text="@string/digital_type_chip" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/studyTypeChip"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="true"
-                            android:text="@string/study_type_chip" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/dailyNecessityTypeChip"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="true"
-                            android:text="@string/daily_necessity_type_chip" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/phoneBillTypeChip"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="true"
-                            android:text="@string/phone_bill_type_chip" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/makeupTypeChip"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="true"
-                            android:text="@string/makeup_type_chip" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/medicalTypeChip"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="true"
-                            android:text="@string/medical_type_chip" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/travelTypeChip"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="true"
-                            android:text="@string/travel_type_chip" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/waterElectricityTypeChip"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="true"
-                            android:text="@string/water_electricity_type_chip" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/sportTypeChip"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="true"
-                            android:text="@string/sport_type_chip" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/giftTypeChip"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="true"
-                            android:text="@string/gift_type_chip" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/redEnvelopeTypeChip"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="true"
-                            android:text="@string/red_envelope_type_chip" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/donateTypeChip"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="true"
-                            android:text="@string/donate_type_chip" />
                     </com.google.android.material.chip.ChipGroup>
 
                     <Button
@@ -300,6 +133,7 @@
                         android:layout_marginStart="20dp"
                         android:layout_alignTop="@id/setDateRangeButton"
                         android:text="@string/confirm"
+                        android:enabled="false"
                         />
                 </RelativeLayout>
                 <com.github.mikephil.charting.charts.PieChart
