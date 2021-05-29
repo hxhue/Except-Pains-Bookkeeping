@@ -171,6 +171,9 @@ class InboxFragment : Fragment() {
             // Capturing the adapter is then the wise choice
             // val entryList = entryAdapter.entries
 
+            // 因为动画很奇怪所以关闭比较好……
+            this.itemAnimator = null
+
             // 用于删除该位置的元素
             val deleteEntryRunnable = object : Runnable {
                 var entryPos: Int? = null
