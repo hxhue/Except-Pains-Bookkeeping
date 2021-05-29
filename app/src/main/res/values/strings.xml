@@ -172,7 +172,7 @@
     <string name="alert_time">Alert time</string>
     <string name="noti_time_sum_fmt">Current: %s (24-hour clock)</string>
     <string name="have_not_set_time_prompt">You haven\'t set the time yet</string>
-    <string name="event_del_comfirm">Are you sure about deleting this event?</string>
+    <string name="event_del_confirm">Are you sure about deleting this event?</string>
     <string name="create_event">Create Event</string>
     <string name="modify_event">Modify Event</string>
     <string name="starts_on">Starts on</string>
@@ -206,5 +206,6 @@
     <string name="no_unhandled_records">No unhandled records.</string>
     <string name="clear_all_btn">全部清除</string>
     <string name="confirm">确认</string>
+    <string name="home_page_the_records_are_empty">The records are empty.</string>
 
 </resources>

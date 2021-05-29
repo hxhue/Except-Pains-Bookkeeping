@@ -3,47 +3,31 @@ package com.example.epledger.qaction
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.epledger.R
+import com.example.epledger.db.AppDatabase
 import com.example.epledger.model.Category
 import com.example.epledger.model.Source
 import kotlinx.coroutines.*
 
 class CardViewModel: ViewModel() {
     // To prevent null-pointer exception, we have to initialize them
-    val sources = MutableLiveData<ArrayList<Source>>(ArrayList(0))
-    val categories = MutableLiveData<ArrayList<Category>>(ArrayList(0))
+    val sources = MutableLiveData<MutableList<Source>>(ArrayList(0))
+    val categories = MutableLiveData<MutableList<Category>>(ArrayList(0))
 
     /**
      * Fetch all data we need from database.
      */
     init {
-        GlobalScope.launch {
-            withContext(Dispatchers.IO) {
-                // TODO: change debug code to: fetch data from DB
-                delay(500)
-                val srcList = arrayListOf(
-                        Source("Alipay"),
-                        Source("Wechat"),
-                        Source("Cash"),
-                        Source("狗狗币")
-                )
-
-                val cateList = arrayListOf(
-                        Category("Sports", R.drawable.u_sports_tennis, 1),
-                        Category("Emergency", R.drawable.u_emergency, 2)
-                )
-                withContext(Dispatchers.Main) {
-                    sources.value = srcList
-                    categories.value = cateList
-                }
-            }
+        GlobalScope.launch(Dispatchers.IO) {
+            sources.postValue(AppDatabase.getAllSources())
+            categories.postValue(AppDatabase.getAllCategories())
         }
     }
 
-    fun getSources(): ArrayList<Source> {
+    fun getSources(): MutableList<Source> {
         return sources.value!!
     }
 
-    fun getCategories(): ArrayList<Category> {
+    fun getCategories(): MutableList<Category> {
         return categories.value!!
     }
 }

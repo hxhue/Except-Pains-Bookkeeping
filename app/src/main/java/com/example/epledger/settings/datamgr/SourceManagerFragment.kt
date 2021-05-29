@@ -60,15 +60,15 @@ class SourceManagerFragment: NavigationFragment() {
     }
 
     private fun setUpModel(view: View) {
-        dbModel.sources.observe(viewLifecycleOwner, {
+        dbModel.sources.observe(viewLifecycleOwner) {
             // Update sourceList when reference changes
             recyclerViewAdapter.sourceList = it
             recyclerViewAdapter.notifyDataSetChanged()
-        })
+        }
     }
 
     class SourceAdapter(
-            var sourceList: ArrayList<Source>
+            var sourceList: MutableList<Source>
     ): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         class ViewHolder(view: View): RecyclerView.ViewHolder(view) {}

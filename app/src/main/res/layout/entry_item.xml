@@ -50,6 +50,7 @@
                 android:minWidth="100dp"
                 android:textColor="@color/label_text_color"
                 android:textSize="20sp"
+                app:layout_constraintEnd_toStartOf="@id/amount"
                 app:layout_constraintStart_toStartOf="@+id/info"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -90,7 +91,6 @@
                 android:singleLine="true"
                 app:layout_constraintTop_toTopOf="@id/info"
                 android:gravity="end"
-                android:minWidth="100dp"
                 android:text="alipay"
                 app:layout_constraintEnd_toEndOf="parent" />
 

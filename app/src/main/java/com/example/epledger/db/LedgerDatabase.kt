@@ -1,6 +1,9 @@
-package com.example.epledger.db.model
+package com.example.epledger.db
 
+import com.example.epledger.R
+import com.example.epledger.model.Category
 import com.example.epledger.model.Record
+import com.example.epledger.model.Source
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -14,7 +17,7 @@ import kotlin.collections.ArrayList
 interface LedgerDatabase {
     /**
      * 从数据库中获取按照日期排序的记录。时间越靠近现在，排序后的位置越靠前。
-     * 查询结果中不包含不完整的记录。
+     * 注意：查询结果中不包含不完整的记录。
      */
     fun getRecordsOrderByDate(): List<Record>
 
@@ -25,13 +28,14 @@ interface LedgerDatabase {
 
     /**
      * 找出所有标星的记录，按照时间排列（排列规则同上）。
+     * 注意：查询结果中不包含不完整的记录。
      */
     fun getStarredRecords(): MutableList<Record>
 
-    /**
-     * 找出所有含有截图的记录，按照时间排列。
-     */
-    fun getRecordsWithPic(): MutableList<Record>
+//    /**
+//     * 找出所有含有截图的记录，按照时间排列。
+//     */
+//    fun getRecordsWithPic(): MutableList<Record>
 
     /**
      * 向数据库中插入一条记录，插入后返回id。由于指针有引用性，不要对这个参数做任何修改。
@@ -47,6 +51,16 @@ interface LedgerDatabase {
      * 更新一条记录。id就是传入参数中的id。由于指针有引用性，不要对这个参数做任何修改。
      */
     fun updateRecord(record: Record)
+
+    /**
+     * 获取所有的来源记录。
+     */
+    fun getAllSources(): MutableList<Source>
+
+    /**
+     * 获取所有的种类记录。
+     */
+    fun getAllCategories(): MutableList<Category>
 }
 
 /**
@@ -65,11 +79,11 @@ class MemoryDatabase : LedgerDatabase {
         val simpleFormat = SimpleDateFormat("yyyy/MM/dd hh:mm", Locale.US)
         val rec1 = Record().apply {
             ID = 11
-            moneyAmount = -199.0
-            category = "Sports"
+            moneyAmount = -2021.0
+            category = "Digital"
             source = "Alipay"
             mDate = simpleFormat.parse("2020/12/31 12:13")!!
-            note = "买了一个新球拍。"
+            note = "买了一个新的。"
         }
         val rec2 = Record().apply {
             ID = 13
@@ -81,7 +95,7 @@ class MemoryDatabase : LedgerDatabase {
         }
         val rec3 = rec1.getCopy().apply {
             ID = 12
-            moneyAmount = -199.0
+            moneyAmount = -3099.0
             source = "Wechat"
             mDate = simpleFormat.parse("2020/12/31 08:19")!!
             starred = true
@@ -114,13 +128,13 @@ class MemoryDatabase : LedgerDatabase {
         return result
     }
 
-    override fun getRecordsWithPic(): MutableList<Record> {
-        val result = ArrayList<Record>(0)
-        records.filter { !it.screenshotPath.isNullOrBlank() }
-            .sortedWith(Record.dateReverseComparator)
-            .forEach { result.add(it) }
-        return result
-    }
+//    override fun getRecordsWithPic(): MutableList<Record> {
+//        val result = ArrayList<Record>(0)
+//        records.filter { !it.screenshotPath.isNullOrBlank() }
+//            .sortedWith(Record.dateReverseComparator)
+//            .forEach { result.add(it) }
+//        return result
+//    }
 
     override fun insertRecord(record: Record): Long {
         val recordToInsert = record.getCopy()
@@ -139,5 +153,26 @@ class MemoryDatabase : LedgerDatabase {
         records.find { it.ID == record.ID }?.apply {
             record.copyTo(this)
         }
+    }
+
+    override fun getAllSources(): MutableList<Source> {
+        return arrayListOf(
+            Source("Alipay"),
+            Source("Wechat"),
+            Source("Cash"),
+        )
+    }
+
+    override fun getAllCategories(): MutableList<Category> {
+        return arrayListOf(
+            Category("Emergency", R.drawable.ic_fas_asterisk, 2),
+            Category("Study", R.drawable.ic_fas_pencil_alt,3),
+            Category("Food", R.drawable.ic_fas_utensils, 4),
+            Category("Shopping", R.drawable.ic_fas_shopping_cart, 5),
+            Category("Transportation", R.drawable.ic_fas_bus, 6),
+            Category("Digital", R.drawable.ic_fas_mobile_alt, 7),
+            Category("Coffee", R.drawable.ic_fas_coffee),
+            Category("Present", R.drawable.ic_fas_gift),
+        )
     }
 }
