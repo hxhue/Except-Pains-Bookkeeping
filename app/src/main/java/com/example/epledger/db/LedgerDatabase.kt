@@ -125,16 +125,16 @@ class MemoryDatabase : LedgerDatabase {
     override fun getIncompleteRecordsOrderByDate(): MutableList<Record> {
         val result = ArrayList<Record>(0)
         records.filter { !it.isComplete() }
-            .sortedWith(Record.dateReverseComparator)
-            .forEach { result.add(it) }
+                .sortedWith(Record.dateReverseComparator)
+                .forEach { result.add(it) }
         return result
     }
 
     override fun getStarredRecords(): MutableList<Record> {
         val result = ArrayList<Record>(0)
         records.filter { it.starred }
-            .sortedWith(Record.dateReverseComparator)
-            .forEach { result.add(it) }
+                .sortedWith(Record.dateReverseComparator)
+                .forEach { result.add(it) }
         return result
     }
 
@@ -167,22 +167,22 @@ class MemoryDatabase : LedgerDatabase {
 
     override fun getAllSources(): MutableList<Source> {
         return arrayListOf(
-            Source("Alipay", 1),
-            Source("Wechat", 2),
-            Source("Cash", 3),
+                Source("Alipay", 1),
+                Source("Wechat", 2),
+                Source("Cash", 3),
         )
     }
 
     override fun getAllCategories(): MutableList<Category> {
         return arrayListOf(
-            Category("Emergency", R.drawable.ic_fas_asterisk, 2),
-            Category("Study", R.drawable.ic_fas_pencil_alt,3),
-            Category("Food", R.drawable.ic_fas_utensils, 4),
-            Category("Shopping", R.drawable.ic_fas_shopping_cart, 5),
-            Category("Transportation", R.drawable.ic_fas_bus, 6),
-            Category("Digital", R.drawable.ic_fas_mobile_alt, 7),
-            Category("Coffee", R.drawable.ic_fas_coffee, 8),
-            Category("Present", R.drawable.ic_fas_gift, 9),
+                Category("Emergency", R.drawable.ic_fas_asterisk, 2),
+                Category("Study", R.drawable.ic_fas_pencil_alt,3),
+                Category("Food", R.drawable.ic_fas_utensils, 4),
+                Category("Shopping", R.drawable.ic_fas_shopping_cart, 5),
+                Category("Transportation", R.drawable.ic_fas_bus, 6),
+                Category("Digital", R.drawable.ic_fas_mobile_alt, 7),
+                Category("Coffee", R.drawable.ic_fas_coffee, 8),
+                Category("Present", R.drawable.ic_fas_gift, 9),
         )
     }
 

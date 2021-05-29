@@ -7,7 +7,6 @@ import android.os.Build
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.preference.PreferenceManager
 import com.example.epledger.MainActivity
 import com.example.epledger.qaction.PopupActivity
 import com.example.epledger.R
@@ -25,7 +24,7 @@ object NotificationUtils {
     fun createQuickActionNotification(ctx: Context): Notification {
         val channelId = ctx.getString(R.string.always_on_channel_id)
         val builder = NotificationCompat.Builder(ctx, channelId) //-TODO: icon需要调整
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.drawable.nic_launcher_foreground)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setVisibility(NotificationCompat.VISIBILITY_SECRET)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
@@ -87,7 +86,7 @@ object NotificationUtils {
         //-TODO: icon需要调整
         val builder = NotificationCompat.Builder(ctx, channelId)
                 .setAutoCancel(true)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.drawable.nic_launcher_foreground)
                 .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(pendingIntent)
