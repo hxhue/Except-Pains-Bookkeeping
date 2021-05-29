@@ -65,7 +65,7 @@ interface LedgerDatabase {
     /**
      *  根据开始日期、结束日期、Source和Category查询Records，用于chart模块
      */
-    fun siftRecords(dateStart:String,dateEnd:String,sources:List<Source>,categories:List<Category>): List<Record>
+    fun siftRecords(dateStart:String, dateEnd:String, sources:List<Source>, categories:List<Category>): List<Record>
 }
 
 /**
@@ -179,5 +179,18 @@ class MemoryDatabase : LedgerDatabase {
             Category("Coffee", R.drawable.ic_fas_coffee, 8),
             Category("Present", R.drawable.ic_fas_gift, 9),
         )
+    }
+
+    override fun siftRecords(
+        dateStart: String,
+        dateEnd: String,
+        sources: List<Source>,
+        categories: List<Category>
+    ): List<Record> {
+        // 2021-05-29 15:20:56 [Simon Yu]
+        // After merging 2d10d9c
+        // 编译错误：Class 'MemoryDatabase' is not abstract and does not implement abstract member public abstract fun siftRecords(dateStart: String, dateEnd: String, sources: List<Source>, categories: List<Category>): List<Record> defined in com.example.epledger.db.LedgerDatabase
+        // 解决方式：补充了空实现以通过编译。请检查是否有实现没有被commit。
+        TODO("Not yet implemented")
     }
 }
