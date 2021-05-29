@@ -65,7 +65,12 @@ interface LedgerDatabase {
     /**
      *  根据开始日期、结束日期、Source和Category查询Records，用于chart模块
      */
-    fun siftRecords(dateStart:String,dateEnd:String,sources:List<Source>,categories:List<Category>): List<Record>
+    fun siftRecords(dateStart:Date,dateEnd:Date,sources:List<Source>,categories:List<Category>): List<Record>
+
+    fun getAllSourceNames(): MutableList<String>
+
+    fun getAllCategoryNames(): MutableList<String>
+
 }
 
 /**
@@ -179,5 +184,26 @@ class MemoryDatabase : LedgerDatabase {
             Category("Coffee", R.drawable.ic_fas_coffee, 8),
             Category("Present", R.drawable.ic_fas_gift, 9),
         )
+    }
+
+    override fun siftRecords(dateStart: Date, dateEnd: Date, sources: List<Source>, categories: List<Category>): List<Record> {
+        val sourceStrs=HashSet<String>()
+        val categoryStrs=HashSet<String>()
+        for(src in sources)
+            sourceStrs.add(src.name)
+        for(cat in categories)
+            categoryStrs.add(cat.name)
+        return records
+                .filter { it.mDate>dateStart&&it.mDate<dateEnd&&sourceStrs.contains(it.source)&&categoryStrs.contains(it.category)}
+                .sortedWith(Record.dateReverseComparator)
+    }
+
+    override fun getAllSourceNames(): MutableList<String> {
+        return arrayListOf("Alipay","Wechat","Cash")
+    }
+
+    override fun getAllCategoryNames(): MutableList<String> {
+        return arrayListOf("Emergency", "Study", "Food", "Shopping", "Transportation"
+                , "Digital", "Coffee", "Present")
     }
 }

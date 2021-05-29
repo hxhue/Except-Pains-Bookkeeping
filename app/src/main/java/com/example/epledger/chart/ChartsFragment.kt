@@ -8,9 +8,10 @@ import android.widget.Button
 import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.core.util.Pair
+import androidx.core.view.get
+import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import com.example.epledger.R
-import com.example.epledger.db.ImportDataFromExcel
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.AxisBase
@@ -23,28 +24,27 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.play.core.internal.i
-import kotlinx.android.synthetic.main.activity_show_chart.*
 import java.text.SimpleDateFormat
-import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.ArrayList
 import com.example.epledger.db.ImportDataFromExcel.bill
+import com.example.epledger.db.MemoryDatabase
 import kotlin.collections.HashMap
 
 class ChartsFragment: Fragment() {
     private lateinit var siftLayout:RelativeLayout
     private lateinit var pieChart: PieChart
     private lateinit var lineChart: LineChart
-    private lateinit var accountChip1:Chip
-    private lateinit var accountChip2:Chip
-    private lateinit var accountChip3:Chip
     private lateinit var accountIdList:List<Int>
     private lateinit var expenseTypeIdList:List<Int>
     val expenseTypeChipList=ArrayList<Chip>()
     private lateinit var accountChipGroup:ChipGroup
+    private lateinit var expenseTypeChipGroup: ChipGroup
     private lateinit var billList:List<bill>
-    val im = ImportDataFromExcel()
+    private lateinit var siftBtn:Button
+    private lateinit var catNames:List<String>
+    private lateinit var srcNames:List<String>
+    val im = MemoryDatabase()
     var dateRangePicker=
             MaterialDatePicker.Builder.dateRangePicker()
                     .setTitleText("Select dates")
@@ -56,19 +56,17 @@ class ChartsFragment: Fragment() {
                     )
                     .build()
 
-
-
     @SuppressLint("ResourceAsColor")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.activity_show_chart, container, false)
-        val expenseTypeChipGroup=view.findViewById<View>(R.id.expenseTypeChipGroup) as ChipGroup
+
+        siftBtn=view.findViewById(R.id.siftBtn)
+        dateRangePicker.addOnPositiveButtonClickListener {
+            siftBtn.isEnabled=true
+        }
         accountChipGroup=view.findViewById(R.id.accountChipGroup)
-        accountChip1=view.findViewById<Chip>(R.id.wechatAccountChip)
-        accountChip2=view.findViewById<Chip>(R.id.alipayAccountChip)
-        accountChip3=view.findViewById<Chip>(R.id.campusCardAccountChip)
-//        accountChipList.add(accountChip1)
-//        accountChipList.add(accountChip2)
-//        accountChipList.add(accountChip3)
+        expenseTypeChipGroup=view.findViewById(R.id.expenseTypeChipGroup)
+
         accountIdList=accountChipGroup.checkedChipIds
         expenseTypeIdList=expenseTypeChipGroup.checkedChipIds
         pieChart=view.findViewById(R.id.pieChart)
@@ -80,80 +78,10 @@ class ChartsFragment: Fragment() {
         setHasOptionsMenu(true) // Turn on option menu
         siftLayout=view.findViewById<View>(R.id.siftLayout) as RelativeLayout
 
+        createChips()
+
         drawPieChart(view)
-
-        val lineChart = view.findViewById<View>(R.id.lineChart) as LineChart
-        val valsComp1: MutableList<Entry> =
-                ArrayList()
-        val valsComp2: MutableList<Entry> =
-                ArrayList()
-        val c1e1 =
-                Entry(0f, 100000f)
-        valsComp1.add(c1e1)
-        val c1e2 =
-                Entry(1f, 140000f) // 1 == quarter 2 ...
-        valsComp1.add(c1e2)
-        val c1e3 =
-                Entry(2f, 120000f) // 1 == quarter 2 ...
-        valsComp1.add(c1e3)
-        val c1e4 =
-                Entry(3f, 180000f) // 1 == quarter 2 ...
-        valsComp1.add(c1e4)
-        val c2e1 =
-                Entry(0f, 130000f) // 0 == quarter 1
-        valsComp2.add(c2e1)
-        val c2e2 =
-                Entry(1f, 115000f) // 1 == quarter 2 ...
-        valsComp2.add(c2e2)
-        val c2e3 =
-                Entry(2f, 60000f) // 0 == quarter 1
-        valsComp2.add(c2e3)
-        val c2e4 =
-                Entry(3f, 170000f) // 1 == quarter 2 ...
-        valsComp2.add(c2e4)
-        val setComp1 = LineDataSet(valsComp1, "Company 1")
-        setComp1.axisDependency = YAxis.AxisDependency.LEFT
-        setComp1.color = R.color.teal_700
-        val setComp2 = LineDataSet(valsComp2, "Company 2")
-        setComp2.axisDependency = YAxis.AxisDependency.RIGHT
-        setComp2.color = R.color.purple_500
-        val lineDataSets: MutableList<ILineDataSet> =
-                ArrayList()
-        lineDataSets.add(setComp1)
-        lineDataSets.add(setComp2)
-        val lineData = LineData(lineDataSets)
-        lineChart.data = lineData
-        val quarters = arrayOf("Q1", "Q2", "Q3", "Q4")
-        val valueFormatter: ValueFormatter =
-                object : ValueFormatter() {
-                    override fun getAxisLabel(
-                            value: Float,
-                            axis: AxisBase
-                    ): String {
-                        return quarters[value.toInt()]
-                    }
-                }
-        val xAxis = lineChart.xAxis
-        xAxis.granularity = 1f
-        xAxis.valueFormatter = valueFormatter
-        val lineChartDescription =
-                Description()
-        lineChartDescription.text = "this is a lineChart description!"
-        lineChartDescription.textAlign = Paint.Align.CENTER
-        lineChartDescription.textColor = R.color.purple_700
-        lineChart.description = lineChartDescription
-        lineChart.setNoDataText("No data available!")
-        lineChart.setDrawGridBackground(false)
-        lineChart.setDrawBorders(true)
-        lineChart.setBorderColor(R.color.design_default_color_error)
-        lineChart.setBackgroundColor(R.color.design_default_color_on_primary) //?
-        lineChart.setBorderWidth(5f)
-        lineChart.invalidate()
-
-
-
-
-
+        drawLineChart(view)
 
         //app bar
         val topAppBar=view.findViewById<View>(R.id.topAppBar) as MaterialToolbar
@@ -223,8 +151,10 @@ class ChartsFragment: Fragment() {
                     expenseTypeChipGroup.clearCheck()
                 }
                 else {
-                    for (chip in expenseTypeChipList){
-                        chip.setChecked(true)
+                    val len=expenseTypeChipGroup.size
+                    for(i in 0 until len){
+                        val chip=expenseTypeChipGroup[i] as Chip
+                        chip.isChecked=true
                     }
                 }
             }
@@ -257,15 +187,11 @@ class ChartsFragment: Fragment() {
     fun getSiftedBills():List<bill>{
         //get date range
         val dateRange=dateRangePicker.selection
-        val dateStart= dateRange?.first?.let { UTC2Str(it) }
-        val dateEnd=dateRange?.second?.let { UTC2Str(it) }
         val checkedAccountIds=accountChipGroup.checkedChipIds as ArrayList<Int>
         val checkedExpenseTypeIds=expenseTypeChipGroup.checkedChipIds as ArrayList<Int>
-        val bills=im.FindTimeFrom(dateStart,dateEnd,checkedAccountIds,checkedExpenseTypeIds)
-
-//        for(bill in bills) System.out.println(bill.id)
-
-        return bills
+//        val bills= im.siftRecords(Date(dateRange.first),Date(dateRange.second),checkedAccountIds,checkedExpenseTypeIds)
+//        return bills
+        return ArrayList<bill>()
     }
 
     fun UTC2Str(utc:Long): String {
@@ -305,7 +231,90 @@ class ChartsFragment: Fragment() {
     }
 
     fun drawLineChart(view:View){
+        val lineChart = view.findViewById<View>(R.id.lineChart) as LineChart
+        val valsComp1: MutableList<Entry> =
+                ArrayList()
+        val valsComp2: MutableList<Entry> =
+                ArrayList()
+        val c1e1 =
+                Entry(0f, 100000f)
+        valsComp1.add(c1e1)
+        val c1e2 =
+                Entry(1f, 140000f) // 1 == quarter 2 ...
+        valsComp1.add(c1e2)
+        val c1e3 =
+                Entry(2f, 120000f) // 1 == quarter 2 ...
+        valsComp1.add(c1e3)
+        val c1e4 =
+                Entry(3f, 180000f) // 1 == quarter 2 ...
+        valsComp1.add(c1e4)
+        val c2e1 =
+                Entry(0f, 130000f) // 0 == quarter 1
+        valsComp2.add(c2e1)
+        val c2e2 =
+                Entry(1f, 115000f) // 1 == quarter 2 ...
+        valsComp2.add(c2e2)
+        val c2e3 =
+                Entry(2f, 60000f) // 0 == quarter 1
+        valsComp2.add(c2e3)
+        val c2e4 =
+                Entry(3f, 170000f) // 1 == quarter 2 ...
+        valsComp2.add(c2e4)
+        val setComp1 = LineDataSet(valsComp1, "Company 1")
+        setComp1.axisDependency = YAxis.AxisDependency.LEFT
+        setComp1.color = R.color.teal_700
+        val setComp2 = LineDataSet(valsComp2, "Company 2")
+        setComp2.axisDependency = YAxis.AxisDependency.RIGHT
+        setComp2.color = R.color.purple_500
+        val lineDataSets: MutableList<ILineDataSet> =
+                ArrayList()
+        lineDataSets.add(setComp1)
+        lineDataSets.add(setComp2)
+        val lineData = LineData(lineDataSets)
+        lineChart.data = lineData
+        val quarters = arrayOf("Q1", "Q2", "Q3", "Q4")
+        val valueFormatter: ValueFormatter =
+                object : ValueFormatter() {
+                    override fun getAxisLabel(
+                            value: Float,
+                            axis: AxisBase
+                    ): String {
+                        return quarters[value.toInt()]
+                    }
+                }
+        val xAxis = lineChart.xAxis
+        xAxis.granularity = 1f
+        xAxis.valueFormatter = valueFormatter
+        val lineChartDescription =
+                Description()
+        lineChartDescription.text = "this is a lineChart description!"
+        lineChartDescription.textAlign = Paint.Align.CENTER
+        lineChartDescription.textColor = R.color.purple_700
+        lineChart.description = lineChartDescription
+        lineChart.setNoDataText("No data available!")
+        lineChart.setDrawGridBackground(false)
+        lineChart.setDrawBorders(true)
+//        lineChart.setBorderColor(R.color.design_default_color_error)
+//        lineChart.setBackgroundColor(R.color.design_default_color_on_primary) //?
+        lineChart.setBorderWidth(5f)
+        lineChart.invalidate()
+    }
 
+    fun createChips(){
+        catNames=im.getAllCategoryNames()
+        srcNames=im.getAllSourceNames()
+//        val chipLP=ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        for(catStr in catNames){
+            val chip=layoutInflater.inflate(R.layout.layout_chip_choice,expenseTypeChipGroup,false) as Chip
+            chip.text=catStr
+            expenseTypeChipGroup.addView(chip)
+        }
+        for(srcStr in srcNames){
+            val chip=layoutInflater.inflate(R.layout.layout_chip_choice,accountChipGroup,false) as Chip
+            chip.text=srcStr
+            accountChipGroup.addView(chip)
+        }
     }
 
 }
