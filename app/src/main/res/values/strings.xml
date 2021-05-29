@@ -206,6 +206,7 @@
     <string name="no_unhandled_records">No unhandled records.</string>
     <string name="clear_all_btn">全部清除</string>
     <string name="confirm">确认</string>
-    <string name="home_page_the_records_are_empty">The records are empty.</string>
+    <string name="select_all_btn">全选</string>
+    <string name="home_page_the_records_are_empty">记录为空</string>
 
 </resources>
