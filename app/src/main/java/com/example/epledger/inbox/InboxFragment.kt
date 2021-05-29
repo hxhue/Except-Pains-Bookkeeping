@@ -14,7 +14,7 @@ import com.example.epledger.asMainActivity
 import com.example.epledger.nav.NavigationFragment
 import com.example.epledger.inbox.event.list.EventFragment
 import com.example.epledger.db.DatabaseModel
-import com.example.epledger.db.model.AppDatabase
+import com.example.epledger.db.AppDatabase
 import com.example.epledger.detail.RecordDetailFragment
 import com.example.epledger.home.EntryAdapter
 import com.example.epledger.model.Record
@@ -161,13 +161,11 @@ class InboxFragment : Fragment() {
     private fun setUpRecyclerView(recyclerView: RecyclerView,
                                   onRecordSubmitListener: OnRecordSubmitListener,
                                   deleteEntryAfterSubmit: Boolean,
-                                  entryWasShownInHomePage: Boolean
+                                  entryWasShownInHomePage: Boolean,
+                                  entryEditingOnOpen: Boolean = false
     ) {
         val initialEntries = ArrayList<Record>(0)
         recyclerView.apply {
-            // 改善动画效果
-            setHasFixedSize(true)
-
             val entryAdapter = EntryAdapter(initialEntries, dbModel)
             // Do not capture entryList too early, cause it may change
             // Capturing the adapter is then the wise choice
@@ -292,7 +290,9 @@ class InboxFragment : Fragment() {
         setUpRecyclerView(view.inbox_incomplete_recycler_view, object :
             OnRecordSubmitListener {
             override fun onRecordSubmit(adapter: EntryAdapter, record: Record) {
-                dbModel.insertRecord(record)
+                // todo: check this updateRecord method
+                // 2021-05-29 06:37:10
+                dbModel.updateIncompleteRecord(record)
             }
         }, deleteEntryAfterSubmit = true, entryWasShownInHomePage = false)
     }
@@ -329,6 +329,8 @@ class InboxFragment : Fragment() {
                     indexToInsert = entries.size
                 }
 
+                this.entries.add(indexToInsert, record)
+                setStarredSectionNumber(entries.size)
                 notifyItemInserted(indexToInsert)
             }
         }
@@ -353,6 +355,7 @@ class InboxFragment : Fragment() {
                     indexToInsert = -(indexToInsert + 1)
                 }
                 entries.add(indexToInsert, record)
+                setStarredSectionNumber(entries.size)
                 notifyItemInserted(indexToInsert)
                 return
             }
@@ -360,6 +363,7 @@ class InboxFragment : Fragment() {
             // 不再有标星时应该删除
             if (!record.starred) {
                 entries.removeAt(index)
+                setStarredSectionNumber(entries.size)
                 notifyItemRemoved(index)
                 notifyItemRangeChanged(index, entries.size)
             } else { // 仍有标星时就在列表更新
@@ -381,6 +385,7 @@ class InboxFragment : Fragment() {
 
             // 无论是否标星，要是原来就在这个栏目中，现在也要一起被删除
             entries.removeAt(index)
+            setStarredSectionNumber(entries.size)
             notifyItemRemoved(index)
             notifyItemRangeChanged(index, entries.size)
         }
@@ -403,6 +408,7 @@ class InboxFragment : Fragment() {
                 return
             }
             entries.removeAt(indexToFind)
+            setInCompleteSectionNumber(entries.size)
             notifyItemRemoved(indexToFind)
             notifyItemRangeChanged(indexToFind, entries.size)
         }

@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.epledger.R
-import com.example.epledger.db.model.AppDatabase
+import com.example.epledger.home.EntryAdapter
 import com.example.epledger.home.SectionAdapter
 import com.example.epledger.inbox.InboxFragment
 import com.example.epledger.model.Record
@@ -20,8 +20,8 @@ import kotlin.collections.ArrayList
 class DatabaseModel: ViewModel() {
     // 对外开放的可观察属性
     // TODO: 把接口中的ArrayList去掉
-    val sources = MutableLiveData<ArrayList<Source>>(ArrayList(0))
-    val categories = MutableLiveData<ArrayList<Category>>(ArrayList(0))
+    val sources = MutableLiveData<MutableList<Source>>(ArrayList(0))
+    val categories = MutableLiveData<MutableList<Category>>(ArrayList(0))
     val groupedRecords = MutableLiveData<MutableList<RecordGroup>>(ArrayList(0))
     val incompleteRecords = MutableLiveData<MutableList<Record>>(ArrayList(0))
     val starredRecords = MutableLiveData<MutableList<Record>>(ArrayList(0))
@@ -42,18 +42,9 @@ class DatabaseModel: ViewModel() {
     fun reloadDatabase() {
         GlobalScope.launch(Dispatchers.IO) {
             // TODO: change debug code to: fetch data from DB
-            val srcList = arrayListOf(
-                Source("Alipay"),
-                Source("Wechat"),
-                Source("Cash"),
-                Source("狗狗币")
-            )
+            val srcList = AppDatabase.getAllSources()
 
-            val cateList = arrayListOf(
-                Category("Sports", R.drawable.u_sports_tennis, 1),
-                Category("Emergency", R.drawable.u_emergency, 2),
-                Category("Study", R.drawable.ic_fas_pencil_alt,3)
-            )
+            val cateList = AppDatabase.getAllCategories()
 
             val records = AppDatabase.getRecordsOrderByDate()
             val groupResult = groupRecordsByDate(records)
@@ -69,11 +60,11 @@ class DatabaseModel: ViewModel() {
         }
     }
 
-    fun requireSources(): ArrayList<Source> {
+    fun requireSources(): MutableList<Source> {
         return sources.value!!
     }
 
-    fun requireCategories(): ArrayList<Category> {
+    fun requireCategories(): MutableList<Category> {
         return categories.value!!
     }
 
@@ -87,30 +78,31 @@ class DatabaseModel: ViewModel() {
 
     /**
      * 检查和更新对应的sections。注意已经更新的sections不要传入，此函数不保证幂等调用。
-     * 可能只能在主线程中调用？2021年05月27日：好像不需要。
+     * 在主线程中调用。
      */
     private fun checkModificationEffectsOnInboxSections(record: Record,
                                                 method: DataModificationMethod,
-                                                sectionsToCheck: EnumSet<InboxFragment.InboxSectionType> = EnumSet.allOf(
-                                                    InboxFragment.InboxSectionType::class.java)) {
-        val inboxFragment = MainScreen.INBOX.fragment as InboxFragment
+                                                sectionsToCheck: EnumSet<InboxFragment.InboxSectionType> = EnumSet.allOf(InboxFragment.InboxSectionType::class.java)) {
+        GlobalScope.launch(Dispatchers.Main) {
+            val inboxFragment = MainScreen.INBOX.fragment as InboxFragment
 
-        InboxFragment.InboxSectionType.values().forEach { enumValue ->
-            if (enumValue in sectionsToCheck) {
-                when (enumValue) {
-                    InboxFragment.InboxSectionType.INCOMPLETE -> {
-                        when (method) {
-                            DataModificationMethod.INSERT -> inboxFragment.checkIncompleteSectionOnInsertion(record)
-                            DataModificationMethod.UPDATE -> inboxFragment.checkIncompleteSectionOnUpdate(record)
-                            DataModificationMethod.DELETE -> inboxFragment.checkIncompleteSectionOnRemoval(record)
+            InboxFragment.InboxSectionType.values().forEach { enumValue ->
+                if (enumValue in sectionsToCheck) {
+                    when (enumValue) {
+                        InboxFragment.InboxSectionType.INCOMPLETE -> {
+                            when (method) {
+                                DataModificationMethod.INSERT -> inboxFragment.checkIncompleteSectionOnInsertion(record)
+                                DataModificationMethod.UPDATE -> inboxFragment.checkIncompleteSectionOnUpdate(record)
+                                DataModificationMethod.DELETE -> inboxFragment.checkIncompleteSectionOnRemoval(record)
+                            }
                         }
-                    }
 
-                    InboxFragment.InboxSectionType.STARRED -> {
-                        when (method) {
-                            DataModificationMethod.INSERT -> inboxFragment.checkStarredSectionOnInsertion(record)
-                            DataModificationMethod.UPDATE -> inboxFragment.checkStarredSectionOnUpdate(record)
-                            DataModificationMethod.DELETE -> inboxFragment.checkStarredSectionOnRemoval(record)
+                        InboxFragment.InboxSectionType.STARRED -> {
+                            when (method) {
+                                DataModificationMethod.INSERT -> inboxFragment.checkStarredSectionOnInsertion(record)
+                                DataModificationMethod.UPDATE -> inboxFragment.checkStarredSectionOnUpdate(record)
+                                DataModificationMethod.DELETE -> inboxFragment.checkStarredSectionOnRemoval(record)
+                            }
                         }
                     }
                 }
@@ -195,7 +187,6 @@ class DatabaseModel: ViewModel() {
                 }
             }
 
-            // 是否需要在主线程中呢？(似乎不需要？)
             checkModificationEffectsOnInboxSections(record, DataModificationMethod.DELETE)
         }
     }
@@ -232,20 +223,34 @@ class DatabaseModel: ViewModel() {
 
             this@DatabaseModel.groupedRecords.postValue(groupedRecords)
 
-            withContext(Dispatchers.Main) {
-                checkModificationEffectsOnInboxSections(record, DataModificationMethod.INSERT)
-            }
+            checkModificationEffectsOnInboxSections(record, DataModificationMethod.INSERT)
         }
     }
 
     /**
-     * 大概是log(n)
+     * 大概是log(n)的查找复杂度
      */
     fun updateRecord(record: Record, sectionAdapter: SectionAdapter) {
         GlobalScope.launch(Dispatchers.IO) {
             val groupedRecords = requireGroupedRecords()
             val (section, position) = requireRecordIndex(record, groupedRecords)
             updateRecord(section, position, sectionAdapter, newRecord = record)
+        }
+    }
+
+    /**
+     * 更新一个不完整的记录。
+     * 由于记录之前不在home界面，所以去查找更新会导致requireRecordIndex设计的运行时异常。
+     */
+    fun updateIncompleteRecord(record: Record) {
+        GlobalScope.launch(Dispatchers.IO) {
+            // Update database
+            AppDatabase.updateRecord(record)
+
+            // Update view
+            withContext(Dispatchers.Main) {
+                checkModificationEffectsOnInboxSections(record, DataModificationMethod.UPDATE)
+            }
         }
     }
 
@@ -269,7 +274,6 @@ class DatabaseModel: ViewModel() {
             // Update view
             withContext(Dispatchers.Main) {
                 sectionAdapter.notifySingleItemChanged(section, position)
-                // 2021年05月27日09:26:10 可能是因为这里的record不一样，导致更新被这个老的record又覆盖了一次
                 checkModificationEffectsOnInboxSections(recordToUpdate, DataModificationMethod.UPDATE)
             }
         }

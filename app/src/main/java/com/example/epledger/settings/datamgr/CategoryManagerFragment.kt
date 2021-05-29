@@ -61,14 +61,14 @@ class CategoryManagerFragment: NavigationFragment() {
     }
 
     private fun setUpModel(view: View) {
-        dbModel.categories.observe(viewLifecycleOwner, {
+        dbModel.categories.observe(viewLifecycleOwner) {
             recyclerViewAdapter.categoryList = it
             recyclerViewAdapter.notifyDataSetChanged()
-        })
+        }
     }
 
     class CategoryAdapter(
-        var categoryList: ArrayList<Category>,
+        var categoryList: MutableList<Category>,
         private val fragmentManager: FragmentManager
     ):RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 

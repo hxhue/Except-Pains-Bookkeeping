@@ -147,7 +147,7 @@
     <string name="alert_time">提醒时间</string>
     <string name="noti_time_sum_fmt">当前为 %s (24小时制)</string>
     <string name="have_not_set_time_prompt">您还没有设定时间</string>
-    <string name="event_del_comfirm">您确定要删除这个事件吗？</string>
+    <string name="event_del_confirm">您确定要删除这个事件吗？</string>
     <string name="create_event">创建事件</string>
     <string name="modify_event">修改事件</string>
     <string name="starts_on">开始于</string>
@@ -185,5 +185,4 @@
     <string name="no_unhandled_records">没有待处理的记录。</string>
     <string name="clear_all_btn">全部清除</string>
     <string name="confirm">确认</string>
-    <string name="select_all_btn">全选</string>
 </resources>
