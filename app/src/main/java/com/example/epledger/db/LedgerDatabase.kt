@@ -61,6 +61,11 @@ interface LedgerDatabase {
      * 获取所有的种类记录。
      */
     fun getAllCategories(): MutableList<Category>
+
+    /**
+     *  根据开始日期、结束日期、Source和Category查询Records，用于chart模块
+     */
+    fun siftRecords(dateStart:String,dateEnd:String,sources:List<Source>,categories:List<Category>): List<Record>
 }
 
 /**

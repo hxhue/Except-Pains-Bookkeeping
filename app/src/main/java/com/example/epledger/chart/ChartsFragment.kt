@@ -7,6 +7,7 @@ import android.view.*
 import android.widget.Button
 import android.widget.RelativeLayout
 import android.widget.Toast
+import androidx.core.util.Pair
 import androidx.fragment.app.Fragment
 import com.example.epledger.R
 import com.example.epledger.db.ImportDataFromExcel
@@ -19,57 +20,68 @@ import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.play.core.internal.i
+import kotlinx.android.synthetic.main.activity_show_chart.*
 import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 import java.util.*
-
+import kotlin.collections.ArrayList
+import com.example.epledger.db.ImportDataFromExcel.bill
+import kotlin.collections.HashMap
 
 class ChartsFragment: Fragment() {
     private lateinit var siftLayout:RelativeLayout
     private lateinit var pieChart: PieChart
     private lateinit var lineChart: LineChart
+    private lateinit var accountChip1:Chip
+    private lateinit var accountChip2:Chip
+    private lateinit var accountChip3:Chip
+    private lateinit var accountIdList:List<Int>
+    private lateinit var expenseTypeIdList:List<Int>
+    val expenseTypeChipList=ArrayList<Chip>()
+    private lateinit var accountChipGroup:ChipGroup
+    private lateinit var billList:List<bill>
+    val im = ImportDataFromExcel()
     var dateRangePicker=
             MaterialDatePicker.Builder.dateRangePicker()
                     .setTitleText("Select dates")
                     .setSelection(
-                            androidx.core.util.Pair<Long, Long>(
+                            Pair<Long, Long>(
                                     MaterialDatePicker.thisMonthInUtcMilliseconds(),
                                     MaterialDatePicker.todayInUtcMilliseconds()
                             )
                     )
                     .build()
-    val im = ImportDataFromExcel()
+
+
+
     @SuppressLint("ResourceAsColor")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.activity_show_chart, container, false)
         val expenseTypeChipGroup=view.findViewById<View>(R.id.expenseTypeChipGroup) as ChipGroup
+        accountChipGroup=view.findViewById(R.id.accountChipGroup)
+        accountChip1=view.findViewById<Chip>(R.id.wechatAccountChip)
+        accountChip2=view.findViewById<Chip>(R.id.alipayAccountChip)
+        accountChip3=view.findViewById<Chip>(R.id.campusCardAccountChip)
+//        accountChipList.add(accountChip1)
+//        accountChipList.add(accountChip2)
+//        accountChipList.add(accountChip3)
+        accountIdList=accountChipGroup.checkedChipIds
+        expenseTypeIdList=expenseTypeChipGroup.checkedChipIds
+        pieChart=view.findViewById(R.id.pieChart)
+        lineChart=view.findViewById(R.id.lineChart)
+        for(id in expenseTypeIdList){
+            expenseTypeChipList.add(view.findViewById<View>(id) as Chip)
+        }
+        billList=ArrayList<bill>()
         setHasOptionsMenu(true) // Turn on option menu
         siftLayout=view.findViewById<View>(R.id.siftLayout) as RelativeLayout
 
-        //pie chart
-        val pieChart = view.findViewById<View>(R.id.pieChart) as PieChart
-        //准备数据
-        val entries: MutableList<PieEntry> = ArrayList()
-        entries.add(PieEntry(18.5f, "Green"))
-        entries.add(PieEntry(26.7f, "Yellow"))
-        entries.add(PieEntry(24.0f, "Red"))
-        entries.add(PieEntry(30.8f, "Blue"))
-        val set = PieDataSet(entries, "Election Results")
-        set.setColors(
-                intArrayOf(
-                        R.color.purple_200,
-                        R.color.purple_500,
-                        R.color.purple_700,
-                        R.color.teal_200
-                ), context
-        )
-        val data = PieData(set)
-        pieChart.data = data
-        pieChart.centerText = "This is a center text!"
-        pieChart.centerTextRadiusPercent = 0.8f
-        pieChart.invalidate() // refresh
+        drawPieChart(view)
+
         val lineChart = view.findViewById<View>(R.id.lineChart) as LineChart
         val valsComp1: MutableList<Entry> =
                 ArrayList()
@@ -204,18 +216,27 @@ class ChartsFragment: Fragment() {
             }
         })
 
-        val clearAllBtn=view.findViewById<View>(R.id.clearAllBtn) as Button
-        clearAllBtn.setOnClickListener(object : View.OnClickListener {
+        val selectAllBtn=view.findViewById<View>(R.id.selectAllBtn) as Button
+        selectAllBtn.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
-                expenseTypeChipGroup.clearCheck()
-                Toast.makeText(context,"clear all tags",Toast.LENGTH_SHORT).show()
+                if(expenseTypeChipGroup.checkedChipIds.size!=0) {
+                    expenseTypeChipGroup.clearCheck()
+                }
+                else {
+                    for (chip in expenseTypeChipList){
+                        chip.setChecked(true)
+                    }
+                }
             }
         })
 
         val siftBtn=view.findViewById<View>(R.id.siftBtn) as Button
         siftBtn.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
-                siftItems()
+                billList=getSiftedBills()
+                drawLineChart(view)
+                drawPieChart(view)
+
             }
         })
 
@@ -227,36 +248,64 @@ class ChartsFragment: Fragment() {
         inflater.inflate(R.menu.top_app_bar, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
+
     override fun onResume() {
         super.onResume()
         Toast.makeText(context, "Hello World", Toast.LENGTH_SHORT)
     }
 
-    fun siftItems(){
+    fun getSiftedBills():List<bill>{
+        //get date range
         val dateRange=dateRangePicker.selection
         val dateStart= dateRange?.first?.let { UTC2Str(it) }
         val dateEnd=dateRange?.second?.let { UTC2Str(it) }
-        if (dateStart != null&&dateEnd!=null) {
-            Toast.makeText(context,dateStart+"   "+dateEnd,Toast.LENGTH_SHORT).show()
-        }
+        val checkedAccountIds=accountChipGroup.checkedChipIds as ArrayList<Int>
+        val checkedExpenseTypeIds=expenseTypeChipGroup.checkedChipIds as ArrayList<Int>
+        val bills=im.FindTimeFrom(dateStart,dateEnd,checkedAccountIds,checkedExpenseTypeIds)
 
+//        for(bill in bills) System.out.println(bill.id)
 
-//        im.find_date_from()
-//        val startDate=
-//        im.find_date_from()
+        return bills
     }
 
-
     fun UTC2Str(utc:Long): String {
-        val sdf=SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+        val sdf=SimpleDateFormat("yyyy/MM/dd")
         val date=Date(utc)
         val str=sdf.format(date)
         return str
     }
 
+    fun drawPieChart(view: View){
+        //pie chart
+        //准备数据
+        Toast.makeText(context,billList.size.toString(),Toast.LENGTH_SHORT).show()
+        val typeSumMap=HashMap<String,Float>()
+        for(bill in billList){
+            typeSumMap.put(bill.type1,typeSumMap.getOrDefault(bill.type1, 0F)?.plus(bill.account))
+        }
 
+        val entries: MutableList<PieEntry> = ArrayList()
+        for(entry in typeSumMap){
+            entries.add(PieEntry(entry.value,entry.key))
+        }
+        val set = PieDataSet(entries, "type proportion")
+//        set.setColors(
+//                intArrayOf(
+//                        R.color.purple_200,
+//                        R.color.purple_500,
+//                        R.color.purple_700,
+//                        R.color.teal_200
+//                ), context
+//        )
+        val data = PieData(set)
+        pieChart.data = data
+        pieChart.centerText = "This is a center text!"
+        pieChart.centerTextRadiusPercent = 0.8f
+        pieChart.invalidate() // refresh
+    }
 
+    fun drawLineChart(view:View){
 
-
+    }
 
 }

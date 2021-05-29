@@ -69,6 +69,7 @@
                         android:layout_toEndOf="@id/accountTextView">
 
                         <com.google.android.material.chip.ChipGroup
+                            android:id="@+id/accountChipGroup"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             app:singleLine="true">
@@ -117,13 +118,13 @@
                         android:text="@string/expense_type" />
 
                     <Button
-                        android:id="@+id/clearAllBtn"
+                        android:id="@+id/selectAllBtn"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_toEndOf="@id/expenseTypeTextView"
                         android:layout_marginStart="20dp"
                         android:layout_alignTop="@id/expenseTypeTextView"
-                        android:text="@string/clear_all_btn"
+                        android:text="@string/select_all_btn"
                         />
 
 
