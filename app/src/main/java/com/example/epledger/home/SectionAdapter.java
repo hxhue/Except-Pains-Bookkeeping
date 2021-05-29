@@ -39,7 +39,8 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ViewHold
             textDate = itemView.findViewById(R.id.textDate);
             innerRecyclerView = itemView.findViewById(R.id.section_rv);
             innerRecyclerView.setLayoutManager(new LinearLayoutManager(itemView.getContext()));
-            innerRecyclerView.setItemAnimator(new DefaultItemAnimator());
+            // 2021-05-29 15:13:53 为了和inbox界面统一，禁用内部的动画
+            innerRecyclerView.setItemAnimator(null);
 
             ft = Fmt.INSTANCE.getDate();
         }
