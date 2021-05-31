@@ -44,13 +44,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // 禁用黑暗模式
-        val im=ImportDataFromExcel()
-        val sqLiteDatabase: SQLiteDatabase = im.dbHelper.getWritableDatabase()
-        im.AddNewType(sqLiteDatabase, "吃饭",R.drawable.ic_far_bookmark)
-        im.AddNewType(sqLiteDatabase, "娱乐",2)
-        im.AddNewFrom(sqLiteDatabase, "支付宝")
-        im.AddNewFrom(sqLiteDatabase, "微信")
-        sqLiteDatabase.close()
+
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
         // 2021年5月22日17:17:23 [Simon Yu]
