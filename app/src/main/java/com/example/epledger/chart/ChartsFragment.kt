@@ -12,6 +12,7 @@ import androidx.core.view.get
 import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import com.example.epledger.R
+import com.example.epledger.db.AppDatabase
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.AxisBase
@@ -45,7 +46,7 @@ class ChartsFragment: Fragment() {
     private lateinit var siftBtn:Button
     private lateinit var catNames:List<String>
     private lateinit var srcNames:List<String>
-    val im = SqliteDatabase()
+
     var dateRangePicker=
             MaterialDatePicker.Builder.dateRangePicker()
                     .setTitleText("Select dates")
@@ -181,7 +182,7 @@ class ChartsFragment: Fragment() {
         Toast.makeText(context, "Hello World", Toast.LENGTH_SHORT)
     }
 
-    fun getSiftedBills(view: View):ArrayList<Record>{
+    fun getSiftedBills(view: View): MutableList<Record>{
         //get date range
         val dateRange=dateRangePicker.selection
         val dateBegin= dateRange?.let { Date(it.first) }
@@ -198,7 +199,7 @@ class ChartsFragment: Fragment() {
             catList.add(chip.text.toString())
         }
 
-        var bills= ArrayList<Record>()
+        var bills: MutableList<Record> = ArrayList<Record>()
         if(dateBegin!=null&&dateEnd!=null){
             System.out.println(dateBegin)
             System.out.println(dateEnd)
@@ -209,7 +210,7 @@ class ChartsFragment: Fragment() {
                 System.out.println(cat)
             }
 
-            bills= im.siftRecords(dateBegin,dateEnd,srcList,catList)
+            bills = AppDatabase.siftRecords(dateBegin,dateEnd,srcList,catList)
         }
         return bills
     }
@@ -321,8 +322,8 @@ class ChartsFragment: Fragment() {
     }
 
     fun createChips(){
-        catNames=im.getAllCategoryNames()
-        srcNames=im.getAllSourceNames()
+        catNames= AppDatabase.getAllCategoryNames()
+        srcNames= AppDatabase.getAllSourceNames()
 //        val chipLP=ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT)
 
         for(catStr in catNames){
