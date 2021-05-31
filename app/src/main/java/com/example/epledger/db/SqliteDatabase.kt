@@ -1,4 +1,5 @@
 package com.example.epledger.db
+import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import androidx.core.database.getStringOrNull
@@ -8,42 +9,9 @@ import com.example.epledger.model.Source
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
-class SqliteDatabase : LedgerDatabase {
-    val im=ImportDataFromExcel();
+class SqliteDatabase(context: Context) : LedgerDatabase {
+    val im = ImportDataFromExcel(context)
     val simpleFormat = SimpleDateFormat("yyyy/MM/dd hh:mm", Locale.US)
-
-    /*val records: MutableList<Record> = run {
-        val simpleFormat = SimpleDateFormat("yyyy/MM/dd hh:mm", Locale.US)
-        val rec1 = Record().apply {
-            ID = 11
-            moneyAmount = -2021.0
-            category = "Digital"
-            source = "Alipay"
-            mDate = simpleFormat.parse("2020/12/31 12:13")!!
-            note = "买了一个新的。"
-        }
-        val rec2 = Record().apply {
-            ID = 13
-            moneyAmount = -29.9
-            category = "Study"
-            mDate = simpleFormat.parse("2021/01/01 14:37")!!
-            note = "这是黄冈密卷，妈妈说这是她对我的爱。"
-            starred = true
-        }
-        val rec3 = rec1.getCopy().apply {
-            ID = 12
-            moneyAmount = -3099.0
-            source = "Wechat"
-            mDate = simpleFormat.parse("2020/12/31 08:19")!!
-            starred = true
-            note = "我是有钱人。"
-        }
-        val rec4 = rec3.getCopy().apply { ID = 17 }
-        val rec5 = rec4.getCopy().apply { ID = 18 }
-        // 不完整的记录也是有ID的，因为已经记录在数据库中了
-        val incompleteRec1 = Record().apply { ID = 20 }
-        arrayListOf(rec1, rec2, rec3, rec4, rec5, incompleteRec1)
-    }*/
 
     override fun getRecordsOrderByDate(): List<Record> {
         val sqLiteDatabase: SQLiteDatabase = im.dbHelper.getReadableDatabase()
@@ -70,9 +38,9 @@ class SqliteDatabase : LedgerDatabase {
                     starred = s
                     //screenshot: Bitmap? = null
                     screenshotPath=cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.bitmap))
-                    note = cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.date1))
+                    note = cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.memo))
                 }
-                if(!r.isComplete()) res.add(r)
+                if(r.isComplete()) res.add(r)
             }
             cursor.close()
         }
@@ -105,7 +73,7 @@ class SqliteDatabase : LedgerDatabase {
                     starred = s
                     //screenshot: Bitmap? = null
                     screenshotPath=cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.bitmap))
-                    note = cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.date1))
+                    note = cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.memo))
                 }
                 if(!r.isComplete()) res.add(r)
             }
@@ -141,7 +109,7 @@ class SqliteDatabase : LedgerDatabase {
                     starred = s
                     //screenshot: Bitmap? = null
                     screenshotPath=cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.bitmap))
-                    note = cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.date1))
+                    note = cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.memo))
                 }
                 res.add(r)
             }
@@ -160,8 +128,10 @@ class SqliteDatabase : LedgerDatabase {
 
     override fun insertRecord(record: Record): Long {
         val sqLiteDatabase: SQLiteDatabase = im.dbHelper.getWritableDatabase()
-        val typeid=im.SelectTypeId(record.category,sqLiteDatabase)
-        val fromid=im.SelectFromId(record.source,sqLiteDatabase)
+
+        val typeid = if (record.category == null) -1 else im.SelectTypeId(record.category,sqLiteDatabase)
+        val fromid = if (record.source == null) -1 else im.SelectFromId(record.source,sqLiteDatabase)
+
         val simpleFormat = SimpleDateFormat("yyyy/MM/dd hh:mm", Locale.US)
         val s=0
         if (record.starred)
@@ -182,8 +152,10 @@ class SqliteDatabase : LedgerDatabase {
 
     override fun updateRecord(record: Record) {
         val sqLiteDatabase: SQLiteDatabase = im.dbHelper.getWritableDatabase()
-        val typeid=im.SelectTypeId(record.category,sqLiteDatabase)
-        val fromid=im.SelectFromId(record.source,sqLiteDatabase)
+
+        val typeid = if (record.category == null) -1 else im.SelectTypeId(record.category,sqLiteDatabase)
+        val fromid = if (record.source == null) - 1 else im.SelectFromId(record.source,sqLiteDatabase)
+
         val s=0
         if (record.starred)
         {
@@ -264,6 +236,30 @@ class SqliteDatabase : LedgerDatabase {
         return res
     }
 
+    override fun insertCategory(category: Category): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun updateCategory(category: Category) {
+        TODO("Not yet implemented")
+    }
+
+    override fun deleteCategoryByID(id: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun insertSource(source: Source): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun updateSource(source: Source) {
+        TODO("Not yet implemented")
+    }
+
+    override fun deleteSourceByID(id: Int) {
+        TODO("Not yet implemented")
+    }
+
     override fun siftRecords(
             dateStart:Date,
             dateEnd: Date,
@@ -275,7 +271,6 @@ class SqliteDatabase : LedgerDatabase {
         // 编译错误：Class 'MemoryDatabase' is not abstract and does not implement abstract member public abstract fun siftRecords(dateStart: String, dateEnd: String, sources: List<Source>, categories: List<Category>): List<Record> defined in com.example.epledger.db.LedgerDatabase
         // 解决方式：补充了空实现以通过编译。请检查是否有实现没有被commit。
         //TODO("Not yet implemented")
-        val im=ImportDataFromExcel();
         val sqLiteDatabase: SQLiteDatabase = im.dbHelper.getReadableDatabase()
         val simpleFormat = SimpleDateFormat("yyyy/MM/dd")
         val start=simpleFormat.format(dateStart)

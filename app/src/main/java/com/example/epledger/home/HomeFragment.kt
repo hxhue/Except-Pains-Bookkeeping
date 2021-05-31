@@ -2,6 +2,8 @@ package com.example.epledger.home
 
 import android.animation.LayoutTransition
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
@@ -18,6 +20,8 @@ import com.example.epledger.db.DatabaseModel
 import com.example.epledger.nav.NavigationFragment.Companion.pushToStack
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.page_home.view.*
+import kotlinx.coroutines.*
+import java.lang.Runnable
 import java.lang.RuntimeException
 
 class HomeFragment : Fragment() {
@@ -88,15 +92,25 @@ class HomeFragment : Fragment() {
             if (!firstLoadIsFinished()) {
                 return@Runnable
             }
-            if (sectionAdapter.sections.isNullOrEmpty()) {
-                requireView().home_page_no_record_image.apply {
-                    alpha = 1.0f
-                    visibility = View.VISIBLE
+
+            GlobalScope.launch(Dispatchers.IO) {
+                // 等待view初始化完成
+                while (view == null) {
+                    delay(100)
                 }
-            } else {
-                requireView().home_page_no_record_image.apply {
-                    alpha = 0.0f
-                    visibility = View.INVISIBLE
+                // 在IO线程中等待好了再回到主线程
+                withContext(Dispatchers.Main) {
+                    if (sectionAdapter.sections.isNullOrEmpty()) {
+                        requireView().home_page_no_record_image.apply {
+                            alpha = 1.0f
+                            visibility = View.VISIBLE
+                        }
+                    } else {
+                        requireView().home_page_no_record_image.apply {
+                            alpha = 0.0f
+                            visibility = View.INVISIBLE
+                        }
+                    }
                 }
             }
         }

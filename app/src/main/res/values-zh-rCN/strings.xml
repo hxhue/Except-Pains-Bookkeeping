@@ -161,7 +161,7 @@
     <string name="manage_categories">管理种类</string>
     <string name="manage_sources">管理来源</string>
     <string name="no_memo_provided"><i>（没有提供备注）</i></string>
-    <string name="no_category_provided">(...)</string>
+    <string name="no_category_provided">未知</string>
     <string name="sources">来源</string>
     <string name="modify_name">修改名称</string>
     <string name="new_source">新建来源</string>
