@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 //import android.support.v7.app.AppCompatActivity;
+import com.example.epledger.R;
 import com.example.epledger.model.Category;
 import com.example.epledger.model.Record;
 import com.example.epledger.model.Source;
@@ -44,6 +45,14 @@ public class ImportDataFromExcel{
         //super.onCreate(savedInstanceState);
         Context c=MainApplication.getCustomApplicationContext();
         dbHelper  = new MySQLiteOpenHelper(c,"test");
+        SQLiteDatabase db=dbHelper.getWritableDatabase();
+        AddNewFrom(db,"支付宝");
+        AddNewFrom(db,"微信");
+        AddNewFrom(db,"花呗");
+        AddNewType(db,"娱乐", R.drawable.ic_far_bookmark);
+        AddNewType(db,"保健", R.drawable.ic_far_bookmark);
+        AddNewType(db,"吃喝", R.drawable.ic_far_bookmark);
+        db.close();
         /*SQLiteDatabase db=dbHelper.getWritableDatabase();
         ContentValues contentValues=getContentValues("2021/5/21",100,1,1,"没有备注");
         db.insert(MySQLiteOpenHelper.TABLE_NAME, null, contentValues);
@@ -64,15 +73,25 @@ public class ImportDataFromExcel{
     public void AddNewType(SQLiteDatabase db,String type,int id)
     {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(MySQLiteOpenHelper.type1, type);
-        contentValues.put(MySQLiteOpenHelper.iconresid, id);
-        db.insert(MySQLiteOpenHelper.TABLE_NAME2, null, contentValues);
+        int istype=SelectTypeId(type,db);
+        if(istype==-1)
+        {
+            contentValues.put(MySQLiteOpenHelper.type1, type);
+            contentValues.put(MySQLiteOpenHelper.iconresid, id);
+            db.insert(MySQLiteOpenHelper.TABLE_NAME2, null, contentValues);
+        }
+
     }
     public void AddNewFrom(SQLiteDatabase db,String from1)
     {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(MySQLiteOpenHelper.from1, from1);
-        db.insert(MySQLiteOpenHelper.TABLE_NAME5, null, contentValues);
+        int isfrom=SelectFromId(from1,db);
+        if(isfrom==-1)
+        {
+            contentValues.put(MySQLiteOpenHelper.from1, from1);
+            db.insert(MySQLiteOpenHelper.TABLE_NAME5,  null, contentValues);
+        }
+
     }
     public ArrayList<Record> FindTimeFrom(SQLiteDatabase sqLiteDatabase, String start, String end, List<String>s, List<String>c) throws ParseException {
         //SQLiteDatabase sqLiteDatabase=dbHelper.getReadableDatabase();
