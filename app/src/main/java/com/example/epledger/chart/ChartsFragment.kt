@@ -1,12 +1,11 @@
 package com.example.epledger.chart
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.graphics.Paint
 import android.os.Bundle
 import android.view.*
-import android.widget.Button
-import android.widget.RelativeLayout
-import android.widget.Toast
+import android.widget.*
 import androidx.core.util.Pair
 import androidx.core.view.get
 import androidx.core.view.size
@@ -30,12 +29,19 @@ import kotlin.collections.ArrayList
 import com.example.epledger.db.ImportDataFromExcel.bill
 import com.example.epledger.db.SqliteDatabase
 import com.example.epledger.model.Record
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
+import com.github.mikephil.charting.utils.ColorTemplate
+import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlin.collections.HashMap
 
 class ChartsFragment: Fragment() {
+    private val ONEDAY=24*60*60*1000
+    private var dateRangeIsSet=false
     private lateinit var siftLayout:RelativeLayout
     private lateinit var pieChart: PieChart
     private lateinit var lineChart: LineChart
+    private lateinit var barChart: BarChart
     private lateinit var accountIdList:List<Int>
     private lateinit var expenseTypeIdList:List<Int>
     val expenseTypeChipList=ArrayList<Chip>()
@@ -43,6 +49,8 @@ class ChartsFragment: Fragment() {
     private lateinit var expenseTypeChipGroup: ChipGroup
     private lateinit var billList:List<Record>
     private lateinit var siftBtn:Button
+    private lateinit var pieSwitch:SwitchMaterial
+    private lateinit var pieTextView:TextView
     private lateinit var catNames:List<String>
     private lateinit var srcNames:List<String>
     val im = SqliteDatabase()
@@ -51,7 +59,7 @@ class ChartsFragment: Fragment() {
                     .setTitleText("Select dates")
                     .setSelection(
                             Pair<Long, Long>(
-                                    MaterialDatePicker.thisMonthInUtcMilliseconds(),
+                                    MaterialDatePicker.todayInUtcMilliseconds()-14*ONEDAY,
                                     MaterialDatePicker.todayInUtcMilliseconds()
                             )
                     )
@@ -62,16 +70,20 @@ class ChartsFragment: Fragment() {
         val view = inflater.inflate(R.layout.activity_show_chart, container, false)
 
         siftBtn=view.findViewById(R.id.siftBtn)
+        pieChart=view.findViewById(R.id.pieChart)
+        lineChart=view.findViewById(R.id.lineChart)
+        barChart=view.findViewById(R.id.barChart)
+        pieSwitch=view.findViewById(R.id.pieSwitch)
+        pieTextView=view.findViewById(R.id.pieTextView)
         dateRangePicker.addOnPositiveButtonClickListener {
             siftBtn.isEnabled=true
+            dateRangeIsSet=true
         }
         accountChipGroup=view.findViewById(R.id.accountChipGroup)
         expenseTypeChipGroup=view.findViewById(R.id.expenseTypeChipGroup)
 
         accountIdList=accountChipGroup.checkedChipIds
         expenseTypeIdList=expenseTypeChipGroup.checkedChipIds
-        pieChart=view.findViewById(R.id.pieChart)
-        lineChart=view.findViewById(R.id.lineChart)
         for(id in expenseTypeIdList){
             expenseTypeChipList.add(view.findViewById<View>(id) as Chip)
         }
@@ -81,11 +93,13 @@ class ChartsFragment: Fragment() {
 
         createChips()
 
-        drawPieChart(view)
-        drawLineChart(view)
+        //默认筛选14天的账单
+        billList=im.siftRecords(Date(Date().time-14*24*60*60*1000),Date(),im.getAllSourceNames() as ArrayList<String>,im.getAllCategoryNames() as ArrayList<String>)
+        drawChart(view,true)
 
         //app bar
         val topAppBar=view.findViewById<View>(R.id.topAppBar) as MaterialToolbar
+
         topAppBar.setNavigationOnClickListener {
             // Handle navigation icon press
         }
@@ -161,12 +175,20 @@ class ChartsFragment: Fragment() {
         siftBtn.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
                 billList=getSiftedBills(view)
-                drawLineChart(view)
-                drawPieChart(view)
-
+                Toast.makeText(context,billList.size.toString()+" records found",Toast.LENGTH_SHORT).show()
+                drawChart(view,true)
             }
         })
 
+        pieSwitch.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener{
+            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+                drawPieChart(view, pieSwitch.isChecked)
+                if (pieSwitch.isChecked)
+                    pieTextView.setText(R.string.cost)
+                else
+                    pieTextView.setText(R.string.income)
+            }
+        })
 
         return view
     }
@@ -214,21 +236,20 @@ class ChartsFragment: Fragment() {
         return bills
     }
 
-    fun UTC2Str(utc:Long): String {
-        val sdf=SimpleDateFormat("yyyy/MM/dd")
-        val date=Date(utc)
-        val str=sdf.format(date)
-        return str
-    }
-
-    fun drawPieChart(view: View){
+    fun drawPieChart(view: View, costOrIncome:Boolean){
         //pie chart
         //准备数据
-        Toast.makeText(context,billList.size.toString(),Toast.LENGTH_SHORT).show()
         val typeSumMap=HashMap<String,Double>()
-        for(bill in billList){
-            bill.category?.let { typeSumMap.put(it,typeSumMap.getOrDefault(bill.category!!, 0.0)?.plus(bill.moneyAmount)) }
+        if(costOrIncome){
+            for(bill in billList){
+                if(bill.moneyAmount<0) bill.category?.let { typeSumMap.put(it,typeSumMap.getOrDefault(bill.category!!, 0.0)?.plus(bill.moneyAmount*(-1.0))) }
+            }
+        }else{
+            for(bill in billList){
+                    if(bill.moneyAmount>0) bill.category?.let { typeSumMap.put(it,typeSumMap.getOrDefault(bill.category!!, 0.0)?.plus(bill.moneyAmount)) }
+            }
         }
+
 
         val entries: MutableList<PieEntry> = ArrayList()
         for(entry in typeSumMap){
@@ -245,13 +266,14 @@ class ChartsFragment: Fragment() {
 //        )
         val data = PieData(set)
         pieChart.data = data
-        pieChart.centerText = "This is a center text!"
+        pieChart.centerText = "It's center text!"
         pieChart.centerTextRadiusPercent = 0.8f
         pieChart.invalidate() // refresh
+        System.out.println(entries.size)
     }
 
     fun drawLineChart(view:View){
-        val lineChart = view.findViewById<View>(R.id.lineChart) as LineChart
+        //按天可视化支出信息
         val valsComp1: MutableList<Entry> =
                 ArrayList()
         val valsComp2: MutableList<Entry> =
@@ -337,4 +359,90 @@ class ChartsFragment: Fragment() {
         }
     }
 
+    fun drawChart(view:View,pieBool:Boolean){
+        drawLineChart(view)
+        drawPieChart(view,pieBool)
+        drawBarChart(view)
+    }
+
+    fun drawBarChart(view:View){
+        //先根据dateRange指定日期范围，创建并初始化map<日期，支出金额>的每一个条目，然后将支出条目的金额加到对应日期上，最后生成barChart。
+        //创建一个开始date（0点），然后用每个支出条目的date减该date并除以一天的时间，就得到对应天数
+        val baseDate=Date((Date().time-ONEDAY*13))
+        val endDate=Date((Date().time+ONEDAY))//第二天的零点
+        if(dateRangeIsSet){
+            baseDate.time= dateRangePicker.selection?.first ?: baseDate.time
+            endDate.time= dateRangePicker.selection?.second?.plus(ONEDAY) ?: endDate.time
+        }
+        baseDate.time=baseDate.time-baseDate.time%ONEDAY-8*60*60*1000 //时间调整为第一天0点
+        endDate.time=endDate.time-endDate.time%ONEDAY-8*60*60*1000
+        val dayNum=(endDate.time-baseDate.time)/ONEDAY
+        println("dayNum=$dayNum")
+        val mp=HashMap<Int,Double>()
+        for(i in 0 until dayNum){
+            mp[i.toInt()] = 0.0
+        }
+
+        for(record in billList){
+            if(record.moneyAmount<0){
+                val idx=(record.mDate.time-baseDate.time)/ONEDAY
+                mp[idx.toInt()]?.minus(record.moneyAmount)?.let { mp.put(idx.toInt(), it) }
+                println("map item idx="+idx.toString()+"  new value="+ mp[idx.toInt()])
+            }
+        }
+        val entries=ArrayList<BarEntry>()
+        for(item in mp){
+            entries.add(BarEntry(item.key.toFloat(),item.value.toFloat()))
+        }
+        val setCost=BarDataSet(entries,"bar chart")
+        //By calling setAxisDependency(...), the axis the DataSet should be plotted against is specified
+        setCost.axisDependency=YAxis.AxisDependency.LEFT
+        val dataSets=ArrayList<IBarDataSet>();
+        dataSets.add(setCost)
+        val data=BarData(dataSets)
+        barChart.data=data
+
+        /**
+         *set x labels
+         */
+        val xlabels=ArrayList<String>()
+        val baseCalendar = Calendar.getInstance()
+        baseCalendar.time=baseDate
+        while(baseCalendar.time<endDate){
+            xlabels.add(baseCalendar.get(Calendar.DAY_OF_MONTH).toString())
+            baseCalendar.add(Calendar.DAY_OF_MONTH,1)
+        }
+        class MyXAXisFormatter:ValueFormatter(){
+            override fun getAxisLabel(value: Float, axis: AxisBase?): String {
+                return xlabels[value.toInt()]
+            }
+        }
+        barChart.xAxis.valueFormatter=MyXAXisFormatter()
+
+        /**
+         * 个性化设置
+         */
+        barChart.xAxis.granularity=1f
+        data.barWidth=0.9f //柱宽
+        barChart.setFitBars(true)  //有什么用？
+        setCost.setColors(intArrayOf(
+                R.color.barColor1,
+                R.color.barColor2,
+                R.color.barColor3,
+                R.color.barColor4
+        ),context)
+
+        barChart.invalidate()
+
+    }
+
+
 }
+
+
+//    fun UTC2Str(utc:Long): String {
+//        val sdf=SimpleDateFormat("yyyy/MM/dd")
+//        val date=Date(utc)
+//        val str=sdf.format(date)
+//        return str
+//    }
