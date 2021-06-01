@@ -10,10 +10,7 @@ import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.viewpager.widget.ViewPager
-import com.example.epledger.db.AppDatabase
-import com.example.epledger.db.DatabaseModel
-import com.example.epledger.db.ImportDataFromExcel
-import com.example.epledger.db.SqliteDatabase
+import com.example.epledger.db.*
 import com.example.epledger.home.SectionAdapter
 import com.example.epledger.inbox.event.item.EventItemFragment
 import com.example.epledger.inbox.event.list.EventFragment
@@ -48,6 +45,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
         // init AppDatabase
         AppDatabase = SqliteDatabase(this.applicationContext)
+//        AppDatabase = MemoryDatabase()
 
         // 禁用黑暗模式
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)

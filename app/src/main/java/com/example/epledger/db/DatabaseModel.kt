@@ -3,8 +3,6 @@ package com.example.epledger.db
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.epledger.R
-import com.example.epledger.home.EntryAdapter
 import com.example.epledger.home.SectionAdapter
 import com.example.epledger.inbox.InboxFragment
 import com.example.epledger.model.Record
@@ -49,7 +47,7 @@ class DatabaseModel: ViewModel() {
             val records = AppDatabase.getRecordsOrderByDate()
 
             Log.i("db", "database reloading. records from database: ${records.map { 
-                "(amount=%.2f, source=%s)".format(it.moneyAmount, it.source)
+                "(amount=%.2f, source=%s)".format(it.money, it.source)
             }}")
 
             val groupResult = groupRecordsByDate(records)
@@ -124,7 +122,7 @@ class DatabaseModel: ViewModel() {
      * @return Pair<index_of_section, position_in_section>
      */
     private fun requireRecordIndex(record: Record, list: MutableList<RecordGroup>): Pair<Int, Int> {
-        val roundedDateOfRecord = roundToDay(record.mDate)
+        val roundedDateOfRecord = roundToDay(record.date)
         val index = list.binarySearch(
             RecordGroup(roundedDateOfRecord, ArrayList(0)),
             RecordGroup.dateReverseComparator
@@ -210,7 +208,7 @@ class DatabaseModel: ViewModel() {
             record.ID = newID
 
             // 插入数据到主存并更新信息
-            val roundedDate = roundToDay(record.mDate)
+            val roundedDate = roundToDay(record.date)
             val groupedRecords = requireGroupedRecords()
 
             val indexToInsert = groupedRecords.binarySearch(
@@ -251,10 +249,44 @@ class DatabaseModel: ViewModel() {
      * 更新一个不完整的记录。
      * 由于记录之前不在home界面，所以去查找更新会导致requireRecordIndex设计的运行时异常。
      */
-    fun updateIncompleteRecord(record: Record) {
+    fun updateIncompleteRecord(record: Record, sectionAdapter: SectionAdapter) {
         GlobalScope.launch(Dispatchers.IO) {
             // Update database
             AppDatabase.updateRecord(record)
+
+            if (record.isComplete()) {
+                val list = requireGroupedRecords()
+                val roundedDate = roundToDay(record.date)
+                val index = list.binarySearch(
+                    RecordGroup(roundedDate, ArrayList(0)),
+                    RecordGroup.dateReverseComparator
+                )
+
+                // 2021-06-01 22:58:19
+                // A little bit in hurry
+                // God bless me!!!!
+                if (index < 0) {
+                    // Time to insert a new group
+                    val newGroup = RecordGroup(roundedDate, arrayListOf(record.getCopy()))
+                    val i = -(index + 1)
+                    list.add(i, newGroup)
+                    withContext(Dispatchers.Main) {
+                        sectionAdapter.notifyItemInserted(i)
+                        sectionAdapter.notifyItemRangeChanged(i, list.size)
+                    }
+                } else {
+                    // insert into the group
+                    val group = list[index]
+                    var indexToInsert = group.records.binarySearch(record, Record.dateReverseComparator)
+                    if (indexToInsert < 0) {
+                        indexToInsert = -(indexToInsert + 1)
+                    }
+                    group.records.add(indexToInsert, record.getCopy())
+                    withContext(Dispatchers.Main) {
+                        sectionAdapter.notifyItemChanged(index)
+                    }
+                }
+            }
 
             // Update view
             withContext(Dispatchers.Main) {
@@ -303,12 +335,12 @@ class DatabaseModel: ViewModel() {
                 Log.d("DatabaseModel#groupRecordsByDate()", "An incomplete record is found.")
             } else if (group.isEmpty()) {
                 group.add(it.getCopy())
-            } else if (onSameDay(group.first().mDate, it.mDate)) {
+            } else if (onSameDay(group.first().date, it.date)) {
                 group.add(it.getCopy())
             } else {
                 // Not on the same day
                 // 分组里面的时间必须抹除小时、分钟、秒
-                val groupDate = roundToDay(group.first().mDate)
+                val groupDate = roundToDay(group.first().date)
                 groupResult.add(RecordGroup(groupDate, group))
                 group = ArrayList()
                 group.add(it.getCopy())
@@ -317,7 +349,7 @@ class DatabaseModel: ViewModel() {
 
         // After iteration, we check for the leftover
         if (group.isNotEmpty()) {
-            val groupDate = roundToDay(group.first().mDate)
+            val groupDate = roundToDay(group.first().date)
             groupResult.add(RecordGroup(groupDate, group))
         }
 

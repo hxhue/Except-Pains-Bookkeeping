@@ -28,8 +28,6 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
-import com.example.epledger.db.ImportDataFromExcel.bill
-import com.example.epledger.db.SqliteDatabase
 import com.example.epledger.model.Record
 import kotlin.collections.HashMap
 
@@ -228,7 +226,7 @@ class ChartsFragment: Fragment() {
         Toast.makeText(context,billList.size.toString(),Toast.LENGTH_SHORT).show()
         val typeSumMap=HashMap<String,Double>()
         for(bill in billList){
-            bill.category?.let { typeSumMap.put(it,typeSumMap.getOrDefault(bill.category!!, 0.0)?.plus(bill.moneyAmount)) }
+            bill.category?.let { typeSumMap.put(it,typeSumMap.getOrDefault(bill.category!!, 0.0)?.plus(bill.money)) }
         }
 
         val entries: MutableList<PieEntry> = ArrayList()

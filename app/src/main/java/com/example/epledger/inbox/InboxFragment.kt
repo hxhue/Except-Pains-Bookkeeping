@@ -51,7 +51,7 @@ class InboxFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         menu.clear()
-        inflater.inflate(R.menu.inbox_menu, menu)
+//        inflater.inflate(R.menu.inbox_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -295,7 +295,8 @@ class InboxFragment : Fragment() {
             override fun onRecordSubmit(adapter: EntryAdapter, record: Record) {
                 // todo: check this updateRecord method
                 // 2021-05-29 06:37:10
-                dbModel.updateIncompleteRecord(record)
+                dbModel.updateIncompleteRecord(record,
+                    this@InboxFragment.requireActivity().asMainActivity().homeSectionAdapter!!)
             }
         }, deleteEntryAfterSubmit = true, entryWasShownInHomePage = false)
     }
@@ -325,7 +326,7 @@ class InboxFragment : Fragment() {
         if (record.starred) {
             // insert this record to starred section
             (requireView().inbox_star_recycler_view.adapter as EntryAdapter).apply {
-                var indexToInsert = entries.indexOfFirst { it.mDate <= record.mDate }
+                var indexToInsert = entries.indexOfFirst { it.date <= record.date }
 
                 // 所有的记录日期都比当前的大时，插入到最后
                 if (indexToInsert < 0) {

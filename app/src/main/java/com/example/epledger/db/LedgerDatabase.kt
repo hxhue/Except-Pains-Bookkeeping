@@ -1,6 +1,5 @@
 package com.example.epledger.db
 
-import com.example.epledger.BuildConfig
 import com.example.epledger.R
 import com.example.epledger.model.Category
 import com.example.epledger.model.Record
@@ -121,25 +120,25 @@ class MemoryDatabase : LedgerDatabase {
         val simpleFormat = SimpleDateFormat("yyyy/MM/dd hh:mm", Locale.US)
         val rec1 = Record().apply {
             ID = 11
-            moneyAmount = -2021.0
+            money = -2021.0
             category = "Digital"
             source = "Alipay"
-            mDate = simpleFormat.parse("2020/12/31 12:13")!!
+            date = simpleFormat.parse("2020/12/31 12:13")!!
             note = "买了一个新的。"
         }
         val rec2 = Record().apply {
             ID = 13
-            moneyAmount = -29.9
+            money = -29.9
             category = "Study"
-            mDate = simpleFormat.parse("2021/01/01 14:37")!!
+            date = simpleFormat.parse("2021/01/01 14:37")!!
             note = "这是黄冈密卷，妈妈说这是她对我的爱。"
             starred = true
         }
         val rec3 = rec1.getCopy().apply {
             ID = 12
-            moneyAmount = -3099.0
+            money = -3099.0
             source = "Wechat"
-            mDate = simpleFormat.parse("2020/12/31 08:19")!!
+            date = simpleFormat.parse("2020/12/31 08:19")!!
             starred = true
             note = "我是有钱人。"
         }
@@ -147,8 +146,8 @@ class MemoryDatabase : LedgerDatabase {
         val rec5 = rec4.getCopy().apply { ID = 18 }
         // 不完整的记录也是有ID的，因为已经记录在数据库中了
         val incompleteRec1 = Record().apply { ID = 20 }
-//        arrayListOf(rec1, rec2, rec3, rec4, rec5, incompleteRec1)
-        arrayListOf()
+        arrayListOf(rec1, rec2, rec3, rec4, rec5, incompleteRec1)
+//        arrayListOf()
     }
 
     override fun getRecordsOrderByDate(): List<Record> {
@@ -235,7 +234,7 @@ class MemoryDatabase : LedgerDatabase {
 //        for(cat in categories)
 //            categoryStrs.add(cat.name)
         val result=ArrayList<Record>()
-        records.filter { it.mDate>dateStart&&it.mDate<dateEnd&&sources.contains(it.source)&&categories.contains(it.category)}
+        records.filter { it.date>dateStart&&it.date<dateEnd&&sources.contains(it.source)&&categories.contains(it.category)}
                 .sortedWith(Record.dateReverseComparator)
                 .forEach { result.add(it) }
         return result
