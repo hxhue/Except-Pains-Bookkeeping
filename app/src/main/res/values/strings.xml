@@ -185,8 +185,8 @@
     <string name="management">Management</string>
     <string name="manage_categories">Manage categories</string>
     <string name="manage_sources">Manage sources</string>
-    <string name="no_memo_provided"><i>(No memo provided)</i></string>
-    <string name="no_category_provided">(...)</string>
+    <string name="no_memo_provided"><i>(No memo)</i></string>
+    <string name="no_category_provided">Unknown</string>
     <string name="sources">Sources</string>
     <string name="modify_name">Modify Name</string>
     <string name="new_source">New Source</string>
