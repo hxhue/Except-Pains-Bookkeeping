@@ -47,7 +47,16 @@ class DatabaseModel: ViewModel() {
             val cateList = AppDatabase.getAllCategories()
 
             val records = AppDatabase.getRecordsOrderByDate()
+
+            Log.i("db", "database reloading. records from database: ${records.map { 
+                "(amount=%.2f, source=%s)".format(it.moneyAmount, it.source)
+            }}")
+
             val groupResult = groupRecordsByDate(records)
+
+            Log.i("db", "database reloading. records after grouping: ${groupResult.map {
+                it.records.toString()
+            }}")
 
             val incompleteRecordsToPost = AppDatabase.getIncompleteRecordsOrderByDate()
             val starredRecordsToPost = AppDatabase.getStarredRecords()
