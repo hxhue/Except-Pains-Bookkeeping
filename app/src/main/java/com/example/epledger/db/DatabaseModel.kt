@@ -1,6 +1,8 @@
 package com.example.epledger.db
 
 import android.util.Log
+import android.util.SparseArray
+import androidx.core.util.set
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.epledger.home.SectionAdapter
@@ -23,15 +25,8 @@ class DatabaseModel: ViewModel() {
     val incompleteRecords = MutableLiveData<MutableList<Record>>(ArrayList(0))
     val starredRecords = MutableLiveData<MutableList<Record>>(ArrayList(0))
 
-//    /**初始化了之后才能够调用这个函数。
-//     * （2021年5月20日13:43:15）Harmful，但是不知道原因
-//     */
-//    fun clearDatabase() {
-//        sources.postValue(ArrayList(0))
-//        categories.postValue(ArrayList(0))
-//        groupedRecords.postValue(ArrayList(0))
-//        // todo: 更多数据
-//    }
+    private val sourceMap = SparseArray<Source>(16)
+    private val categoryMap = SparseArray<Category>(16)
 
     var databaseHasLoaded = false
         private set
@@ -45,28 +40,33 @@ class DatabaseModel: ViewModel() {
      */
     fun reloadDatabase() {
         GlobalScope.launch(Dispatchers.IO) {
-            // TODO: change debug code to: fetch data from DB
-            val srcList = AppDatabase.getAllSources()
-
-            val cateList = AppDatabase.getAllCategories()
-
+            val sourceList = AppDatabase.getAllSources()
+            val categoryList = AppDatabase.getAllCategories()
             val records = AppDatabase.getRecordsOrderByDate()
-
-            Log.i("db", "database reloading. records from database: ${records.map { 
-                "(amount=%.2f, source=%s)".format(it.money, it.source)
-            }}")
-
             val groupResult = groupRecordsByDate(records)
+            val incompleteRecordsToPost = AppDatabase.getIncompleteRecordsOrderByDate()
+            val starredRecordsToPost = AppDatabase.getStarredRecords()
 
             Log.i("db", "database reloading. records after grouping: ${groupResult.map {
                 it.records.toString()
             }}")
 
-            val incompleteRecordsToPost = AppDatabase.getIncompleteRecordsOrderByDate()
-            val starredRecordsToPost = AppDatabase.getStarredRecords()
+            // Construct maps
+            sourceMap.apply {
+                clear()
+                for (source in sourceList) {
+                    append(source.ID!!, source)
+                }
+            }
+            categoryMap.apply {
+                clear()
+                for (category in categoryList) {
+                    append(category.ID!!, category)
+                }
+            }
 
-            sources.postValue(srcList)
-            categories.postValue(cateList)
+            sources.postValue(sourceList)
+            categories.postValue(categoryList)
             groupedRecords.postValue(groupResult)
             incompleteRecords.postValue(incompleteRecordsToPost)
             starredRecords.postValue(starredRecordsToPost)
@@ -325,6 +325,9 @@ class DatabaseModel: ViewModel() {
         GlobalScope.launch(Dispatchers.IO) {
             AppDatabase.deleteCategoryByID(id)
 
+            // modify map
+            categoryMap.delete(id)
+
             withContext(Dispatchers.Main) {
                 val requiredCategories = requireCategories()
                 requiredCategories.removeIf {
@@ -354,6 +357,9 @@ class DatabaseModel: ViewModel() {
             val id = AppDatabase.insertCategory(category)
             category.ID = id
 
+            // modify map
+            categoryMap.put(category.ID!!, category)
+
             withContext(Dispatchers.Main) {
                 // Update in memory
                 requireCategories().add(category)
@@ -380,6 +386,9 @@ class DatabaseModel: ViewModel() {
         GlobalScope.launch(Dispatchers.IO) {
             // Update in database
             AppDatabase.updateCategory(category)
+
+            // modify map
+            categoryMap[category.ID!!] = category
 
             // To avoid concurrent access exception
             withContext(Dispatchers.Main) {
@@ -408,6 +417,10 @@ class DatabaseModel: ViewModel() {
     fun updateSource(source: Source, viewRefreshMethod: (()->Unit)? = null) {
         GlobalScope.launch(Dispatchers.IO) {
             AppDatabase.updateSource(source)
+
+            // modify map
+            sourceMap[source.ID!!] = source
+
             withContext(Dispatchers.Main) {
                 val requiredSources = requireSources()
                 for (requiredSource in requiredSources) {
@@ -431,6 +444,10 @@ class DatabaseModel: ViewModel() {
     fun insertSource(source: Source, viewRefreshMethod: (()->Unit)? = null) {
         GlobalScope.launch(Dispatchers.IO) {
             source.ID = AppDatabase.insertSource(source)
+
+            // modify map
+            sourceMap.put(source.ID!!, source)
+
             withContext(Dispatchers.Main) {
                 requireSources().add(source)
 
@@ -448,6 +465,9 @@ class DatabaseModel: ViewModel() {
     fun deleteSourceByID(id: Int, viewRefreshMethod: (()->Unit)? = null) {
         GlobalScope.launch(Dispatchers.IO) {
             AppDatabase.deleteSourceByID(id)
+
+            sourceMap.delete(id)
+
             withContext(Dispatchers.Main) {
                 requireSources().removeIf {
                     it.ID == id
@@ -474,6 +494,14 @@ class DatabaseModel: ViewModel() {
         groupedRecords.postValue(groupedRecords.value)
         starredRecords.postValue(starredRecords.value)
         incompleteRecords.postValue(incompleteRecords.value)
+    }
+
+    fun findSourceByID(id: Int): Source? {
+        return sourceMap.get(id)
+    }
+
+    fun findCategoryByID(id: Int): Category? {
+        return categoryMap.get(id)
     }
 
     /**
