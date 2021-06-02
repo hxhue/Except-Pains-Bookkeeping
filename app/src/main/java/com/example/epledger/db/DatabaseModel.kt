@@ -23,15 +23,15 @@ class DatabaseModel: ViewModel() {
     val incompleteRecords = MutableLiveData<MutableList<Record>>(ArrayList(0))
     val starredRecords = MutableLiveData<MutableList<Record>>(ArrayList(0))
 
-    /**初始化了之后才能够调用这个函数。
-     * （2021年5月20日13:43:15）Harmful，但是不知道原因
-     */
-    fun clearDatabase() {
-        sources.postValue(ArrayList(0))
-        categories.postValue(ArrayList(0))
-        groupedRecords.postValue(ArrayList(0))
-        // todo: 更多数据
-    }
+//    /**初始化了之后才能够调用这个函数。
+//     * （2021年5月20日13:43:15）Harmful，但是不知道原因
+//     */
+//    fun clearDatabase() {
+//        sources.postValue(ArrayList(0))
+//        categories.postValue(ArrayList(0))
+//        groupedRecords.postValue(ArrayList(0))
+//        // todo: 更多数据
+//    }
 
     var databaseHasLoaded = false
         private set
@@ -128,15 +128,27 @@ class DatabaseModel: ViewModel() {
     }
 
     /**
+     * 找到给定的record所属的group的下标，找不到则返回-(indexToInsert + 1)
+     */
+    private fun findRecordGroupIndex(record: Record, list: MutableList<RecordGroup>): Int {
+        val roundedDate = roundToDay(record.date)
+        return list.binarySearch(
+            RecordGroup(roundedDate, ArrayList(0)),
+            RecordGroup.dateReverseComparator
+        )
+    }
+
+    /**
      * 找到record在组中的位置。要求record必须存在于组中，且list按照时间排序好。而判断record的依据是ID相等。
      * @return Pair<index_of_section, position_in_section>
      */
     private fun requireRecordIndex(record: Record, list: MutableList<RecordGroup>): Pair<Int, Int> {
-        val roundedDateOfRecord = roundToDay(record.date)
-        val index = list.binarySearch(
-            RecordGroup(roundedDateOfRecord, ArrayList(0)),
-            RecordGroup.dateReverseComparator
-        )
+//        val roundedDateOfRecord = roundToDay(record.date)
+//        val index = list.binarySearch(
+//            RecordGroup(roundedDateOfRecord, ArrayList(0)),
+//            RecordGroup.dateReverseComparator
+//        )
+        val index = findRecordGroupIndex(record, list)
         if (index < 0) {
             throw RuntimeException("The record to be deleted is not in the list.")
         }
@@ -145,7 +157,8 @@ class DatabaseModel: ViewModel() {
         var recordIsFound = false
         var positionInSection = 0
 
-        // 由于组内数量少，所以这里的还是很快的
+        // Find index inside the group
+        // This is O(n) but the data set is so small (like less than 5) so it's effective
         currentGroup.forEachIndexed { thisIndex, thisRecord ->
             if (thisRecord.ID!! == record.ID!!) {
                 recordIsFound = true
@@ -259,73 +272,98 @@ class DatabaseModel: ViewModel() {
      * 更新一个不完整的记录。
      * 由于记录之前不在home界面，所以去查找更新会导致requireRecordIndex设计的运行时异常。
      */
-    fun updateIncompleteRecord(record: Record, sectionAdapter: SectionAdapter) {
-        GlobalScope.launch(Dispatchers.IO) {
-            // Update database
-            AppDatabase.updateRecord(record)
-
-            if (record.isComplete()) {
-                val list = requireGroupedRecords()
-                val roundedDate = roundToDay(record.date)
-                val index = list.binarySearch(
-                    RecordGroup(roundedDate, ArrayList(0)),
-                    RecordGroup.dateReverseComparator
-                )
-
-                // 2021-06-01 22:58:19
-                // A little bit in hurry
-                // God bless me!!!!
-                if (index < 0) {
-                    // Time to insert a new group
-                    val newGroup = RecordGroup(roundedDate, arrayListOf(record.getCopy()))
-                    val i = -(index + 1)
-                    list.add(i, newGroup)
-                    withContext(Dispatchers.Main) {
-                        sectionAdapter.notifyItemInserted(i)
-                        sectionAdapter.notifyItemRangeChanged(i, list.size)
-                    }
-                } else {
-                    // insert into the group
-                    val group = list[index]
-                    var indexToInsert = group.records.binarySearch(record, Record.dateReverseComparator)
-                    if (indexToInsert < 0) {
-                        indexToInsert = -(indexToInsert + 1)
-                    }
-                    group.records.add(indexToInsert, record.getCopy())
-                    withContext(Dispatchers.Main) {
-                        sectionAdapter.notifyItemChanged(index)
-                    }
-                }
-            }
-
-            // Update view
-            withContext(Dispatchers.Main) {
-                checkModificationEffectsOnInboxSections(record, DataModificationMethod.UPDATE)
-            }
-        }
-    }
+//    fun updateIncompleteRecord(record: Record, sectionAdapter: SectionAdapter) {
+//        GlobalScope.launch(Dispatchers.IO) {
+//            // Update database
+//            AppDatabase.updateRecord(record)
+//
+//            if (record.isComplete()) {
+//                val list = requireGroupedRecords()
+//                val roundedDate = roundToDay(record.date)
+//                val index = list.binarySearch(
+//                    RecordGroup(roundedDate, ArrayList(0)),
+//                    RecordGroup.dateReverseComparator
+//                )
+//
+//                // 2021-06-01 22:58:19
+//                // A little bit in hurry
+//                // God bless me!!!!
+//                if (index < 0) {
+//                    // Time to insert a new group
+//                    val newGroup = RecordGroup(roundedDate, arrayListOf(record.getCopy()))
+//                    val i = -(index + 1)
+//                    list.add(i, newGroup)
+//                    withContext(Dispatchers.Main) {
+//                        sectionAdapter.notifyItemInserted(i)
+//                        sectionAdapter.notifyItemRangeChanged(i, list.size)
+//                    }
+//                } else {
+//                    // insert into the group
+//                    val group = list[index]
+//                    var indexToInsert = group.records.binarySearch(record, Record.dateReverseComparator)
+//                    if (indexToInsert < 0) {
+//                        indexToInsert = -(indexToInsert + 1)
+//                    }
+//                    group.records.add(indexToInsert, record.getCopy())
+//                    withContext(Dispatchers.Main) {
+//                        sectionAdapter.notifyItemChanged(index)
+//                    }
+//                }
+//            }
+//
+//            // Update view
+//            withContext(Dispatchers.Main) {
+//                checkModificationEffectsOnInboxSections(record, DataModificationMethod.UPDATE)
+//            }
+//        }
+//    }
 
     /**
      * 更新主页面中的record记录。如果有newRecord则需要替换，否则单纯进行刷新。
      */
-    // 已经发现了一个问题
     fun updateRecord(section: Int, position: Int, sectionAdapter: SectionAdapter, newRecord: Record? = null) {
         GlobalScope.launch(Dispatchers.IO) {
             val groupedRecords = requireGroupedRecords()
             val group = groupedRecords[section]
 
-            if (newRecord != null) {
-                group.records[position] = newRecord
-            }
-
-            val recordToUpdate = group.records[position]
+            // If new record is not provided, we assume that the record is modified by reference
+            val recordToUpdate = newRecord ?: group.records[position]
 
             // Update database
             AppDatabase.updateRecord(recordToUpdate)
 
             // Update view
+            // 2021-06-02 15:11:41
+            // If the date is changed, we should move this record to another position
+            // So we take a delete-then-insert strategy
             withContext(Dispatchers.Main) {
-                sectionAdapter.notifySingleItemChanged(section, position)
+//                sectionAdapter.notifySingleItemChanged(section, position)
+                var index = findRecordGroupIndex(recordToUpdate, groupedRecords)
+
+                // Stage 1: delete record
+                group.records.removeAt(position)
+                sectionAdapter.notifyItemChanged(section)
+
+                // Stage 2: insert record
+                // If the record is now in a group that exists, we insert into the group
+                if (index >= 0) {
+                    groupedRecords[index].records.apply {
+                        add(recordToUpdate)
+                        sortWith(Record.dateReverseComparator)
+                    }
+                    // We don't care whether index == section
+                    // If that is the case, we just waste a single update action (which is cheap)
+                    sectionAdapter.notifyItemChanged(index)
+                }
+                // If the record is in a new group, we create one to insert
+                else {
+                    index = -(index + 1)
+                    val roundedDate = roundToDay(recordToUpdate.date)
+                    val newGroup = RecordGroup(roundedDate, arrayListOf(recordToUpdate))
+                    groupedRecords.add(index, newGroup)
+                    sectionAdapter.notifyItemInserted(index)
+                }
+
                 checkModificationEffectsOnInboxSections(recordToUpdate, DataModificationMethod.UPDATE)
             }
         }
