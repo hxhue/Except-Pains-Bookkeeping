@@ -208,7 +208,7 @@ class RecordDetailFragment:
         view.detail_star.isChecked = bindingRecord.starred
 
         // 更新日期和时间
-        val date = bindingRecord.mDate
+        val date = bindingRecord.date
         val cal = Calendar.getInstance()
         cal.time = date
 
@@ -226,7 +226,7 @@ class RecordDetailFragment:
         // 更新金额组件显示
         val moneyText = view.findViewById<EditText>(R.id.detail_money_text)
         moneyText.apply {
-            setText(bindingRecord.moneyAmount.toString())
+            setText(bindingRecord.money.toString())
             setSelection(text.length)
         }
 
@@ -460,7 +460,7 @@ class RecordDetailFragment:
     private fun setTime(view: View, hourOfDay: Int, minuteOfHour: Int) {
         // 保存记录
         val bindingRecord = getBindingRecord()
-        bindingRecord.mDate.let { date ->
+        bindingRecord.date.let { date ->
             val cal = Calendar.getInstance()
             // 和设置timeInMills是等效的，可以点进去看jdk的实现。不会影响到date这个参数
             cal.time = date
@@ -482,13 +482,13 @@ class RecordDetailFragment:
         val bindingRecord = getBindingRecord()
         // 生成日期数据
         val cal = Calendar.getInstance()
-        cal.timeInMillis = bindingRecord.mDate.time
+        cal.timeInMillis = bindingRecord.date.time
         cal.set(year, month, dayOfMonth)
         // 保存记录
-        bindingRecord.mDate.time = cal.timeInMillis
+        bindingRecord.date.time = cal.timeInMillis
         // 更新视图
         val dateText = view.findViewById<EditText>(R.id.detail_date_text)
-        dateText.setText(Fmt.date.format(bindingRecord.mDate))
+        dateText.setText(Fmt.date.format(bindingRecord.date))
     }
 
     /**
@@ -549,7 +549,7 @@ class RecordDetailFragment:
         val bindingRecord = getBindingRecord()
 
         // 拉取金额
-        bindingRecord.moneyAmount = try {
+        bindingRecord.money = try {
             val money = detail_money_text.text.toString().toDouble()
             // 格式化金额
             val format = DecimalFormat("0.##")

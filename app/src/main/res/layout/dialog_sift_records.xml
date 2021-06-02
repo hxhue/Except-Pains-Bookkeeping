@@ -66,7 +66,7 @@
             android:id="@+id/dateRangeTextView"
             android:layout_width="wrap_content"
             android:layout_height="49dp"
-            android:layout_below="@id/expenseTypeChipGroup"
+            android:layout_below="@id/typeScrollView"
             android:layout_alignParentStart="true"
             android:layout_marginStart="24dp"
             android:layout_marginTop="12dp"
@@ -103,25 +103,35 @@
             android:layout_marginBottom="0dp"
             android:text="@string/select_all_btn" />
 
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/expenseTypeChipGroup"
+        <ScrollView
+            android:id="@+id/typeScrollView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="200dp"
             android:layout_below="@id/expenseTypeTextView"
             android:layout_alignStart="@+id/expenseTypeTextView"
             android:layout_alignEnd="@+id/selectAllCategoriesBtn"
             android:layout_marginStart="0dp"
-            android:layout_marginEnd="0dp"
-            app:singleLine="false"
-            app:singleSelection="false">
+            android:layout_marginEnd="0dp">
 
-        </com.google.android.material.chip.ChipGroup>
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/expenseTypeChipGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                app:singleLine="false"
+                app:singleSelection="false">
+
+            </com.google.android.material.chip.ChipGroup>
+
+        </ScrollView>
+
+
 
         <Button
             android:id="@+id/setDateRangeButton"
             android:layout_width="wrap_content"
             android:layout_height="49dp"
-            android:layout_below="@id/expenseTypeChipGroup"
+            android:layout_below="@id/typeScrollView"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="24dp"
             android:layout_marginTop="12dp"

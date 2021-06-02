@@ -311,7 +311,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
 
     private fun discardDatePickerWidget() {
         // Set data
-        ledgerRecord.mDate = Date()
+        ledgerRecord.date = Date()
 
         // Set the view
         val view = findViewById<View>(R.id.qa_date_compo)
@@ -330,16 +330,15 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
 
     private fun discardTimePickerWidget() {
         // Set data
-        ledgerRecord.mDate.let { date ->
+        ledgerRecord.date.apply {
             val cal = Calendar.getInstance()
-            val h = cal.get(Calendar.HOUR_OF_DAY)
-            val m = cal.get(Calendar.MINUTE)
 
-            // After fetching current time, calendar can be reset
-            cal.timeInMillis = date.time
-            cal.set(Calendar.HOUR_OF_DAY, h)
-            cal.set(Calendar.MINUTE, m)
-            date.time = cal.timeInMillis
+            // 2021-06-01 23:14:06 fix：超过12点的部分被截断
+            // just clear seconds and milliseconds
+            cal.clear(Calendar.MILLISECOND)
+            cal.clear(Calendar.SECOND)
+            this.time = cal.timeInMillis
+            Log.i("record", "[qaction] Date of this record: ${this.toString()}")
         }
 
         // Set the view
@@ -390,7 +389,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         val formatString = "%02d:%02d"
         timeText.setText(String.format(formatString, hour, minute))
 
-        ledgerRecord.mDate.let { date ->
+        ledgerRecord.date.let { date ->
             // hour和minute已经取得，因此cal可以重用了
             cal.timeInMillis = date.time
             cal.set(Calendar.HOUR_OF_DAY, hour)
@@ -403,7 +402,7 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         // Create a dialog and add it into callback
         val dialog = TimePickerDialog(this, R.style.Theme_Dialog_WithOurColors, { picker, h, m ->
             // Save the time
-            ledgerRecord.mDate.let { date ->
+            ledgerRecord.date.let { date ->
                 val tempCalender = Calendar.getInstance()
                 tempCalender.timeInMillis = date.time
                 tempCalender.set(Calendar.HOUR_OF_DAY, h)
@@ -436,17 +435,17 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
 
         // 设置默认日期为今日
         val dateOfNow = Date()
-        ledgerRecord.mDate = dateOfNow
+        ledgerRecord.date = dateOfNow
         dateText.setText(Fmt.date.format(dateOfNow))
 
         // 添加按钮回调
         val dialog = DatePickerDialog(this, R.style.Theme_Dialog_WithOurColors)
         dialog.setOnDateSetListener { _, year, month, dayOfMonth ->
             val cal = Calendar.getInstance()
-            cal.timeInMillis = ledgerRecord.mDate.time
+            cal.timeInMillis = ledgerRecord.date.time
             cal.set(year, month, dayOfMonth)
-            ledgerRecord.mDate.time = cal.timeInMillis
-            dateText.setText(Fmt.date.format(ledgerRecord.mDate))
+            ledgerRecord.date.time = cal.timeInMillis
+            dateText.setText(Fmt.date.format(ledgerRecord.date))
         }
 
         dialog.setOnShowListener {
@@ -488,29 +487,30 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
 
         // Money amount
         try {
-            rec.moneyAmount = moneyEditText.text.toString().toDouble()
-            if (rec.moneyAmount == 0.0) {
-                rec.moneyAmount = -0.0
+            rec.money = moneyEditText.text.toString().toDouble()
+            if (rec.money == 0.0) {
+                rec.money = -0.0
             } else {
                 // 格式化金额
                 val format = DecimalFormat("0.##")
                 format.roundingMode = RoundingMode.FLOOR
-                rec.moneyAmount = format.format(rec.moneyAmount).toDouble()
+                rec.money = format.format(rec.money).toDouble()
             }
         } catch (e: Exception) {
-            rec.moneyAmount = -0.0
+            rec.money = -0.0
         }
 
         // Star status
         rec.starred = starToggleButton.isChecked
 
+        rec.screenshot?.let {
+            val screenshotPath = ScreenshotUtils.saveToSandbox(this, it)
+            rec.screenshot = null
+            rec.screenshotPath = screenshotPath
+        }
+
         // Print the record to trace and debug the procedure
         Log.d("************************ Save record", "$ledgerRecord")
-
-        rec.screenshot?.let {
-            ScreenshotUtils.saveToSandbox(this, it)
-            rec.screenshot = null
-        }
 
         // 同步插入数据库（因为这个活动马上就要停止，如果不同步插入可能会插入失败）
         AppDatabase.insertRecord(rec)
