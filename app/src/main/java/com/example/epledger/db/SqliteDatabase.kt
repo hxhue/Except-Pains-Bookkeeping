@@ -10,7 +10,7 @@ import java.lang.RuntimeException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
-class SqliteDatabase(context: Context) : LedgerDatabase {
+class SqliteDatabase(context: Context) : LedgerDatabase() {
     val im = ImportDataFromExcel(context)
     private val simpleFormat = SimpleDateFormat("yyyy/MM/dd hh:mm", Locale.US)
 
@@ -151,6 +151,7 @@ class SqliteDatabase(context: Context) : LedgerDatabase {
         val sqLiteDatabase: SQLiteDatabase = im.dbHelper.getWritableDatabase()
 
         // Just for sure, we check if the record is in database
+        // Checking: step 1
         if (record.ID == null) {
             throw RuntimeException("This record have null ID")
         }

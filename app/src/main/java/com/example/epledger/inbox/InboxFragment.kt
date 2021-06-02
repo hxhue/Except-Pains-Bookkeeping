@@ -158,11 +158,11 @@ class InboxFragment : Fragment() {
      * @param onRecordSubmitListener 是在提交时提供的回调。
      * @param deleteEntryAfterSubmit 决定是否在调用onRecordSubmitRunnable.run()之后删除该项。
      */
-    private fun setUpRecyclerView(recyclerView: RecyclerView,
-                                  onRecordSubmitListener: OnRecordSubmitListener,
-                                  deleteEntryAfterSubmit: Boolean,
-                                  entryWasShownInHomePage: Boolean,
-                                  entryEditingOnOpen: Boolean = false
+    private fun setUpRecyclerView(
+        recyclerView: RecyclerView,
+        onRecordSubmitListener: OnRecordSubmitListener,
+        deleteEntryAfterSubmit: Boolean,
+        entryWasShownInHomePage: Boolean
     ) {
         val initialEntries = ArrayList<Record>(0)
         recyclerView.apply {
@@ -293,10 +293,11 @@ class InboxFragment : Fragment() {
         setUpRecyclerView(view.inbox_incomplete_recycler_view, object :
             OnRecordSubmitListener {
             override fun onRecordSubmit(adapter: EntryAdapter, record: Record) {
-                // todo: check this updateRecord method
-                // 2021-05-29 06:37:10
-                dbModel.updateIncompleteRecord(record,
-                    this@InboxFragment.requireActivity().asMainActivity().homeSectionAdapter!!)
+                // 2021-05-29 06:37:10 change insert to update
+                // 2021-06-02 09:39:50 change update back to insert:
+                //      because we've delete this record previously.
+                //      This is done by deleteEntryRunnable.
+                dbModel.insertRecord(record)
             }
         }, deleteEntryAfterSubmit = true, entryWasShownInHomePage = false)
     }
