@@ -17,7 +17,6 @@ import kotlin.collections.ArrayList
 
 class DatabaseModel: ViewModel() {
     // 对外开放的可观察属性
-    // TODO: 把接口中的ArrayList去掉
     val sources = MutableLiveData<MutableList<Source>>(ArrayList(0))
     val categories = MutableLiveData<MutableList<Category>>(ArrayList(0))
     val groupedRecords = MutableLiveData<MutableList<RecordGroup>>(ArrayList(0))
@@ -32,6 +31,13 @@ class DatabaseModel: ViewModel() {
         categories.postValue(ArrayList(0))
         groupedRecords.postValue(ArrayList(0))
         // todo: 更多数据
+    }
+
+    var databaseHasLoaded = false
+        private set
+
+    init {
+        reloadDatabase()
     }
 
     /**
@@ -64,6 +70,10 @@ class DatabaseModel: ViewModel() {
             groupedRecords.postValue(groupResult)
             incompleteRecords.postValue(incompleteRecordsToPost)
             starredRecords.postValue(starredRecordsToPost)
+
+            // So we can use this flag to indicate whether database is loading or already loaded
+            // That will be helpful for home page to know whether it should show an empty box picture
+            databaseHasLoaded = true
         }
     }
 
