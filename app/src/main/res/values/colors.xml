@@ -180,4 +180,14 @@
     <color name="barColor3">#aa96da</color>
     <color name="barColor4">#95e1d3</color>
 
+    <!--  pieColors  -->
+    <color name="pieColor1">#00b8a9</color>
+    <color name="pieColor2">#3282b8</color>
+    <color name="pieColor3">#f6416c</color>
+    <color name="pieColor4">#ff9a00</color>
+    <color name="pieColor5">#b693fe</color>
+    <color name="pieColor6">#3f72af</color>
+    <color name="pieColor7">#52616b</color>
+
+
 </resources>
