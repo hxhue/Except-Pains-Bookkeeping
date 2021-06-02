@@ -51,25 +51,12 @@ public class ImportDataFromExcel {
         dbHelper = new MySQLiteOpenHelper(c,"test");
         SQLiteDatabase db=dbHelper.getWritableDatabase();
 
-        Category[] categoriesToAdd = new Category[] {
-                new Category("Emergency", R.drawable.ic_fas_asterisk, 2),
-                new Category("Study", R.drawable.ic_fas_pencil_alt,3),
-                new Category("Food", R.drawable.ic_fas_utensils, 4),
-                new Category("Shopping", R.drawable.ic_fas_shopping_cart, 5),
-                new Category("Transportation", R.drawable.ic_fas_bus, 6),
-                new Category("Digital", R.drawable.ic_fas_mobile_alt, 7),
-                new Category("Coffee", R.drawable.ic_fas_coffee, 8),
-                new Category("Present", R.drawable.ic_fas_gift, 9),
-        };
+        List<Category> categoriesToAdd = Category.Companion.getDefaultCategories(mContext);
         for (Category item: categoriesToAdd) {
             AddNewType(db, item.getName(), item.getIconResID());
         }
 
-        Source[] sourcesToAdd = new Source[] {
-                new Source("Alipay", 1),
-                new Source("Wechat", 2),
-                new Source("Cash", 3),
-        };
+        List<Source> sourcesToAdd = Source.Companion.getDefaultSources(mContext);
         for (Source item: sourcesToAdd) {
             AddNewFrom(db, item.getName());
         }

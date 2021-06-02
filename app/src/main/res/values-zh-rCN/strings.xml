@@ -188,4 +188,15 @@
     <string name="select_all_btn">全选</string>
     <string name="home_page_the_records_are_empty">没有记录</string>
     <string name="inbox_page_no_need_to_handle">记录都已被处理</string>
+    <string name="alipay">支付宝</string>
+    <string name="wechat">微信</string>
+    <string name="cash">现金</string>
+    <string name="emergency">紧急</string>
+    <string name="study">学习</string>
+    <string name="shopping">购物</string>
+    <string name="digital">数码</string>
+    <string name="transportation">交通</string>
+    <string name="coffee">咖啡</string>
+    <string name="present">礼物</string>
+    <string name="food">餐饮</string>
 </resources>
