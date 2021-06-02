@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
         // Init AppDatabase
 //        AppDatabase = SqliteDatabase(this.applicationContext)
-        AppDatabase = MemoryDatabase()
+        AppDatabase = MemoryDatabase(this.applicationContext)
 
         // 禁用黑暗模式
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)

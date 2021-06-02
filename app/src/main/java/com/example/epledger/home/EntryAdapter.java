@@ -1,7 +1,6 @@
 package com.example.epledger.home;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +15,7 @@ import com.example.epledger.R;
 import com.example.epledger.db.DatabaseModel;
 import com.example.epledger.model.Record;
 import com.example.epledger.model.Category;
+import com.example.epledger.model.Source;
 
 import java.util.List;
 
@@ -44,24 +44,23 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
             mEntry = entry;
             Context ctx = itemView.getContext();
 
-            Drawable newImage = null;
-            for (Category category: dbModel.requireCategories()) {
-                if (category.getName().equals(entry.getCategory())) {
-                    newImage = ContextCompat.getDrawable(ctx, category.getIconResID());
-                    break;
-                }
-            }
-            if (newImage == null) {
-                // 没有设置种类时
-                newImage = ContextCompat.getDrawable(ctx, R.drawable.ic_fas_times_circle);
-            }
-            labelImage.setImageDrawable(newImage);
+            Integer categoryID = entry.getCategoryID();
+            // Unboxing may produce 'NullPointerException' so we use try-catch
+            try {
+                Category category = dbModel.findCategory(categoryID);
+                labelImage.setImageDrawable((category == null) ?
+                        ContextCompat.getDrawable(ctx, R.drawable.ic_fas_times_circle) :
+                        ContextCompat.getDrawable(ctx, category.getIconResID()));
 
-            // Show category
-            final String categoryOfItem = mEntry.getCategory();
-            if (categoryOfItem != null && !categoryOfItem.trim().isEmpty()) {
-                labelText.setText(categoryOfItem);
-            } else {
+                if (!category.getName().trim().isEmpty()) {
+                    labelText.setText(category.getName());
+                } else {
+                    labelText.setText(R.string.no_category_provided);
+                }
+            } catch (NullPointerException e) {
+                labelImage.setImageDrawable(
+                        ContextCompat.getDrawable(ctx, R.drawable.ic_fas_times_circle)
+                );
                 labelText.setText(R.string.no_category_provided);
             }
 
@@ -86,7 +85,13 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
                 infoText.setText(R.string.no_memo_provided);
             }
 
-            categoryText.setText(mEntry.getSource());
+            Source source = null;
+            try {
+                int sourceID = mEntry.getSourceID();
+                categoryText.setText(dbModel.findSource(sourceID).getName());
+            } catch (NullPointerException e) {
+                categoryText.setText("");
+            }
         }
     }
 

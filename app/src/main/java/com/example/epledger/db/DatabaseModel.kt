@@ -16,6 +16,7 @@ import kotlinx.coroutines.*
 import java.lang.RuntimeException
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class DatabaseModel: ViewModel() {
     // 对外开放的可观察属性
@@ -26,7 +27,9 @@ class DatabaseModel: ViewModel() {
     val starredRecords = MutableLiveData<MutableList<Record>>(ArrayList(0))
 
     private val sourceMap = SparseArray<Source>(16)
+    private val sourceNameMap = HashMap<String, Source>(16)
     private val categoryMap = SparseArray<Category>(16)
+    private val categoryNameMap = HashMap<String, Category>(16)
 
     var databaseHasLoaded = false
         private set
@@ -52,17 +55,20 @@ class DatabaseModel: ViewModel() {
             }}")
 
             // Construct maps
-            sourceMap.apply {
-                clear()
-                for (source in sourceList) {
-                    append(source.ID!!, source)
-                }
+            sourceMap.clear()
+            sourceNameMap.clear()
+            categoryMap.clear()
+            categoryNameMap.clear()
+
+            for (source in sourceList) {
+                val sourceCopy = source.copy()
+                sourceMap.append(source.ID!!, sourceCopy)
+                sourceNameMap[source.name] = sourceCopy
             }
-            categoryMap.apply {
-                clear()
-                for (category in categoryList) {
-                    append(category.ID!!, category)
-                }
+            for (category in categoryList) {
+                val categoryCopy = category.copy()
+                categoryMap.append(category.ID!!, categoryCopy)
+                categoryNameMap[category.name] = categoryCopy
             }
 
             sources.postValue(sourceList)
@@ -160,7 +166,7 @@ class DatabaseModel: ViewModel() {
         // Find index inside the group
         // This is O(n) but the data set is so small (like less than 5) so it's effective
         currentGroup.forEachIndexed { thisIndex, thisRecord ->
-            if (thisRecord.ID!! == record.ID!!) {
+            if (thisRecord.id!! == record.id!!) {
                 recordIsFound = true
                 positionInSection = thisIndex
                 return@forEachIndexed
@@ -194,7 +200,7 @@ class DatabaseModel: ViewModel() {
             val record = group.records[position]
 
             // 在外存中删除
-            AppDatabase.deleteRecordByID(record.ID!!)
+            AppDatabase.deleteRecordByID(record.id!!)
 
             // 如果该组有多个元素则删除单个元素即可
             if (group.records.size > 1) {
@@ -228,7 +234,7 @@ class DatabaseModel: ViewModel() {
 
             // 插入记录到数据库
             val newID = AppDatabase.insertRecord(record)
-            record.ID = newID
+            record.id = newID
 
             // 插入数据到主存并更新信息
             val roundedDate = roundToDay(record.date)
@@ -326,6 +332,7 @@ class DatabaseModel: ViewModel() {
             AppDatabase.deleteCategoryByID(id)
 
             // modify map
+            categoryNameMap.remove(categoryMap[id].name)
             categoryMap.delete(id)
 
             withContext(Dispatchers.Main) {
@@ -359,6 +366,7 @@ class DatabaseModel: ViewModel() {
 
             // modify map
             categoryMap.put(category.ID!!, category)
+            categoryNameMap[category.name] = category
 
             withContext(Dispatchers.Main) {
                 // Update in memory
@@ -387,8 +395,14 @@ class DatabaseModel: ViewModel() {
             // Update in database
             AppDatabase.updateCategory(category)
 
-            // modify map
+            // Categories in map should be separate from the arguments outside
+            // So the map still have old versions which has their name information
+            val originalCategory = categoryMap[category.ID!!]
+            categoryNameMap.remove(originalCategory.name)
+
+            // After removal of Name-Category pair, we insert or update new data
             categoryMap[category.ID!!] = category
+            categoryNameMap[category.name] = category
 
             // To avoid concurrent access exception
             withContext(Dispatchers.Main) {
@@ -418,8 +432,12 @@ class DatabaseModel: ViewModel() {
         GlobalScope.launch(Dispatchers.IO) {
             AppDatabase.updateSource(source)
 
-            // modify map
+            // Sources in map should be separate from the arguments outside
+            // So the map still have old versions which has their name information
+            val originalSource = sourceMap[source.ID!!]
+            sourceNameMap.remove(originalSource.name)
             sourceMap[source.ID!!] = source
+            sourceNameMap[source.name] = source
 
             withContext(Dispatchers.Main) {
                 val requiredSources = requireSources()
@@ -447,6 +465,7 @@ class DatabaseModel: ViewModel() {
 
             // modify map
             sourceMap.put(source.ID!!, source)
+            sourceNameMap[source.name] = source
 
             withContext(Dispatchers.Main) {
                 requireSources().add(source)
@@ -466,6 +485,8 @@ class DatabaseModel: ViewModel() {
         GlobalScope.launch(Dispatchers.IO) {
             AppDatabase.deleteSourceByID(id)
 
+            val sourceName = sourceMap[id].name
+            sourceNameMap.remove(sourceName)
             sourceMap.delete(id)
 
             withContext(Dispatchers.Main) {
@@ -496,12 +517,36 @@ class DatabaseModel: ViewModel() {
         incompleteRecords.postValue(incompleteRecords.value)
     }
 
-    fun findSourceByID(id: Int): Source? {
-        return sourceMap.get(id)
+    fun findSource(id: Int): Source? {
+        val source = sourceMap.get(id)
+        if (source != null) {
+            return source.copy()
+        }
+        return null
     }
 
-    fun findCategoryByID(id: Int): Category? {
-        return categoryMap.get(id)
+    fun findCategory(id: Int): Category? {
+        val category = categoryMap.get(id)
+        if (category != null) {
+            return category.copy()
+        }
+        return null
+    }
+
+    fun findSource(name: String): Source? {
+        val source = sourceNameMap[name]
+        if (source != null) {
+            return source.copy()
+        }
+        return null
+    }
+
+    fun findCategory(name: String): Category? {
+        val category = categoryNameMap[name]
+        if (category != null) {
+            return category.copy()
+        }
+        return null
     }
 
     /**

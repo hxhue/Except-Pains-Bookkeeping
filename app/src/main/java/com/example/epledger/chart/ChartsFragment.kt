@@ -11,8 +11,10 @@ import androidx.core.util.Pair
 import androidx.core.view.get
 import androidx.core.view.size
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.example.epledger.R
 import com.example.epledger.db.AppDatabase
+import com.example.epledger.db.DatabaseModel
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.AxisBase
@@ -29,6 +31,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import com.example.epledger.model.Record
+import java.lang.RuntimeException
 import kotlin.collections.HashMap
 
 class ChartsFragment: Fragment() {
@@ -44,6 +47,10 @@ class ChartsFragment: Fragment() {
     private lateinit var siftBtn:Button
     private lateinit var catNames:List<String>
     private lateinit var srcNames:List<String>
+
+    // This is a database model used for accessing running data.
+    // But do not use it without knowing what it's truly for.
+    private val dbModel: DatabaseModel by activityViewModels()
 
     var dateRangePicker=
             MaterialDatePicker.Builder.dateRangePicker()
@@ -226,7 +233,14 @@ class ChartsFragment: Fragment() {
         Toast.makeText(context,billList.size.toString(),Toast.LENGTH_SHORT).show()
         val typeSumMap=HashMap<String,Double>()
         for(bill in billList){
-            bill.category?.let { typeSumMap.put(it,typeSumMap.getOrDefault(bill.category!!, 0.0)?.plus(bill.money)) }
+            bill.categoryID?.let {
+                val categoryName = dbModel.findCategory(it)?.name
+                    ?: throw RuntimeException("Category with given ID cannot be found.")
+
+                typeSumMap.put(categoryName,
+                    typeSumMap.getOrDefault(categoryName, 0.0).plus(bill.money)
+                )
+            }
         }
 
         val entries: MutableList<PieEntry> = ArrayList()
