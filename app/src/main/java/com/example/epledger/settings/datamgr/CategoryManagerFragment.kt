@@ -72,7 +72,7 @@ class CategoryManagerFragment: NavigationFragment() {
     }
 
     private fun setUpModel(view: View) {
-        dbModel.categories.observe(viewLifecycleOwner) {
+        dbModel.categories.observeForever {
             recyclerViewAdapter.categoryList = it
             recyclerViewAdapter.notifyDataSetChanged()
         }

@@ -63,7 +63,7 @@ class SourceManagerFragment: NavigationFragment() {
     }
 
     private fun setUpModel(view: View) {
-        dbModel.sources.observe(viewLifecycleOwner) {
+        dbModel.sources.observeForever {
             // Update sourceList when reference changes
             recyclerViewAdapter.sourceList = it
             recyclerViewAdapter.notifyDataSetChanged()
