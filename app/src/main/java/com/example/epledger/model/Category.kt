@@ -10,6 +10,11 @@ data class Category(
     var iconResID: Int = R.drawable.ic_far_bookmark,
     var ID: Int? = null
 ) {
+    fun copyAllExceptID(from: Category) {
+        this.name = from.name
+        this.iconResID = from.iconResID
+    }
+
     companion object {
         fun getDefaultCategories(context: Context): MutableList<Category> {
             return arrayListOf(

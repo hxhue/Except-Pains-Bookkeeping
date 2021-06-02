@@ -43,16 +43,14 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // init AppDatabase
-        AppDatabase = SqliteDatabase(this.applicationContext)
-//        AppDatabase = MemoryDatabase()
+        // Init AppDatabase
+//        AppDatabase = SqliteDatabase(this.applicationContext)
+        AppDatabase = MemoryDatabase()
 
         // 禁用黑暗模式
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
         // 界面初始化
-        // Handler.post may fix the problem of frame skipping?
-        // Not for ChartsFragment though.
         setupViews()
 
         // 加载其他模块

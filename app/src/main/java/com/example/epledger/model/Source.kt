@@ -7,6 +7,10 @@ data class Source(
     var name: String,
     var ID: Int? = null
 ) {
+    fun copyAllExceptID(from: Source) {
+        this.name = from.name
+    }
+
     companion object {
         fun getDefaultSources(context: Context): MutableList<Source> {
             return arrayListOf(
