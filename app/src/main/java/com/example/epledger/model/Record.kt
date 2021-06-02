@@ -33,62 +33,6 @@ class Record() : Parcelable{
                 "note=$note, starred=$starred)"
     }
 
-    /*override fun getEntryId(): Int {
-        return ID!!.toInt()
-    }
-
-    override fun setEntryId(id: Int) {
-        this.ID = id.toLong()
-    }
-
-    override fun getAmount(): Double {
-        return this.moneyAmount!!
-    }
-
-    override fun setAmount(amount: Double) {
-        this.moneyAmount = amount
-    }
-
-    override fun getLabel(): String? {
-        return this.category
-    }
-
-    override fun setLabel(label: String?) {
-        this.category = label!!
-    }
-
-    override fun getInfo(): String? {
-        return this.note
-    }
-
-    override fun setInfo(info: String?) {
-        this.note = info!!
-    }
-
-    override fun getEntrySource(): String? {
-        return this.source
-    }
-
-    override fun setEntrySource(source: String?) {
-        this.source = source!!
-    }
-
-    override fun getDate(): Date {
-        return this.mDate
-    }
-
-    override fun setDate(date: Date) {
-        this.mDate = date
-    }
-
-    override fun getEntryCategory(): String? {
-        return this.category
-    }
-
-    override fun setEntryCategory(s: String) {
-        this.category = s
-    }*/
-
     fun getCopy(): Record {
         val another = Record()
         copyTo(another)
@@ -126,7 +70,7 @@ class Record() : Parcelable{
      * 判断一个记录是否不完整。
      */
     fun isComplete(): Boolean {
-        return (money != 0.0 && money != -0.0) && category != null
+        return (money != 0.0 && money != -0.0) && (!category.isNullOrBlank())
     }
 
     companion object CREATOR : Parcelable.Creator<Record> {

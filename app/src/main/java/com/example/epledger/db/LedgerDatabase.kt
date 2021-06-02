@@ -1,5 +1,7 @@
 package com.example.epledger.db
 
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.MutableLiveData
 import com.example.epledger.R
 import com.example.epledger.model.Category
 import com.example.epledger.model.Record
@@ -11,108 +13,120 @@ import kotlin.collections.ArrayList
 
 /**
  * 数据库的接口。
- * TODO: 增加Context参数
  * 下面接口的实现中不必考虑异步问题，只需给出同步实现，异步部分在接口外做。
  * 默认的排序方式是时间的倒序：时间越大越靠前。
  */
-interface LedgerDatabase {
+abstract class LedgerDatabase {
+    private val latestAccessTime = MutableLiveData<Date>(Date())
+
+    fun updateAccessTime() {
+        latestAccessTime.postValue(Date())
+    }
+
+    fun observe(owner: LifecycleOwner, observer: androidx.lifecycle.Observer<Date>) {
+        latestAccessTime.observe(owner, observer)
+    }
+
     /**
      * 从数据库中获取按照日期排序的记录。时间越靠近现在，排序后的位置越靠前。
      * 注意：查询结果中不包含不完整的记录。
      */
-    fun getRecordsOrderByDate(): List<Record>
+    abstract fun getRecordsOrderByDate(): List<Record>
 
     /**
      * 类似getRecordsOrderByDate，但结果中只包含不完整的记录。
      */
-    fun getIncompleteRecordsOrderByDate(): MutableList<Record>
+    abstract fun getIncompleteRecordsOrderByDate(): MutableList<Record>
 
     /**
      * 找出所有标星的记录，按照时间排列（排列规则同上）。
      * 注意：查询结果中不包含不完整的记录。
      */
-    fun getStarredRecords(): MutableList<Record>
-
-//    /**
-//     * 找出所有含有截图的记录，按照时间排列。
-//     */
-//    fun getRecordsWithPic(): MutableList<Record>
+    abstract fun getStarredRecords(): MutableList<Record>
 
     /**
      * 向数据库中插入一条记录，插入后返回id。由于指针有引用性，不要对这个参数做任何修改。
      */
-    fun insertRecord(record: Record): Long
+    abstract fun insertRecord(record: Record): Long
 
     /**
      * 通过给定的ID删除一条记录。
      */
-    fun deleteRecordByID(id: Long)
+    abstract fun deleteRecordByID(id: Long)
 
     /**
      * 更新一条记录。id就是传入参数中的id。由于指针有引用性，不要对这个参数做任何修改。
      */
-    fun updateRecord(record: Record)
+    abstract fun updateRecord(record: Record)
 
     /**
      * 获取所有的来源记录。
      */
-    fun getAllSources(): MutableList<Source>
+    abstract fun getAllSources(): MutableList<Source>
 
     /**
      * 获取所有的种类记录。
      */
-    fun getAllCategories(): MutableList<Category>
+    abstract fun getAllCategories(): MutableList<Category>
 
     /**
      *  根据开始日期、结束日期、Source和Category查询Records，用于chart模块
      */
-    fun siftRecords(dateStart:Date,dateEnd:Date,sources:ArrayList<String>,categories:ArrayList<String>): MutableList<Record>
+    abstract fun siftRecords(dateStart:Date,dateEnd:Date,sources:ArrayList<String>,categories:ArrayList<String>): MutableList<Record>
 
-    fun getAllSourceNames(): MutableList<String>
+    abstract fun getAllSourceNames(): MutableList<String>
 
-    fun getAllCategoryNames(): MutableList<String>
+    abstract fun getAllCategoryNames(): MutableList<String>
 
     /**
      * 向数据库中插入一条新的种类。返回插入好后的id。
      */
-    fun insertCategory(category: Category): Int
+    abstract fun insertCategory(category: Category): Int
 
     /**
      * 更新数据库中的种类。
      */
-    fun updateCategory(category: Category)
+    abstract fun updateCategory(category: Category)
 
     /**
      * 删除数据库中的一条种类。
      */
-    fun deleteCategoryByID(id: Int)
+    abstract fun deleteCategoryByID(id: Int)
 
     /**
      * 向数据库中插入一条新的来源（账户）信息。返回插入好后的id。
      */
-    fun insertSource(source: Source): Int
+    abstract fun insertSource(source: Source): Int
 
     /**
      * 更新数据库中的来源（账户）信息。
      */
-    fun updateSource(source: Source)
+    abstract fun updateSource(source: Source)
 
     /**
      * 删除数据库中的一条来源（账户）信息。
      */
-    fun deleteSourceByID(id: Int)
+    abstract fun deleteSourceByID(id: Int)
 
 }
 
 /**
  * 应用使用的数据库。
  */
-lateinit var AppDatabase: LedgerDatabase
+private lateinit var AppDatabaseContent: LedgerDatabase
+var AppDatabase: LedgerDatabase
+    get() {
+        AppDatabaseContent.updateAccessTime()
+        return AppDatabaseContent
+    }
+    set(value) {
+        AppDatabaseContent = value
+    }
 
 /**
  * 内存中数据库的模拟。有相同的接口。
  */
-class MemoryDatabase : LedgerDatabase {
+class MemoryDatabase : LedgerDatabase() {
 
     var currentId: Long = 20
 
@@ -169,14 +183,6 @@ class MemoryDatabase : LedgerDatabase {
                 .forEach { result.add(it) }
         return result
     }
-
-//    override fun getRecordsWithPic(): MutableList<Record> {
-//        val result = ArrayList<Record>(0)
-//        records.filter { !it.screenshotPath.isNullOrBlank() }
-//            .sortedWith(Record.dateReverseComparator)
-//            .forEach { result.add(it) }
-//        return result
-//    }
 
     override fun insertRecord(record: Record): Long {
         val recordToInsert = record.getCopy()
