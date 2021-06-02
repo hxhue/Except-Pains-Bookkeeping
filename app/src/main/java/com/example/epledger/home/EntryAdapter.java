@@ -66,15 +66,15 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
             }
 
             // Show money
-            if (mEntry.getMoneyAmount() == 0 || mEntry.getMoneyAmount() == -0) {
+            if (mEntry.getMoney() == 0 || mEntry.getMoney() == -0) {
                 amountText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.amount_not_provided_color));
                 amountText.setText("￥0.00");
-            } else if (mEntry.getMoneyAmount() > 0) {
+            } else if (mEntry.getMoney() > 0) {
                 amountText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.amount_income_color));
-                amountText.setText("+￥" + String.format("%.2f", Math.abs(mEntry.getMoneyAmount())));
+                amountText.setText("+￥" + String.format("%.2f", Math.abs(mEntry.getMoney())));
             } else  {
                 amountText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.amount_expand_color));
-                amountText.setText("-￥" + String.format("%.2f", Math.abs(mEntry.getMoneyAmount())));
+                amountText.setText("-￥" + String.format("%.2f", Math.abs(mEntry.getMoney())));
             }
 
             // Show info(or attached note)

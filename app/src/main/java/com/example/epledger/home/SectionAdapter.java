@@ -142,10 +142,11 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.ViewHold
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.section_item, parent, false);
 
-        // 设置嵌套在内部的recyclerView以防止奇怪的动画出现
+        // 设置嵌套在内部的recyclerView
         // https://stackoverflow.com/a/45579654/13785815
-        RecyclerView innerRecyclerView = view.findViewById(R.id.section_rv);
-        innerRecyclerView.setHasFixedSize(true);
+//        RecyclerView innerRecyclerView = view.findViewById(R.id.section_rv);
+//        innerRecyclerView.setHasFixedSize(true);
+        // 2021-06-02 13:55:29 这会导致列表删除项目后高度无法变小
 
         return new ViewHolder(view, dbModel);
     }

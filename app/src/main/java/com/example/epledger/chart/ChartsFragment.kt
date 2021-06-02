@@ -197,11 +197,11 @@ class ChartsFragment: Fragment() {
         val typeSumMap=HashMap<String, Double>()
         if(costOrIncome){
             for(bill in billList){
-                if(bill.moneyAmount<0) bill.category?.let { typeSumMap.put(it, typeSumMap.getOrDefault(bill.category!!, 0.0)?.plus(bill.moneyAmount * (-1.0))) }
+                if(bill.money<0) bill.category?.let { typeSumMap.put(it, typeSumMap.getOrDefault(bill.category!!, 0.0)?.plus(bill.money * (-1.0))) }
             }
         }else{
             for(bill in billList){
-                    if(bill.moneyAmount>0) bill.category?.let { typeSumMap.put(it, typeSumMap.getOrDefault(bill.category!!, 0.0)?.plus(bill.moneyAmount)) }
+                    if(bill.money>0) bill.category?.let { typeSumMap.put(it, typeSumMap.getOrDefault(bill.category!!, 0.0)?.plus(bill.money)) }
             }
         }
 
@@ -370,9 +370,9 @@ class ChartsFragment: Fragment() {
         }
 
         for(record in billList){
-            if(record.moneyAmount<0){
-                val idx=(record.mDate.time-baseDate.time)/ONEDAY
-                mp[idx.toInt()]?.minus(record.moneyAmount)?.let { mp.put(idx.toInt(), it) }
+            if(record.money<0){
+                val idx=(record.date.time-baseDate.time)/ONEDAY
+                mp[idx.toInt()]?.minus(record.money)?.let { mp.put(idx.toInt(), it) }
             }
         }
         val entries=ArrayList<BarEntry>()

@@ -51,25 +51,12 @@ public class ImportDataFromExcel {
         dbHelper = new MySQLiteOpenHelper(c,"test");
         SQLiteDatabase db=dbHelper.getWritableDatabase();
 
-        Category[] categoriesToAdd = new Category[] {
-                new Category("Emergency", R.drawable.ic_fas_asterisk, 2),
-                new Category("Study", R.drawable.ic_fas_pencil_alt,3),
-                new Category("Food", R.drawable.ic_fas_utensils, 4),
-                new Category("Shopping", R.drawable.ic_fas_shopping_cart, 5),
-                new Category("Transportation", R.drawable.ic_fas_bus, 6),
-                new Category("Digital", R.drawable.ic_fas_mobile_alt, 7),
-                new Category("Coffee", R.drawable.ic_fas_coffee, 8),
-                new Category("Present", R.drawable.ic_fas_gift, 9),
-        };
+        List<Category> categoriesToAdd = Category.Companion.getDefaultCategories(mContext);
         for (Category item: categoriesToAdd) {
             AddNewType(db, item.getName(), item.getIconResID());
         }
 
-        Source[] sourcesToAdd = new Source[] {
-                new Source("Alipay", 1),
-                new Source("Wechat", 2),
-                new Source("Cash", 3),
-        };
+        List<Source> sourcesToAdd = Source.Companion.getDefaultSources(mContext);
         for (Source item: sourcesToAdd) {
             AddNewFrom(db, item.getName());
         }
@@ -279,8 +266,8 @@ public class ImportDataFromExcel {
                 Record b = new Record();
                 b.setID(cursor.getLong(cursor.getColumnIndex(MySQLiteOpenHelper.record_id)));
                 Date tmp=simpleFormat.parse(cursor.getString(cursor.getColumnIndex(MySQLiteOpenHelper.date1)));
-                b.setMDate(tmp);
-                b.setMoneyAmount(cursor.getDouble(cursor.getColumnIndex(MySQLiteOpenHelper.account)));
+                b.setDate(tmp);
+                b.setMoney(cursor.getDouble(cursor.getColumnIndex(MySQLiteOpenHelper.account)));
                 int type_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.type_id));
                 int from_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.from_id));
                 b.setSource( get_id_from(from_id,db));
