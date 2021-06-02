@@ -2,6 +2,7 @@ package com.example.epledger.db
 
 import com.example.epledger.R
 import com.example.epledger.model.Category
+import com.example.epledger.model.Filter
 import com.example.epledger.model.Record
 import com.example.epledger.model.Source
 import java.text.SimpleDateFormat
@@ -70,6 +71,11 @@ interface LedgerDatabase {
     fun getAllSourceNames(): MutableList<String>
 
     fun getAllCategoryNames(): MutableList<String>
+
+    /**
+     * 通过filter筛选记录，默认按日期从早到晚排序
+     */
+    fun filterRecords(filter: Filter): List<Record>
 
 }
 
@@ -207,5 +213,21 @@ class MemoryDatabase : LedgerDatabase {
     override fun getAllCategoryNames(): MutableList<String> {
         return arrayListOf("Emergency", "Study", "Food", "Shopping", "Transportation"
                 , "Digital", "Coffee", "Present")
+    }
+
+    // TODO: 现在还不知道应该用id还是string索引category和source，之后再改
+    override fun filterRecords(filter: Filter): List<Record> {
+        TODO()
+//        val result = ArrayList<Record>()
+//        records.filter { filter.minAmount <= it.moneyAmount &&
+//                it.moneyAmount <= filter.maxAmount &&
+//                filter.startDate <= it.mDate &&
+//                it.mDate <= filter.endDate &&
+//                filter.sources.contains(it.sourceId) &&
+//                filter.categories.contains(it.categoryId)
+//        }
+//                .sortedWith(Record.dateReverseComparator)
+//                .forEach {result.add(it)}
+//        return result
     }
 }
