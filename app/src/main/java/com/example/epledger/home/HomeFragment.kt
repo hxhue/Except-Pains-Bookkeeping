@@ -14,8 +14,13 @@ import com.example.epledger.asMainActivity
 import com.example.epledger.model.Record
 import com.example.epledger.detail.RecordDetailFragment
 import com.example.epledger.db.DatabaseModel
+import com.example.epledger.filter.FilterCategoriesViewModel
+import com.example.epledger.filter.FilterDialogFragment
+import com.example.epledger.filter.FilterSourcesViewModel
+import com.example.epledger.model.Filter
 //import com.example.epledger.model.Record
 import com.example.epledger.nav.NavigationFragment.Companion.pushToStack
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.page_home.view.*
 import java.lang.RuntimeException
@@ -24,6 +29,8 @@ class HomeFragment : Fragment() {
     private var mRecyclerView: RecyclerView? = null
     private var mSectionAdapter: SectionAdapter? = null
     private val dbModel by activityViewModels<DatabaseModel>()
+    private val filterCategoriesViewModel by activityViewModels<FilterCategoriesViewModel>()
+    private val filterSourcesViewModel by activityViewModels<FilterSourcesViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -130,5 +137,31 @@ class HomeFragment : Fragment() {
         menu.clear()
         inflater.inflate(R.menu.top_app_bar, menu)
         super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.sift -> {
+                val dialog = FilterDialogFragment()
+                dialog.setFilterSubmitListener(object : FilterDialogFragment.FilterSubmitListener {
+                    override fun onFilterSubmit(filter: Filter?) {
+                        // 筛选然后显示
+                        TODO("Not yet implemented")
+                    }
+                })
+                dialog.show(requireActivity().supportFragmentManager, null)
+                true
+            }
+            R.id.reset -> {
+                filterCategoriesViewModel.reset()
+                filterSourcesViewModel.reset()
+                // TODO
+                true
+            }
+            R.id.more -> {
+                true
+            }
+            else -> false
+        }
     }
 }

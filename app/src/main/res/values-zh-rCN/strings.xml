@@ -187,4 +187,10 @@
     <string name="confirm">确认</string>
     <string name="select_all_btn">全选</string>
     <string name="home_page_the_records_are_empty">记录为空</string>
+    <string name="filter_title">筛选</string>
+    <string name="from">co</string>
+    <string name="to">到</string>
+    <string name="date_range">日期范围</string>
+    <string name="amount_range">金额范围</string>
+    <string name="filter_incomplete_prompt">这个筛选条件不完整而不能提交。请完善筛选信息后提交。</string>
 </resources>
