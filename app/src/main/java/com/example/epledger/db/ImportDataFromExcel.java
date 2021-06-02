@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 //import android.support.v7.app.AppCompatActivity;
-import com.example.epledger.R;
 import com.example.epledger.model.Category;
 import com.example.epledger.model.Record;
 import com.example.epledger.model.Source;
@@ -264,14 +263,20 @@ public class ImportDataFromExcel {
 
             while (cursor.moveToNext()) {
                 Record b = new Record();
-                b.setID(cursor.getLong(cursor.getColumnIndex(MySQLiteOpenHelper.record_id)));
+                b.setId(cursor.getLong(cursor.getColumnIndex(MySQLiteOpenHelper.record_id)));
                 Date tmp=simpleFormat.parse(cursor.getString(cursor.getColumnIndex(MySQLiteOpenHelper.date1)));
                 b.setDate(tmp);
                 b.setMoney(cursor.getDouble(cursor.getColumnIndex(MySQLiteOpenHelper.account)));
                 int type_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.type_id));
                 int from_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.from_id));
-                b.setSource( get_id_from(from_id,db));
-                b.setCategory(get_id_type(type_id,db));
+//                b.setSource( get_id_from(from_id,db));
+//                b.setCategory(get_id_type(type_id,db));
+
+                // 2021-06-02 18:08:45
+                // Now these fields are of type (Int?)
+                b.setSourceID(from_id);
+                b.setCategoryID(type_id);
+
                 b.setNote(cursor.getString(cursor.getColumnIndex(MySQLiteOpenHelper.memo)));
                 int isstar=cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.star));
                 b.setStarred(isstar==1);

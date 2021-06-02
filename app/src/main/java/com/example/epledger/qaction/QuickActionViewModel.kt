@@ -8,18 +8,32 @@ import com.example.epledger.model.Category
 import com.example.epledger.model.Source
 import kotlinx.coroutines.*
 
-class CardViewModel: ViewModel() {
+class QuickActionViewModel: ViewModel() {
     // To prevent null-pointer exception, we have to initialize them
     val sources = MutableLiveData<MutableList<Source>>(ArrayList(0))
     val categories = MutableLiveData<MutableList<Category>>(ArrayList(0))
+
+    private val sourceNameMap = HashMap<String, Source>()
+    private val categoryNameMap = HashMap<String, Category>()
 
     /**
      * Fetch all data we need from database.
      */
     init {
         GlobalScope.launch(Dispatchers.IO) {
-            sources.postValue(AppDatabase.getAllSources())
-            categories.postValue(AppDatabase.getAllCategories())
+            val sourceList = AppDatabase.getAllSources()
+            val categoryList = AppDatabase.getAllCategories()
+
+            sources.postValue(sourceList)
+            categories.postValue(categoryList)
+
+            // Construct maps
+            sourceList.forEach {
+                sourceNameMap[it.name] = it
+            }
+            categoryList.forEach {
+                categoryNameMap[it.name] = it
+            }
         }
     }
 
@@ -29,5 +43,13 @@ class CardViewModel: ViewModel() {
 
     fun getCategories(): MutableList<Category> {
         return categories.value!!
+    }
+
+    fun requireSource(name: String): Source {
+        return sourceNameMap[name]!!
+    }
+
+    fun requireCategories(name: String): Category {
+        return categoryNameMap[name]!!
     }
 }

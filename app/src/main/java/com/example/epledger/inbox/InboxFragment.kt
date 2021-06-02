@@ -192,7 +192,7 @@ class InboxFragment : Fragment() {
 
                     // Manage database and view in home page
                     GlobalScope.launch(Dispatchers.IO) {
-                        AppDatabase.deleteRecordByID(recordToDelete.ID!!)
+                        AppDatabase.deleteRecordByID(recordToDelete.id!!)
                         if (entryWasShownInHomePage) {
                             dbModel.deleteRecord(recordToDelete, requireActivity().asMainActivity().homeSectionAdapter!!)
                         }
@@ -267,11 +267,11 @@ class InboxFragment : Fragment() {
                 // 1. 删除的时候要将主页面列表中的项目也一同删除（见setUpRecyclerView的另一个参数）
                 // 2. 提交的时候检查当前是否仍然在标星Section中、是否仍然在截图Section中。
 
-                require(record.ID != null)
+                require(record.id != null)
 
                 // 2021年05月27日 这里的提交并没有真正影响到数据库
                 val indexInSection = adapter.entries.indexOfFirst {
-                    record.ID == it.ID
+                    record.id == it.id
                 }
 
                 if (record.starred) {
@@ -345,10 +345,10 @@ class InboxFragment : Fragment() {
     }
 
     fun checkStarredSectionOnUpdate(record: Record) {
-        require(record.ID != null)
+        require(record.id != null)
 
         (requireView().inbox_star_recycler_view.adapter as EntryAdapter).apply {
-            val index = entries.indexOfFirst { record.ID == it.ID }
+            val index = entries.indexOfFirst { record.id == it.id }
 
             // 错误：2021年05月26日：如果record本身不在这个section中，直接返回
             // 修正：2021年05月27日：如果record本身不在这个section中，而又是带有标星的项目，说明需要新增一项
@@ -381,10 +381,10 @@ class InboxFragment : Fragment() {
     }
 
     fun checkStarredSectionOnRemoval(record: Record) {
-        require(record.ID != null)
+        require(record.id != null)
 
         (requireView().inbox_star_recycler_view.adapter as EntryAdapter).apply {
-            val index = entries.indexOfFirst { record.ID == it.ID }
+            val index = entries.indexOfFirst { record.id == it.id }
 
             // 如果record本身不在这个section中，直接返回
             if (index < 0) {
@@ -406,12 +406,12 @@ class InboxFragment : Fragment() {
     }
 
     fun checkIncompleteSectionOnRemoval(record: Record) {
-        if (record.ID == null) {
+        if (record.id == null) {
             return
         }
-        val id = record.ID!!
+        val id = record.id!!
         (requireView().inbox_incomplete_recycler_view.adapter as EntryAdapter).apply {
-            val indexToFind = entries.indexOfFirst { it.ID == id }
+            val indexToFind = entries.indexOfFirst { it.id == id }
             if (indexToFind < 0) {
                 return
             }
