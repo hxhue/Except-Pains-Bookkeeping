@@ -107,9 +107,12 @@ class InboxFragment : Fragment() {
         }
 
         if (sectionCheckSet.isEmpty()) {
-            rootView.no_sections_msg.visibility = View.VISIBLE
+            // 不再使用简单文本来提示无记录信息
+//            rootView.no_sections_msg.visibility = View.VISIBLE
+            rootView.inbox_page_no_record_image.visibility = View.VISIBLE
         } else {
-            rootView.no_sections_msg.visibility = View.GONE
+//            rootView.no_sections_msg.visibility = View.GONE
+            rootView.inbox_page_no_record_image.visibility = View.GONE
         }
     }
 
