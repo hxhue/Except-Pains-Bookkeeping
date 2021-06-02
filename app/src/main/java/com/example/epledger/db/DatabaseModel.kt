@@ -1,6 +1,8 @@
 package com.example.epledger.db
 
 import android.util.Log
+import android.util.SparseArray
+import androidx.core.util.set
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.epledger.home.SectionAdapter
@@ -14,6 +16,7 @@ import kotlinx.coroutines.*
 import java.lang.RuntimeException
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class DatabaseModel: ViewModel() {
     // 对外开放的可观察属性
@@ -23,15 +26,10 @@ class DatabaseModel: ViewModel() {
     val incompleteRecords = MutableLiveData<MutableList<Record>>(ArrayList(0))
     val starredRecords = MutableLiveData<MutableList<Record>>(ArrayList(0))
 
-//    /**初始化了之后才能够调用这个函数。
-//     * （2021年5月20日13:43:15）Harmful，但是不知道原因
-//     */
-//    fun clearDatabase() {
-//        sources.postValue(ArrayList(0))
-//        categories.postValue(ArrayList(0))
-//        groupedRecords.postValue(ArrayList(0))
-//        // todo: 更多数据
-//    }
+    private val sourceMap = SparseArray<Source>(16)
+    private val sourceNameMap = HashMap<String, Source>(16)
+    private val categoryMap = SparseArray<Category>(16)
+    private val categoryNameMap = HashMap<String, Category>(16)
 
     var databaseHasLoaded = false
         private set
@@ -45,28 +43,36 @@ class DatabaseModel: ViewModel() {
      */
     fun reloadDatabase() {
         GlobalScope.launch(Dispatchers.IO) {
-            // TODO: change debug code to: fetch data from DB
-            val srcList = AppDatabase.getAllSources()
-
-            val cateList = AppDatabase.getAllCategories()
-
+            val sourceList = AppDatabase.getAllSources()
+            val categoryList = AppDatabase.getAllCategories()
             val records = AppDatabase.getRecordsOrderByDate()
-
-            Log.i("db", "database reloading. records from database: ${records.map { 
-                "(amount=%.2f, source=%s)".format(it.money, it.source)
-            }}")
-
             val groupResult = groupRecordsByDate(records)
+            val incompleteRecordsToPost = AppDatabase.getIncompleteRecordsOrderByDate()
+            val starredRecordsToPost = AppDatabase.getStarredRecords()
 
             Log.i("db", "database reloading. records after grouping: ${groupResult.map {
                 it.records.toString()
             }}")
 
-            val incompleteRecordsToPost = AppDatabase.getIncompleteRecordsOrderByDate()
-            val starredRecordsToPost = AppDatabase.getStarredRecords()
+            // Construct maps
+            sourceMap.clear()
+            sourceNameMap.clear()
+            categoryMap.clear()
+            categoryNameMap.clear()
 
-            sources.postValue(srcList)
-            categories.postValue(cateList)
+            for (source in sourceList) {
+                val sourceCopy = source.copy()
+                sourceMap.append(source.ID!!, sourceCopy)
+                sourceNameMap[source.name] = sourceCopy
+            }
+            for (category in categoryList) {
+                val categoryCopy = category.copy()
+                categoryMap.append(category.ID!!, categoryCopy)
+                categoryNameMap[category.name] = categoryCopy
+            }
+
+            sources.postValue(sourceList)
+            categories.postValue(categoryList)
             groupedRecords.postValue(groupResult)
             incompleteRecords.postValue(incompleteRecordsToPost)
             starredRecords.postValue(starredRecordsToPost)
@@ -160,7 +166,7 @@ class DatabaseModel: ViewModel() {
         // Find index inside the group
         // This is O(n) but the data set is so small (like less than 5) so it's effective
         currentGroup.forEachIndexed { thisIndex, thisRecord ->
-            if (thisRecord.ID!! == record.ID!!) {
+            if (thisRecord.id!! == record.id!!) {
                 recordIsFound = true
                 positionInSection = thisIndex
                 return@forEachIndexed
@@ -194,7 +200,7 @@ class DatabaseModel: ViewModel() {
             val record = group.records[position]
 
             // 在外存中删除
-            AppDatabase.deleteRecordByID(record.ID!!)
+            AppDatabase.deleteRecordByID(record.id!!)
 
             // 如果该组有多个元素则删除单个元素即可
             if (group.records.size > 1) {
@@ -221,14 +227,14 @@ class DatabaseModel: ViewModel() {
         }
     }
 
-    fun insertRecord(record: Record) {
+    fun insertRecord(rec: Record) {
         GlobalScope.launch(Dispatchers.IO) {
             // 获取拷贝
-            val record = record.getCopy()
+            val record = rec.getCopy()
 
             // 插入记录到数据库
             val newID = AppDatabase.insertRecord(record)
-            record.ID = newID
+            record.id = newID
 
             // 插入数据到主存并更新信息
             val roundedDate = roundToDay(record.date)
@@ -317,6 +323,231 @@ class DatabaseModel: ViewModel() {
 //            }
 //        }
 //    }
+
+    /**
+     * @param viewRefreshMethod 是更新视图的方式，如果不提供则会用默认方式更新视图
+     */
+    fun deleteCategoryByID(id: Int, viewRefreshMethod: (()->Unit)? = null) {
+        GlobalScope.launch(Dispatchers.IO) {
+            AppDatabase.deleteCategoryByID(id)
+
+            // modify map
+            categoryNameMap.remove(categoryMap[id].name)
+            categoryMap.delete(id)
+
+            withContext(Dispatchers.Main) {
+                val requiredCategories = requireCategories()
+                requiredCategories.removeIf {
+                    it.ID == id
+                }
+
+                if (viewRefreshMethod == null) {
+                    // Rebind to outlet the modification
+                    categories.postValue(categories.value)
+                } else {
+                    viewRefreshMethod()
+                }
+//                categories.postValue(categories.value)
+
+                // outlet a notification
+                onCategoriesChanged()
+            }
+        }
+    }
+
+    /**
+     * @param viewRefreshMethod 是更新视图的方式，如果不提供则会用默认方式更新视图
+     */
+    fun insertCategory(category: Category, viewRefreshMethod: (()->Unit)? = null) {
+        GlobalScope.launch(Dispatchers.IO) {
+            // Update in database
+            val id = AppDatabase.insertCategory(category)
+            category.ID = id
+
+            // modify map
+            categoryMap.put(category.ID!!, category)
+            categoryNameMap[category.name] = category
+
+            withContext(Dispatchers.Main) {
+                // Update in memory
+                requireCategories().add(category)
+
+                if (viewRefreshMethod == null) {
+                    // Rebind to outlet the modification
+                    categories.postValue(categories.value)
+                } else {
+                    viewRefreshMethod()
+                }
+//                categories.postValue(categories.value)
+
+                // outlet a notification
+                onCategoriesChanged()
+            }
+        }
+
+    }
+
+    /**
+     * @param viewRefreshMethod 是更新视图的方式，如果不提供则会用默认方式更新视图
+     */
+    fun updateCategory(category: Category, viewRefreshMethod: (()->Unit)? = null) {
+        GlobalScope.launch(Dispatchers.IO) {
+            // Update in database
+            AppDatabase.updateCategory(category)
+
+            // Categories in map should be separate from the arguments outside
+            // So the map still have old versions which has their name information
+            val originalCategory = categoryMap[category.ID!!]
+            categoryNameMap.remove(originalCategory.name)
+
+            // After removal of Name-Category pair, we insert or update new data
+            categoryMap[category.ID!!] = category
+            categoryNameMap[category.name] = category
+
+            // To avoid concurrent access exception
+            withContext(Dispatchers.Main) {
+                // Update in memory
+                for (requireCategory in requireCategories()) {
+                    if (requireCategory.ID == category.ID) {
+                        requireCategory.copyAllExceptID(category)
+                        break
+                    }
+                }
+
+                if (viewRefreshMethod == null) {
+                    // Rebind to outlet the modification
+                    categories.postValue(categories.value)
+                } else {
+                    viewRefreshMethod()
+                }
+//                categories.postValue(categories.value)
+
+                // outlet a notification
+                onCategoriesChanged()
+            }
+        }
+    }
+
+    fun updateSource(source: Source, viewRefreshMethod: (()->Unit)? = null) {
+        GlobalScope.launch(Dispatchers.IO) {
+            AppDatabase.updateSource(source)
+
+            // Sources in map should be separate from the arguments outside
+            // So the map still have old versions which has their name information
+            val originalSource = sourceMap[source.ID!!]
+            sourceNameMap.remove(originalSource.name)
+            sourceMap[source.ID!!] = source
+            sourceNameMap[source.name] = source
+
+            withContext(Dispatchers.Main) {
+                val requiredSources = requireSources()
+                for (requiredSource in requiredSources) {
+                    if (requiredSource.ID == source.ID) {
+                        requiredSource.copyAllExceptID(source)
+                        break
+                    }
+                }
+
+                if (viewRefreshMethod == null) {
+                    sources.postValue(sources.value)
+                } else {
+                    viewRefreshMethod()
+                }
+
+                onSourcesChanged()
+            }
+        }
+    }
+
+    fun insertSource(source: Source, viewRefreshMethod: (()->Unit)? = null) {
+        GlobalScope.launch(Dispatchers.IO) {
+            source.ID = AppDatabase.insertSource(source)
+
+            // modify map
+            sourceMap.put(source.ID!!, source)
+            sourceNameMap[source.name] = source
+
+            withContext(Dispatchers.Main) {
+                requireSources().add(source)
+
+                if (viewRefreshMethod == null) {
+                    sources.postValue(sources.value)
+                } else {
+                    viewRefreshMethod()
+                }
+
+                onSourcesChanged()
+            }
+        }
+    }
+
+    fun deleteSourceByID(id: Int, viewRefreshMethod: (()->Unit)? = null) {
+        GlobalScope.launch(Dispatchers.IO) {
+            AppDatabase.deleteSourceByID(id)
+
+            val sourceName = sourceMap[id].name
+            sourceNameMap.remove(sourceName)
+            sourceMap.delete(id)
+
+            withContext(Dispatchers.Main) {
+                requireSources().removeIf {
+                    it.ID == id
+                }
+
+                if (viewRefreshMethod == null) {
+                    sources.postValue(sources.value)
+                } else {
+                    viewRefreshMethod()
+                }
+
+                onSourcesChanged()
+            }
+        }
+    }
+
+    private fun onSourcesChanged() {
+        groupedRecords.postValue(groupedRecords.value)
+        starredRecords.postValue(starredRecords.value)
+        incompleteRecords.postValue(incompleteRecords.value)
+    }
+
+    private fun onCategoriesChanged() {
+        groupedRecords.postValue(groupedRecords.value)
+        starredRecords.postValue(starredRecords.value)
+        incompleteRecords.postValue(incompleteRecords.value)
+    }
+
+    fun findSource(id: Int): Source? {
+        val source = sourceMap.get(id)
+        if (source != null) {
+            return source.copy()
+        }
+        return null
+    }
+
+    fun findCategory(id: Int): Category? {
+        val category = categoryMap.get(id)
+        if (category != null) {
+            return category.copy()
+        }
+        return null
+    }
+
+    fun findSource(name: String): Source? {
+        val source = sourceNameMap[name]
+        if (source != null) {
+            return source.copy()
+        }
+        return null
+    }
+
+    fun findCategory(name: String): Category? {
+        val category = categoryNameMap[name]
+        if (category != null) {
+            return category.copy()
+        }
+        return null
+    }
 
     /**
      * 更新主页面中的record记录。如果有newRecord则需要替换，否则单纯进行刷新。
