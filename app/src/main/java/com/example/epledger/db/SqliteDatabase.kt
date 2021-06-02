@@ -156,11 +156,12 @@ class SqliteDatabase(context: Context) : LedgerDatabase() {
             throw RuntimeException("This record have null ID")
         }
         // Checking: step 2
-        val cursor = sqLiteDatabase.rawQuery("select * from " + MySQLiteOpenHelper.TABLE_NAME +
-                " where record_id=${record.ID}", null)
-        if (cursor.moveToNext()) {
-            throw RuntimeException("This record is never in database")
-        }
+//        val cursor = sqLiteDatabase.rawQuery("select * from " + MySQLiteOpenHelper.TABLE_NAME +
+//                " where record_id=${record.ID}", null)
+//        if (cursor.moveToNext()) {
+//            throw RuntimeException("This record is never in database")
+//        }
+        // The way of checking may be wrong...
 
         val typeid = if (record.category == null) -1 else im.SelectTypeId(record.category,sqLiteDatabase)
         val fromid = if (record.source == null) - 1 else im.SelectFromId(record.source,sqLiteDatabase)
