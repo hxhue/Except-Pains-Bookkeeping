@@ -210,5 +210,16 @@
     <string name="home_page_the_records_are_empty">No records</string>
     <string name="please_select_data_range">Please select data range!</string>
     <string name="inbox_page_no_need_to_handle">All records are handled</string>
+    <string name="alipay">Alipay</string>
+    <string name="wechat">Wechat</string>
+    <string name="cash">Cash</string>
+    <string name="emergency">Emergency</string>
+    <string name="study">Study</string>
+    <string name="food">Food</string>
+    <string name="shopping">Shopping</string>
+    <string name="digital">Digital</string>
+    <string name="transportation">Transportation</string>
+    <string name="coffee">Coffee</string>
+    <string name="present">Present</string>
 
 </resources>

@@ -308,6 +308,7 @@ class DatabaseModel: ViewModel() {
     /**
      * 更新主页面中的record记录。如果有newRecord则需要替换，否则单纯进行刷新。
      */
+    // 已经发现了一个问题
     fun updateRecord(section: Int, position: Int, sectionAdapter: SectionAdapter, newRecord: Record? = null) {
         GlobalScope.launch(Dispatchers.IO) {
             val groupedRecords = requireGroupedRecords()
