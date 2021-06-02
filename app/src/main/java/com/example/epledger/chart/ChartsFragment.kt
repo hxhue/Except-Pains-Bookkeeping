@@ -194,14 +194,14 @@ class ChartsFragment: Fragment() {
      * 根据billList生成饼图
      */
     private fun drawPieChart(view: View, costOrIncome: Boolean){
-        val typeSumMap=HashMap<String, Double>()
+        val typeSumMap=HashMap<Int, Double>()
         if(costOrIncome){
             for(bill in billList){
-                if(bill.money<0) bill.category?.let { typeSumMap.put(it, typeSumMap.getOrDefault(bill.category!!, 0.0)?.plus(bill.money * (-1.0))) }
+                if(bill.money<0) bill.categoryID?.let { typeSumMap.put(it, typeSumMap.getOrDefault(bill.categoryID!!, 0.0)?.plus(bill.money * (-1.0))) }
             }
         }else{
             for(bill in billList){
-                    if(bill.money>0) bill.category?.let { typeSumMap.put(it, typeSumMap.getOrDefault(bill.category!!, 0.0)?.plus(bill.money)) }
+                    if(bill.money>0) bill.categoryID?.let { typeSumMap.put(it, typeSumMap.getOrDefault(bill.categoryID!!, 0.0)?.plus(bill.money)) }
             }
         }
 
@@ -234,6 +234,7 @@ class ChartsFragment: Fragment() {
             setTransparentCircleAlpha(120)
             description.isEnabled=false
             legend.isEnabled=false
+            setNoDataText("No records available!")
         }
 
         /**
@@ -419,6 +420,7 @@ class ChartsFragment: Fragment() {
             setVisibleXRangeMaximum(14F)
 //            setVisibleXRangeMinimum(4F)
             description.isEnabled=false
+            setNoDataText("No data available!")
         }
 
 //        barChart.invalidate()
