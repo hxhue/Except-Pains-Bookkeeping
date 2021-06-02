@@ -5,22 +5,22 @@ import android.os.Parcel
 import android.os.Parcelable
 import java.util.Date
 
-class Record() : Parcelable{
-    var ID: Long? = null
+class Record() : Parcelable {
+    var id: Long? = null
     var date: Date = Date()
     var money: Double = -0.0
-    var category: String? = null
-    var source: String? = null
+    var categoryID: Int? = null
+    var sourceID: Int? = null
     var screenshot: Bitmap? = null
     var screenshotPath: String? = null
     var note: String? = null
     var starred: Boolean = false
 
     constructor(parcel: Parcel) : this() {
-        ID = parcel.readValue(Long::class.java.classLoader) as? Long
+        id = parcel.readValue(Long::class.java.classLoader) as? Long
         money = parcel.readValue(Double::class.java.classLoader) as Double
-        category = parcel.readString()
-        source = parcel.readString()
+        categoryID = parcel.readValue(Int::class.java.classLoader) as? Int
+        sourceID = parcel.readValue(Int::class.java.classLoader) as? Int
         screenshotPath = parcel.readString()
         note = parcel.readString()
         starred = parcel.readByte() != 0.toByte()
@@ -29,7 +29,7 @@ class Record() : Parcelable{
 
     override fun toString(): String {
         return "Record(date=$date, amount=$money, " +
-                "type=$category, source=$source, screenshotPath=$screenshotPath, " +
+                "type=$categoryID, source=$sourceID, screenshotPath=$screenshotPath, " +
                 "note=$note, starred=$starred)"
     }
 
@@ -40,11 +40,11 @@ class Record() : Parcelable{
     }
 
     fun copyTo(another: Record) {
-        another.ID = ID
+        another.id = id
         another.date = date
         another.money = money
-        another.category = category
-        another.source = source
+        another.categoryID = categoryID
+        another.sourceID = sourceID
         another.screenshot = screenshot
         another.note = note
         another.starred = starred
@@ -52,10 +52,10 @@ class Record() : Parcelable{
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeValue(ID)
+        parcel.writeValue(id)
         parcel.writeValue(money)
-        parcel.writeString(category)
-        parcel.writeString(source)
+        parcel.writeValue(categoryID)
+        parcel.writeValue(sourceID)
         parcel.writeString(screenshotPath)
         parcel.writeString(note)
         parcel.writeByte(if (starred) 1 else 0)
@@ -70,7 +70,7 @@ class Record() : Parcelable{
      * 判断一个记录是否不完整。
      */
     fun isComplete(): Boolean {
-        return (money != 0.0 && money != -0.0) && (!category.isNullOrBlank())
+        return (money != 0.0 && money != -0.0) && (categoryID != null)
     }
 
     companion object CREATOR : Parcelable.Creator<Record> {

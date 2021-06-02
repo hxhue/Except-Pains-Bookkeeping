@@ -28,13 +28,17 @@ class SqliteDatabase(context: Context) : LedgerDatabase() {
                 val from_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.from_id))
                 val type_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.type_id))
                 val s = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.star))==1
-                val from1 = im.get_id_from(from_id, sqLiteDatabase)
-                val type1 = im.get_id_type(type_id, sqLiteDatabase)
+//                val from1 = im.get_id_from(from_id, sqLiteDatabase)
+//                val type1 = im.get_id_type(type_id, sqLiteDatabase)
                 val r = b.apply {
-                    ID =t
-                    money =cursor.getDouble(cursor.getColumnIndex(MySQLiteOpenHelper.account))
-                    source = from1
-                    category=type1
+                    id =t
+                    money = cursor.getDouble(cursor.getColumnIndex(MySQLiteOpenHelper.account))
+
+                    // 2021-06-02 17:39:24
+                    // We use int for these fields now
+                    sourceID = if (from_id < 0) null else from_id
+                    categoryID = if (type_id < 0) null else type_id
+
                     date = simpleFormat.parse(cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.date1)))
                     starred = s
                     //screenshot: Bitmap? = null
@@ -63,13 +67,17 @@ class SqliteDatabase(context: Context) : LedgerDatabase() {
                 val from_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.from_id))
                 val type_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.type_id))
                 val s = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.star))==1
-                val from1 = im.get_id_from(from_id, sqLiteDatabase)
-                val type1 = im.get_id_type(type_id, sqLiteDatabase)
+//                val from1 = im.get_id_from(from_id, sqLiteDatabase)
+//                val type1 = im.get_id_type(type_id, sqLiteDatabase)
                 val r = b.apply {
-                    ID =t
+                    id =t
                     money =cursor.getDouble(cursor.getColumnIndex(MySQLiteOpenHelper.account))
-                    source = from1
-                    category=type1
+
+                    // 2021-06-02 17:40:41
+                    // We use int for these fields now
+                    sourceID = if (from_id < 0) null else from_id
+                    categoryID = if (type_id < 0) null else type_id
+
                     date = simpleFormat.parse(cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.date1)))
                     starred = s
                     //screenshot: Bitmap? = null
@@ -99,13 +107,17 @@ class SqliteDatabase(context: Context) : LedgerDatabase() {
                 val from_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.from_id))
                 val type_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.type_id))
                 val s = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.star))==1
-                val from1 = im.get_id_from(from_id, sqLiteDatabase)
-                val type1 = im.get_id_type(type_id, sqLiteDatabase)
+//                val from1 = im.get_id_from(from_id, sqLiteDatabase)
+//                val type1 = im.get_id_type(type_id, sqLiteDatabase)
                 val r = b.apply {
-                    ID =t
+                    id =t
                     money =cursor.getDouble(cursor.getColumnIndex(MySQLiteOpenHelper.account))
-                    source = from1
-                    category=type1
+
+                    // 2021-06-02 17:40:56
+                    // We use int for these fields now
+                    sourceID = if (from_id < 0) null else from_id
+                    categoryID = if (type_id < 0) null else type_id
+
                     date =simpleFormat.parse(cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.date1)))
                     starred = s
                     //screenshot: Bitmap? = null
@@ -130,8 +142,13 @@ class SqliteDatabase(context: Context) : LedgerDatabase() {
     override fun insertRecord(record: Record): Long {
         val sqLiteDatabase: SQLiteDatabase = im.dbHelper.getWritableDatabase()
 
-        val typeid = if (record.category == null) -1 else im.SelectTypeId(record.category,sqLiteDatabase)
-        val fromid = if (record.source == null) -1 else im.SelectFromId(record.source,sqLiteDatabase)
+//        val typeid = if (record.category == null) -1 else im.SelectTypeId(record.category,sqLiteDatabase)
+//        val fromid = if (record.source == null) -1 else im.SelectFromId(record.source,sqLiteDatabase)
+
+        // 2021-06-02 17:42:38
+        // We use int for these fields now
+        val typeid = record.categoryID ?: -1
+        val fromid = record.sourceID ?: -1
 
         val simpleFormat = SimpleDateFormat("yyyy/MM/dd hh:mm", Locale.US)
         val s = if (record.starred) 1 else 0
@@ -152,7 +169,7 @@ class SqliteDatabase(context: Context) : LedgerDatabase() {
 
         // Just for sure, we check if the record is in database
         // Checking: step 1
-        if (record.ID == null) {
+        if (record.id == null) {
             throw RuntimeException("This record have null ID")
         }
         // Checking: step 2
@@ -163,12 +180,17 @@ class SqliteDatabase(context: Context) : LedgerDatabase() {
 //        }
         // The way of checking may be wrong...
 
-        val typeid = if (record.category == null) -1 else im.SelectTypeId(record.category,sqLiteDatabase)
-        val fromid = if (record.source == null) - 1 else im.SelectFromId(record.source,sqLiteDatabase)
+//        val typeid = if (record.category == null) -1 else im.SelectTypeId(record.category,sqLiteDatabase)
+//        val fromid = if (record.source == null) - 1 else im.SelectFromId(record.source,sqLiteDatabase)
+
+        // 2021-06-02 17:42:38
+        // We use int for these fields now
+        val typeid = record.categoryID ?: -1
+        val fromid = record.sourceID ?: -1
 
         val s = if (record.starred) 1 else 0
         val c=im.getContentValues(simpleFormat.format(record.date),record.money,typeid,fromid,record.note,record.screenshotPath,s)
-        im.Update(record.ID, c, sqLiteDatabase)
+        im.Update(record.id, c, sqLiteDatabase)
     }
 
     override fun getAllSources(): MutableList<Source> {

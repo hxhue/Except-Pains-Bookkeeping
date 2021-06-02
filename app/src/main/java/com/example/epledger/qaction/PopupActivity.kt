@@ -38,7 +38,7 @@ import java.util.*
  * or quick actions in the notification center.
  */
 class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnItemSelectedListener {
-    private val cardViewModel: CardViewModel by viewModels()
+    private val qaModel: QuickActionViewModel by viewModels()
 
     private var waitingEvent: Int = -1
     private lateinit var handler: Handler
@@ -52,8 +52,8 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
     private var screenshotAtStart = false
 
     // For spinners
-    private lateinit var sources: ArrayList<String>
-    private lateinit var types: ArrayList<String>
+    private lateinit var sourceNames: ArrayList<String>
+    private lateinit var categoryNames: ArrayList<String>
     private lateinit var sourcesSpinnerAdapter: ArrayAdapter<String>
     private lateinit var typesSpinnerAdapter: ArrayAdapter<String>
 
@@ -85,17 +85,17 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
     }
 
     private fun registerObservers() {
-        cardViewModel.categories.observeForever {
-            types.clear()
-            types.add(getString(R.string.unspecified))
-            types.addAll(it.map { category -> category.name })
+        qaModel.categories.observeForever {
+            categoryNames.clear()
+            categoryNames.add(getString(R.string.unspecified))
+            categoryNames.addAll(it.map { category -> category.name })
             typesSpinnerAdapter.notifyDataSetChanged()
         }
 
-        cardViewModel.sources.observeForever {
-            sources.clear()
-            sources.add(getString(R.string.unspecified))
-            sources.addAll(it.map { source -> source.name })
+        qaModel.sources.observeForever {
+            sourceNames.clear()
+            sourceNames.add(getString(R.string.unspecified))
+            sourceNames.addAll(it.map { source -> source.name })
             sourcesSpinnerAdapter.notifyDataSetChanged()
         }
     }
@@ -264,12 +264,12 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
     private fun setupSpinners() {
         // Late init here
         val unspecifiedString = getString(R.string.unspecified)
-        sources = arrayListOf(unspecifiedString)
-        types = arrayListOf(unspecifiedString)
+        sourceNames = arrayListOf(unspecifiedString)
+        categoryNames = arrayListOf(unspecifiedString)
         sourcesSpinnerAdapter = ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_dropdown_item, sources)
+                android.R.layout.simple_spinner_dropdown_item, sourceNames)
         typesSpinnerAdapter = ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_dropdown_item, types)
+                android.R.layout.simple_spinner_dropdown_item, categoryNames)
 
         // Set up sourceSpinner
         val sourceSpinner = findViewById<Spinner>(R.id.qa_src_spinner)
@@ -286,20 +286,20 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         require(parent != null)
         if (parent.id == R.id.qa_src_spinner) {
             Log.d("qaction.PopupActivity",
-                    "onItemSelected(): sourceSpinner has (${sources[position]}) selected.")
+                    "onItemSelected(): sourceSpinner has (${sourceNames[position]}) selected.")
             if (position == RecordDetailFragment.UNSPECIFIED_ITEM_POSITION) {
-                ledgerRecord.source = null
+                ledgerRecord.sourceID = null
             } else {
-                ledgerRecord.source = sources[position]
+                ledgerRecord.sourceID = qaModel.requireSource(sourceNames[position]).ID
             }
         } else if (parent.id == R.id.qa_type_spinner) {
             Log.d("qaction.PopupActivity",
-                    "onItemSelected(): typeSpinner has (${types[position]}) selected.")
+                    "onItemSelected(): typeSpinner has (${categoryNames[position]}) selected.")
 
             if (position == RecordDetailFragment.UNSPECIFIED_ITEM_POSITION) {
-                ledgerRecord.category = null
+                ledgerRecord.categoryID = null
             } else {
-                ledgerRecord.category = types[position]
+                ledgerRecord.categoryID = qaModel.requireCategories(categoryNames[position]).ID
             }
         }
     }
