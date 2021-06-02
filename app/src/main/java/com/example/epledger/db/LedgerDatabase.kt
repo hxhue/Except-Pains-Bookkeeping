@@ -303,6 +303,8 @@ class MemoryDatabase : LedgerDatabase() {
     }
 
     override fun deleteSourceByID(id: Int) {
-        TODO("Not yet implemented")
+        sources.removeAll {
+            it.ID == id
+        }
     }
 }

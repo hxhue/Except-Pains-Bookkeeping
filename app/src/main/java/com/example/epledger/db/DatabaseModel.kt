@@ -221,10 +221,10 @@ class DatabaseModel: ViewModel() {
         }
     }
 
-    fun insertRecord(record: Record) {
+    fun insertRecord(rec: Record) {
         GlobalScope.launch(Dispatchers.IO) {
             // 获取拷贝
-            val record = record.getCopy()
+            val record = rec.getCopy()
 
             // 插入记录到数据库
             val newID = AppDatabase.insertRecord(record)
@@ -317,6 +317,164 @@ class DatabaseModel: ViewModel() {
 //            }
 //        }
 //    }
+
+    /**
+     * @param viewRefreshMethod 是更新视图的方式，如果不提供则会用默认方式更新视图
+     */
+    fun deleteCategoryByID(id: Int, viewRefreshMethod: (()->Unit)? = null) {
+        GlobalScope.launch(Dispatchers.IO) {
+            AppDatabase.deleteCategoryByID(id)
+
+            withContext(Dispatchers.Main) {
+                val requiredCategories = requireCategories()
+                requiredCategories.removeIf {
+                    it.ID == id
+                }
+
+                if (viewRefreshMethod == null) {
+                    // Rebind to outlet the modification
+                    categories.postValue(categories.value)
+                } else {
+                    viewRefreshMethod()
+                }
+//                categories.postValue(categories.value)
+
+                // outlet a notification
+                onCategoriesChanged()
+            }
+        }
+    }
+
+    /**
+     * @param viewRefreshMethod 是更新视图的方式，如果不提供则会用默认方式更新视图
+     */
+    fun insertCategory(category: Category, viewRefreshMethod: (()->Unit)? = null) {
+        GlobalScope.launch(Dispatchers.IO) {
+            // Update in database
+            val id = AppDatabase.insertCategory(category)
+            category.ID = id
+
+            withContext(Dispatchers.Main) {
+                // Update in memory
+                requireCategories().add(category)
+
+                if (viewRefreshMethod == null) {
+                    // Rebind to outlet the modification
+                    categories.postValue(categories.value)
+                } else {
+                    viewRefreshMethod()
+                }
+//                categories.postValue(categories.value)
+
+                // outlet a notification
+                onCategoriesChanged()
+            }
+        }
+
+    }
+
+    /**
+     * @param viewRefreshMethod 是更新视图的方式，如果不提供则会用默认方式更新视图
+     */
+    fun updateCategory(category: Category, viewRefreshMethod: (()->Unit)? = null) {
+        GlobalScope.launch(Dispatchers.IO) {
+            // Update in database
+            AppDatabase.updateCategory(category)
+
+            // To avoid concurrent access exception
+            withContext(Dispatchers.Main) {
+                // Update in memory
+                for (requireCategory in requireCategories()) {
+                    if (requireCategory.ID == category.ID) {
+                        requireCategory.copyAllExceptID(category)
+                        break
+                    }
+                }
+
+                if (viewRefreshMethod == null) {
+                    // Rebind to outlet the modification
+                    categories.postValue(categories.value)
+                } else {
+                    viewRefreshMethod()
+                }
+//                categories.postValue(categories.value)
+
+                // outlet a notification
+                onCategoriesChanged()
+            }
+        }
+    }
+
+    fun updateSource(source: Source, viewRefreshMethod: (()->Unit)? = null) {
+        GlobalScope.launch(Dispatchers.IO) {
+            AppDatabase.updateSource(source)
+            withContext(Dispatchers.Main) {
+                val requiredSources = requireSources()
+                for (requiredSource in requiredSources) {
+                    if (requiredSource.ID == source.ID) {
+                        requiredSource.copyAllExceptID(source)
+                        break
+                    }
+                }
+
+                if (viewRefreshMethod == null) {
+                    sources.postValue(sources.value)
+                } else {
+                    viewRefreshMethod()
+                }
+
+                onSourcesChanged()
+            }
+        }
+    }
+
+    fun insertSource(source: Source, viewRefreshMethod: (()->Unit)? = null) {
+        GlobalScope.launch(Dispatchers.IO) {
+            source.ID = AppDatabase.insertSource(source)
+            withContext(Dispatchers.Main) {
+                requireSources().add(source)
+
+                if (viewRefreshMethod == null) {
+                    sources.postValue(sources.value)
+                } else {
+                    viewRefreshMethod()
+                }
+
+                onSourcesChanged()
+            }
+        }
+    }
+
+    fun deleteSourceByID(id: Int, viewRefreshMethod: (()->Unit)? = null) {
+        GlobalScope.launch(Dispatchers.IO) {
+            AppDatabase.deleteSourceByID(id)
+            withContext(Dispatchers.Main) {
+                requireSources().removeIf {
+                    it.ID == id
+                }
+
+                if (viewRefreshMethod == null) {
+                    sources.postValue(sources.value)
+                } else {
+                    viewRefreshMethod()
+                }
+
+                onSourcesChanged()
+            }
+        }
+    }
+
+    private fun onSourcesChanged() {
+        groupedRecords.postValue(groupedRecords.value)
+        starredRecords.postValue(starredRecords.value)
+        incompleteRecords.postValue(incompleteRecords.value)
+    }
+
+    private fun onCategoriesChanged() {
+        groupedRecords.postValue(groupedRecords.value)
+        starredRecords.postValue(starredRecords.value)
+        incompleteRecords.postValue(incompleteRecords.value)
+    }
 
     /**
      * 更新主页面中的record记录。如果有newRecord则需要替换，否则单纯进行刷新。
