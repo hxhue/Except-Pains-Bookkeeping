@@ -205,4 +205,7 @@
     <string name="coffee">咖啡</string>
     <string name="present">礼物</string>
     <string name="food">餐饮</string>
+    <string name="date_start">起始日期</string>
+    <string name="date_end">终止日期</string>
+    <string name="show_date_range">%1$s - %2$s</string>
 </resources>

@@ -12,6 +12,7 @@ import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import com.example.epledger.R
 import com.example.epledger.db.AppDatabase
+import com.example.epledger.db.DatabaseModel
 import com.example.epledger.model.Record
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.LineChart
@@ -31,9 +32,12 @@ import com.google.android.material.chip.ChipGroup
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.switchmaterial.SwitchMaterial
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import androidx.fragment.app.activityViewModels
+import java.lang.RuntimeException
 
 class ChartsFragment: Fragment() {
     private val ONEDAY=24*60*60*1000
@@ -54,6 +58,10 @@ class ChartsFragment: Fragment() {
     private lateinit var mainView:View
     private var submittedTypeChipIds=ArrayList<Int>()
     private var submittedAccountChipIds=ArrayList<Int>()
+    private lateinit var dateRangeDisplay: TextView
+    // This is a database model used for accessing running data.
+    // But do not use it without knowing what it's truly for.
+    private val dbModel: DatabaseModel by activityViewModels()
     private var dateRangePicker=
             MaterialDatePicker.Builder.dateRangePicker()
                     .setTitleText("Select dates")
@@ -84,6 +92,7 @@ class ChartsFragment: Fragment() {
         barChart=view.findViewById(R.id.barChart)
         pieSwitch=view.findViewById(R.id.pieSwitch)
         pieTextView=view.findViewById(R.id.pieTextView)
+        dateRangeDisplay=siftDialogView.findViewById(R.id.dateRangeDisplay)
         billList=ArrayList()
         dialog= context?.let {
             MaterialAlertDialogBuilder(it)
@@ -99,6 +108,10 @@ class ChartsFragment: Fragment() {
                     .create()
         }!!
         dialog.setOnShowListener {
+            if(!dateRangeIsSet){
+                dateRangeDisplay.text=getString(R.string.show_date_range,
+                    utc2str(Date().time-ONEDAY*13), utc2str(Date().time))
+            }
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled=dateRangeIsSet
         }
         barXLabels=ArrayList()
@@ -117,7 +130,7 @@ class ChartsFragment: Fragment() {
         /**
          * 默认筛选最近14天的账单,并生成图表
          */
-        billList= AppDatabase.siftRecords(Date(Date().time - 14 * 24 * 60 * 60 * 1000), Date()
+        billList= AppDatabase.siftRecords(Date(Date().time - 14 * ONEDAY), Date()
                 , AppDatabase.getAllSourceNames() as ArrayList<String>, AppDatabase.getAllCategoryNames() as ArrayList<String>)
         drawChart(view, true)
 
@@ -194,24 +207,33 @@ class ChartsFragment: Fragment() {
      * 根据billList生成饼图
      */
     private fun drawPieChart(view: View, costOrIncome: Boolean){
-        val typeSumMap=HashMap<Int, Double>()
+        val typeSumMap=HashMap<String, Double>()
         if(costOrIncome){
             for(bill in billList){
-                if(bill.money<0) bill.categoryID?.let { typeSumMap.put(it, typeSumMap.getOrDefault(bill.categoryID!!, 0.0)?.plus(bill.money * (-1.0))) }
+                if(bill.money<0) {
+                    val cat= bill.categoryID?.let { dbModel.findCategory(it) }
+                    if (cat != null) {
+                        typeSumMap[cat.name] = typeSumMap.getOrDefault(cat.name, 0.0).plus(bill.money * (-1.0))
+                    }
+                }
             }
         }else{
             for(bill in billList){
-                    if(bill.money>0) bill.categoryID?.let { typeSumMap.put(it, typeSumMap.getOrDefault(bill.categoryID!!, 0.0)?.plus(bill.money)) }
+                if(bill.money>0) {
+                    val cat= bill.categoryID?.let { dbModel.findCategory(it) }
+                    if (cat != null) {
+                        typeSumMap[cat.name] = typeSumMap.getOrDefault(cat.name, 0.0).plus(bill.money)
+                    }
+                }
             }
         }
-
 
         val entries: MutableList<PieEntry> = ArrayList()
         for(entry in typeSumMap){
             entries.add(PieEntry(entry.value.toFloat(), entry.key))
         }
         val set = PieDataSet(entries, "type proportion")
-        set.sliceSpace= 5F
+        set.sliceSpace= 2F
         set.setColors(
                 intArrayOf(
                         R.color.pieColor1,R.color.pieColor2,R.color.pieColor3,R.color.pieColor4
@@ -246,9 +268,10 @@ class ChartsFragment: Fragment() {
             }
 
             override fun onValueSelected(p0: Entry?, p1: Highlight?) {
-                if (p0 is PieEntry) {
-                    pieChart.centerText = (p0.label + "\n" + p0.value + " 元")
-                }
+//                if (p0 is PieEntry) {
+//                    pieChart.centerText = (p0.label + "\n" + p0.value + " 元")
+//                }
+                pieChart.centerText=""
             }
         })
 //        pieChart.invalidate() // refresh
@@ -559,9 +582,8 @@ class ChartsFragment: Fragment() {
 }
 
 
-//    fun UTC2Str(utc:Long): String {
-//        val sdf=SimpleDateFormat("yyyy/MM/dd")
-//        val date=Date(utc)
-//        val str=sdf.format(date)
-//        return str
-//    }
+    fun utc2str(utc:Long): String {
+        val sdf= SimpleDateFormat("yyyy/MM/dd",Locale.getDefault())
+        val date=Date(utc)
+        return sdf.format(date)
+    }
