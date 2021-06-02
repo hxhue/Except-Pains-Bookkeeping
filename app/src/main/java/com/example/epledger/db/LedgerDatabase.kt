@@ -1,6 +1,5 @@
 package com.example.epledger.db
 
-import com.example.epledger.BuildConfig
 import com.example.epledger.R
 import com.example.epledger.model.Category
 import com.example.epledger.model.Record
