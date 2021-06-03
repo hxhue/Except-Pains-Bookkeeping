@@ -204,10 +204,6 @@
     <string name="record_incomplete_prompt">This record is considered incomplete and cannot be submitted. Please at least provide information about money (which cannot be 0.0 or -0.0) and category.</string>
     <string name="incomplete_item_removal_confirm">Are you sure about deleting this item? It is an incomplete item, which means you might have decided to create a placeholder record.</string>
     <string name="no_unhandled_records">No unhandled records.</string>
-    <string name="clear_all_btn">全部清除</string>
-    <string name="confirm">确认</string>
-    <string name="select_all_btn">全选</string>
-    <string name="home_page_the_records_are_empty">记录为空</string>
     <string name="please_select_data_range">Please select data range!</string>
     <string name="filter_title">Filter</string>
     <string name="from">from</string>
@@ -236,7 +232,6 @@
     <string name="income">收入</string>
     <string name="cancel">取消</string>
     <string name="sift_conditions">筛选条件</string>
-    <string name="date_range">日期范围</string>
     <string name="date_start">起始日期</string>
     <string name="date_end">终止日期</string>
     <string name="show_date_range">%1$s - %2$s</string>

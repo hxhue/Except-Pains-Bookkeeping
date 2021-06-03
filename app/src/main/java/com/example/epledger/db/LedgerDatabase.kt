@@ -112,7 +112,7 @@ abstract class LedgerDatabase {
     /**
      * 通过filter筛选记录，默认按日期从早到晚排序
      */
-    fun filterRecords(filter: Filter): List<Record>
+    abstract fun filterRecords(filter: Filter): List<Record>
 
 }
 
@@ -296,17 +296,16 @@ class MemoryDatabase(private val context: Context) : LedgerDatabase() {
 
     // TODO: 现在还不知道应该用id还是string索引category和source，之后再改
     override fun filterRecords(filter: Filter): List<Record> {
-        TODO()
-//        val result = ArrayList<Record>()
-//        records.filter { filter.minAmount <= it.moneyAmount &&
-//                it.moneyAmount <= filter.maxAmount &&
-//                filter.startDate <= it.mDate &&
-//                it.mDate <= filter.endDate &&
-//                filter.sources.contains(it.sourceId) &&
-//                filter.categories.contains(it.categoryId)
-//        }
-//                .sortedWith(Record.dateReverseComparator)
-//                .forEach {result.add(it)}
-//        return result
+        val result = ArrayList<Record>()
+        records.filter { filter.minAmount <= it.money &&
+                it.money <= filter.maxAmount &&
+                filter.startDate <= it.date &&
+                it.date <= filter.endDate &&
+                filter.sources.contains(it.sourceID) &&
+                filter.categories.contains(it.categoryID)
+        }
+                .sortedWith(Record.dateReverseComparator)
+                .forEach {result.add(it)}
+        return result
     }
 }
