@@ -10,8 +10,7 @@ import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.viewpager.widget.ViewPager
-import com.example.epledger.db.DatabaseModel
-import com.example.epledger.db.ImportDataFromExcel
+import com.example.epledger.db.*
 import com.example.epledger.home.SectionAdapter
 import com.example.epledger.inbox.event.item.EventItemFragment
 import com.example.epledger.inbox.event.list.EventFragment
@@ -43,17 +42,15 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // 禁用黑暗模式
 
+        // Init AppDatabase
+        AppDatabase = SqliteDatabase(this.applicationContext)
+//        AppDatabase = MemoryDatabase(this.applicationContext)
+
+        // 禁用黑暗模式
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
-        // 2021年5月22日17:17:23 [Simon Yu]
-        // Doubt if the following line is useful.
-//        val it=ImportDataFromExcel();
-
         // 界面初始化
-        // Handler.post may fix the problem of frame skipping?
-        // Not for ChartsFragment though.
         setupViews()
 
         // 加载其他模块

@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 //import android.support.v7.app.AppCompatActivity;
-import com.example.epledger.R;
 import com.example.epledger.model.Category;
 import com.example.epledger.model.Record;
 import com.example.epledger.model.Source;
@@ -22,7 +21,6 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -36,48 +34,48 @@ import java.util.List;
 
 /**
  */
-public class ImportDataFromExcel{
+public class ImportDataFromExcel {
     public MySQLiteOpenHelper dbHelper;
+    Context mContext;
 
     private SharedPreferences sharedPreferences;
     //@Override
-    public ImportDataFromExcel() {
-        //super.onCreate(savedInstanceState);
-        Context c=MainApplication.getCustomApplicationContext();
-        dbHelper  = new MySQLiteOpenHelper(c,"test");
-        SQLiteDatabase db=dbHelper.getWritableDatabase();
-        AddNewFrom(db,"支付宝");
-        AddNewFrom(db,"微信");
-        AddNewFrom(db,"花呗");
-        AddNewType(db,"娱乐", R.drawable.ic_far_bookmark);
-        AddNewType(db,"保健", R.drawable.ic_far_bookmark);
-        AddNewType(db,"吃喝", R.drawable.ic_far_bookmark);
-        db.close();
-        /*SQLiteDatabase db=dbHelper.getWritableDatabase();
-        ContentValues contentValues=getContentValues("2021/5/21",100,1,1,"没有备注");
-        db.insert(MySQLiteOpenHelper.TABLE_NAME, null, contentValues);
-        contentValues=getContentValues("2021/5/22",100,2,1,"备注2");
-        db.insert(MySQLiteOpenHelper.TABLE_NAME, null, contentValues);
-        db.close();
-        ArrayList<Integer>a=new ArrayList<Integer>();
-        a.add(1);
-        a.add(2);
-        List<bill>tmp=FindTimeFrom("2021/5/21","2021/5/22",a,a);
-        for(int i=0;i<tmp.size();i++) System.out.println(tmp.get(i).id);*/
+    public ImportDataFromExcel(Context m) {
+        mContext = m;
+        initializeDatabase();
     }
-    public void StoreRecord(SQLiteDatabase db,bill b)
+
+    public void initializeDatabase() {
+        Context c = mContext;
+        dbHelper = new MySQLiteOpenHelper(c,"test");
+        SQLiteDatabase db=dbHelper.getWritableDatabase();
+
+        List<Category> categoriesToAdd = Category.Companion.getDefaultCategories(mContext);
+        for (Category item: categoriesToAdd) {
+            AddNewType(db, item.getName(), item.getIconResID());
+        }
+
+        List<Source> sourcesToAdd = Source.Companion.getDefaultSources(mContext);
+        for (Source item: sourcesToAdd) {
+            AddNewFrom(db, item.getName());
+        }
+
+        db.close();
+    }
+
+    public void StoreRecord(SQLiteDatabase db, bill b)
     {
         /*ContentValues contentValues=getContentValues(b.date1,b.account,b.type1,b.from1,b.beizhu);
         db.insert(MySQLiteOpenHelper.TABLE_NAME, null, contentValues);*/
     }
-    public void AddNewType(SQLiteDatabase db,String type,int id)
+    public void AddNewType(SQLiteDatabase db,String type,int resID)
     {
         ContentValues contentValues = new ContentValues();
         int istype=SelectTypeId(type,db);
         if(istype==-1)
         {
             contentValues.put(MySQLiteOpenHelper.type1, type);
-            contentValues.put(MySQLiteOpenHelper.iconresid, id);
+            contentValues.put(MySQLiteOpenHelper.iconresid, resID);
             db.insert(MySQLiteOpenHelper.TABLE_NAME2, null, contentValues);
         }
 
@@ -248,7 +246,7 @@ public class ImportDataFromExcel{
         contentValues.put(MySQLiteOpenHelper.account,account);
         if(type_id!=-1) contentValues.put(MySQLiteOpenHelper.type_id, type_id);
         contentValues.put(MySQLiteOpenHelper.from_id, from_id);
-        contentValues.put(MySQLiteOpenHelper.beizhu, beizhu);
+        contentValues.put(MySQLiteOpenHelper.memo, beizhu);
         contentValues.put(MySQLiteOpenHelper.bitmap, bitmap);
         contentValues.put(MySQLiteOpenHelper.star, s);
         return contentValues;
@@ -265,15 +263,21 @@ public class ImportDataFromExcel{
 
             while (cursor.moveToNext()) {
                 Record b = new Record();
-                b.setID(cursor.getLong(cursor.getColumnIndex(MySQLiteOpenHelper.record_id)));
+                b.setId(cursor.getLong(cursor.getColumnIndex(MySQLiteOpenHelper.record_id)));
                 Date tmp=simpleFormat.parse(cursor.getString(cursor.getColumnIndex(MySQLiteOpenHelper.date1)));
-                b.setMDate(tmp);
-                b.setMoneyAmount(cursor.getDouble(cursor.getColumnIndex(MySQLiteOpenHelper.account)));
+                b.setDate(tmp);
+                b.setMoney(cursor.getDouble(cursor.getColumnIndex(MySQLiteOpenHelper.account)));
                 int type_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.type_id));
                 int from_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.from_id));
-                b.setSource( get_id_from(from_id,db));
-                b.setCategory(get_id_type(type_id,db));
-                b.setNote(cursor.getString(cursor.getColumnIndex(MySQLiteOpenHelper.beizhu)));
+//                b.setSource( get_id_from(from_id,db));
+//                b.setCategory(get_id_type(type_id,db));
+
+                // 2021-06-02 18:08:45
+                // Now these fields are of type (Int?)
+                b.setSourceID(from_id);
+                b.setCategoryID(type_id);
+
+                b.setNote(cursor.getString(cursor.getColumnIndex(MySQLiteOpenHelper.memo)));
                 int isstar=cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.star));
                 b.setStarred(isstar==1);
                 b.setScreenshotPath(cursor.getString(cursor.getColumnIndex(MySQLiteOpenHelper.bitmap)));
@@ -414,7 +418,7 @@ public class ImportDataFromExcel{
         headRow.createCell(2).setCellValue(MySQLiteOpenHelper.account);
         headRow.createCell(3).setCellValue(MySQLiteOpenHelper.type1);
         headRow.createCell(4).setCellValue(MySQLiteOpenHelper.from1);
-        headRow.createCell(5).setCellValue(MySQLiteOpenHelper.beizhu);
+        headRow.createCell(5).setCellValue(MySQLiteOpenHelper.memo);
         //headRow.createCell(6).setCellValue(MySQLiteOpenHelper.beizhu);
     }
 

@@ -185,8 +185,8 @@
     <string name="management">Management</string>
     <string name="manage_categories">Manage categories</string>
     <string name="manage_sources">Manage sources</string>
-    <string name="no_memo_provided"><i>(No memo provided)</i></string>
-    <string name="no_category_provided">(...)</string>
+    <string name="no_memo_provided"><i>(No memo)</i></string>
+    <string name="no_category_provided">Unknown</string>
     <string name="sources">Sources</string>
     <string name="modify_name">Modify Name</string>
     <string name="new_source">New Source</string>
@@ -215,5 +215,31 @@
     <string name="date_range">Date Range</string>
     <string name="amount_range">Amount Range</string>
     <string name="filter_incomplete_prompt">This filter information is considered incomplete and cannot be submit. Please complete it.</string>
+    <string name="clear_all_btn">Clear all</string>
+    <string name="confirm">Confirm</string>
+    <string name="select_all_btn">Select all</string>
+    <string name="home_page_the_records_are_empty">No records</string>
+    <string name="inbox_page_no_need_to_handle">All records are handled</string>
+    <string name="alipay">Alipay</string>
+    <string name="wechat">Wechat</string>
+    <string name="cash">Cash</string>
+    <string name="emergency">Emergency</string>
+    <string name="study">Study</string>
+    <string name="food">Food</string>
+    <string name="shopping">Shopping</string>
+    <string name="digital">Digital</string>
+    <string name="transportation">Transportation</string>
+    <string name="coffee">Coffee</string>
+    <string name="present">Present</string>
+    <string name="switch_income_cost">切换收支</string>
+    <string name="cost">支出</string>
+    <string name="income">收入</string>
+    <string name="cancel">取消</string>
+    <string name="sift_conditions">筛选条件</string>
+    <string name="date_range">日期范围</string>
+    <string name="date_start">起始日期</string>
+    <string name="date_end">终止日期</string>
+    <string name="show_date_range">%1$s - %2$s</string>
+
 
 </resources>

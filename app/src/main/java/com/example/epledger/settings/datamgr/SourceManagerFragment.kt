@@ -26,7 +26,7 @@ class SourceManagerFragment: NavigationFragment() {
     private val dbModel: DatabaseModel by activityViewModels()
     private val recyclerViewAdapter by lazy {
         val sourceList = dbModel.requireSources()
-        SourceAdapter(sourceList)
+        SourceAdapter(sourceList, dbModel)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -49,10 +49,13 @@ class SourceManagerFragment: NavigationFragment() {
             val dialog = createSourceDialog(ctx, null, object : OnSourceSubmitListener {
                 override fun onSourceSubmit(sourceName: String) {
                     val newSource = Source(sourceName)
-                    // TODO: add source to database and **fetch its ID**
-                    val list = recyclerViewAdapter.sourceList
-                    list.add(newSource)
-                    recyclerViewAdapter.notifyItemInserted(list.size - 1)
+                    dbModel.insertSource(newSource) {
+                        recyclerViewAdapter.notifyItemInserted(recyclerViewAdapter.sourceList.size - 1)
+                    }
+
+//                    val list = recyclerViewAdapter.sourceList
+//                    list.add(newSource)
+//                    recyclerViewAdapter.notifyItemInserted(list.size - 1)
                 }
             })
             dialog.show()
@@ -60,7 +63,7 @@ class SourceManagerFragment: NavigationFragment() {
     }
 
     private fun setUpModel(view: View) {
-        dbModel.sources.observe(viewLifecycleOwner) {
+        dbModel.sources.observeForever {
             // Update sourceList when reference changes
             recyclerViewAdapter.sourceList = it
             recyclerViewAdapter.notifyDataSetChanged()
@@ -68,7 +71,8 @@ class SourceManagerFragment: NavigationFragment() {
     }
 
     class SourceAdapter(
-            var sourceList: MutableList<Source>
+            var sourceList: MutableList<Source>,
+            private val dbModel: DatabaseModel
     ): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         class ViewHolder(view: View): RecyclerView.ViewHolder(view) {}
@@ -88,10 +92,15 @@ class SourceManagerFragment: NavigationFragment() {
                 val adapter = this
                 val dialog = createSourceDialog(ctx, sourceList[position].name, object : OnSourceSubmitListener {
                     override fun onSourceSubmit(sourceName: String) {
+                        // This is safe because update CAN happen multiple times
                         sourceList[position].name = sourceName
-                        adapter.notifyItemChanged(position)
-                        // TODO: write data into database
-                        // TODO: inform other modules that this item has changed
+                        dbModel.updateSource(sourceList[position]) {
+                            adapter.notifyItemChanged(position)
+                        }
+//                        sourceList[position].name = sourceName
+//                        adapter.notifyItemChanged(position)
+//                        // TODO: write data into database
+//                        // TODO: inform other modules that this item has changed
                     }
                 })
                 dialog.show()
@@ -103,9 +112,11 @@ class SourceManagerFragment: NavigationFragment() {
                         .setMessage(ctx.getString(R.string.del_item_confirm))
                         .setNegativeButton(R.string.no) { _, _ -> /* nothing */ }
                         .setPositiveButton(R.string.ok) { _, _ ->
-                            sourceList.removeAt(position)
-                            this.notifyItemRemoved(position)
-                            this.notifyItemRangeChanged(position, sourceList.size)
+                            dbModel.deleteSourceByID(sourceList[position].ID!!) {
+                                this.notifyItemRemoved(position)
+                                this.notifyItemRangeChanged(position, sourceList.size)
+                            }
+//                            sourceList.removeAt(position)
                             // TODO: delete data from database
                         }
                 dialog.show()
