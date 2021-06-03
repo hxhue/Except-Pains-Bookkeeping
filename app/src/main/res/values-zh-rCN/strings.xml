@@ -186,7 +186,13 @@
     <string name="clear_all_btn">全部清除</string>
     <string name="confirm">确认</string>
     <string name="select_all_btn">全选</string>
-    <string name="home_page_the_records_are_empty">没有记录</string>
+    <string name="home_page_the_records_are_empty">记录为空</string>
+    <string name="switch_income_cost">切换收支</string>
+    <string name="cost">支出</string>
+    <string name="income">收入</string>
+    <string name="cancel">取消</string>
+    <string name="sift_conditions">筛选条件</string>
+    <string name="date_range">日期范围</string>
     <string name="inbox_page_no_need_to_handle">记录都已被处理</string>
     <string name="alipay">支付宝</string>
     <string name="wechat">微信</string>
@@ -200,4 +206,7 @@
     <string name="present">礼物</string>
     <string name="food">餐饮</string>
     <string name="sports">运动</string>
+    <string name="date_start">起始日期</string>
+    <string name="date_end">终止日期</string>
+    <string name="show_date_range">%1$s - %2$s</string>
 </resources>
