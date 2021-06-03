@@ -240,28 +240,20 @@ class RecordDetailFragment:
 
         // 更新来源组件
         val sourceSpinner = view.findViewById<Spinner>(R.id.detail_src_spinner)
-        if (bindingRecord.sourceID == null) {
+        try {
+            val index = sourceNames.indexOf(dbModel.findSource(bindingRecord.sourceID!!)!!.name)
+            sourceSpinner.setSelection(if (index < 0) UNSPECIFIED_ITEM_POSITION else index)
+        } catch (e: NullPointerException) {
             sourceSpinner.setSelection(UNSPECIFIED_ITEM_POSITION)
-        } else {
-            val index = sourceNames.indexOf(bindingRecord.sourceID!!)
-            if (index < 0) {
-                sourceSpinner.setSelection(UNSPECIFIED_ITEM_POSITION)
-            } else {
-                sourceSpinner.setSelection(index)
-            }
         }
 
         // 更新种类组件
         val categorySpinner = view.findViewById<Spinner>(R.id.detail_type_spinner)
-        if (bindingRecord.categoryID == null) {
+        try {
+            val index = categoryNames.indexOf(dbModel.findCategory(bindingRecord.categoryID!!)!!.name)
+            categorySpinner.setSelection(if (index < 0) UNSPECIFIED_ITEM_POSITION else index)
+        } catch (e: NullPointerException) {
             categorySpinner.setSelection(UNSPECIFIED_ITEM_POSITION)
-        } else {
-            val index = categoryNames.indexOf(bindingRecord.categoryID!!)
-            if (index < 0) {
-                categorySpinner.setSelection(UNSPECIFIED_ITEM_POSITION)
-            } else {
-                categorySpinner.setSelection(index)
-            }
         }
     }
 
