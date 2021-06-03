@@ -11,20 +11,23 @@ import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.epledger.R
+import com.example.epledger.db.AppDatabase
 import com.example.epledger.db.DatabaseModel
 import com.example.epledger.model.Category
 import com.example.epledger.nav.NavigationFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.dialog_category_edit.view.*
-import kotlinx.android.synthetic.main.dialog_text_input.view.*
 import kotlinx.android.synthetic.main.mgr_rec_cate.view.*
 import kotlinx.android.synthetic.main.mgr_rec_cate_item.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class CategoryManagerFragment: NavigationFragment() {
     private val dbModel: DatabaseModel by activityViewModels()
     private val recyclerViewAdapter by lazy {
         val categories = dbModel.requireCategories()
-        CategoryAdapter(categories, requireActivity().supportFragmentManager)
+        CategoryAdapter(categories, requireActivity().supportFragmentManager, dbModel)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -50,10 +53,18 @@ class CategoryManagerFragment: NavigationFragment() {
             dialog.setCategorySubmitListener(object : CategoryItemDialogFragment.CategorySubmitListener {
                 override fun onCategorySubmit(category: Category) {
                     // TODO: insert this new category into database
-                    val categories = dbModel.categories.value!!
-                    val size = categories.size
-                    categories.add(category)
-                    recyclerViewAdapter.notifyItemInserted(size)
+                    dbModel.insertCategory(category) {
+                        recyclerViewAdapter.notifyItemInserted(dbModel.requireCategories().size)
+                    }
+//                    GlobalScope.launch(Dispatchers.IO) {
+//                        category.ID = AppDatabase.insertCategory(category)
+//                        val categories = dbModel.categories.value!!
+//                        val size = categories.size
+//                        categories.add(category)
+//                        withContext(Dispatchers.Main) {
+//                            recyclerViewAdapter.notifyItemInserted(size)
+//                        }
+//                    }
                 }
             })
             dialog.show(requireActivity().supportFragmentManager, null)
@@ -61,7 +72,7 @@ class CategoryManagerFragment: NavigationFragment() {
     }
 
     private fun setUpModel(view: View) {
-        dbModel.categories.observe(viewLifecycleOwner) {
+        dbModel.categories.observeForever {
             recyclerViewAdapter.categoryList = it
             recyclerViewAdapter.notifyDataSetChanged()
         }
@@ -69,7 +80,8 @@ class CategoryManagerFragment: NavigationFragment() {
 
     class CategoryAdapter(
         var categoryList: MutableList<Category>,
-        private val fragmentManager: FragmentManager
+        private val fragmentManager: FragmentManager,
+        private val dbModel: DatabaseModel
     ):RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         class ViewHolder(view: View): RecyclerView.ViewHolder(view) {}
@@ -99,10 +111,18 @@ class CategoryManagerFragment: NavigationFragment() {
                         .setMessage(ctx.getString(R.string.del_item_confirm))
                         .setNegativeButton(R.string.no) { _, _ -> /* nothing */ }
                         .setPositiveButton(R.string.ok) { _, _ ->
-                            categoryList.removeAt(position)
-                            this.notifyItemRemoved(position)
-                            this.notifyItemRangeChanged(position, categoryList.size)
-                            // TODO: delete data from database
+                            dbModel.deleteCategoryByID(categoryItem.ID!!) {
+                                this@CategoryAdapter.notifyItemRemoved(position)
+                                this@CategoryAdapter.notifyItemRangeChanged(position, categoryList.size)
+                            }
+//                            GlobalScope.launch(Dispatchers.IO) {
+//                                AppDatabase.deleteCategoryByID(categoryList[position].ID!!)
+//                                categoryList.removeAt(position)
+//                                withContext(Dispatchers.Main) {
+//                                    this@CategoryAdapter.notifyItemRemoved(position)
+//                                    this@CategoryAdapter.notifyItemRangeChanged(position, categoryList.size)
+//                                }
+//                            }
                         }
                 dialog.show()
                 true
@@ -114,9 +134,16 @@ class CategoryManagerFragment: NavigationFragment() {
                 dialog.bindExistingCategory(categoryList[position].copy())
                 dialog.setCategorySubmitListener(object: CategoryItemDialogFragment.CategorySubmitListener {
                     override fun onCategorySubmit(category: Category) {
-                        categoryList[position] = category
-                        this@CategoryAdapter.notifyItemChanged(position)
-                        // TODO: write changes into database
+                        dbModel.updateCategory(category) {
+                            this@CategoryAdapter.notifyItemChanged(position)
+                        }
+//                        GlobalScope.launch(Dispatchers.IO) {
+//                            AppDatabase.updateCategory(category)
+//                            categoryList[position] = category
+//                            withContext(Dispatchers.Main) {
+//                                this@CategoryAdapter.notifyItemChanged(position)
+//                            }
+//                        }
                     }
                 })
                 dialog.show(fragmentManager, null)

@@ -2,6 +2,8 @@ package com.example.epledger.home
 
 import android.animation.LayoutTransition
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
@@ -23,6 +25,8 @@ import com.example.epledger.nav.NavigationFragment.Companion.pushToStack
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.page_home.view.*
+import kotlinx.coroutines.*
+import java.lang.Runnable
 import java.lang.RuntimeException
 
 class HomeFragment : Fragment() {
@@ -69,22 +73,8 @@ class HomeFragment : Fragment() {
         // Register observers
         dbModel.groupedRecords.observeForever {
             mSectionAdapter!!.sections = it
-            updateLoadTimes()
             mSectionAdapter!!.notifyDataSetChanged()
         }
-    }
-
-    private var loadTimes = 0
-
-    /**
-     * 返回是否已经完成初次加载。因为首次加载是加载空数据，所以首次加载应该是第二次加载。
-     */
-    private fun updateLoadTimes() {
-        loadTimes = if (loadTimes >= 2) loadTimes else (loadTimes + 1)
-    }
-
-    private fun firstLoadIsFinished(): Boolean {
-        return (loadTimes >= 2)
     }
 
     private fun finishCreatingUI() {
@@ -92,18 +82,29 @@ class HomeFragment : Fragment() {
         val sectionAdapter = SectionAdapter(sections, dbModel)
 
         val checkEmptyListRunnable = Runnable {
-            if (!firstLoadIsFinished()) {
+            if (!dbModel.databaseHasLoaded) {
                 return@Runnable
             }
-            if (sectionAdapter.sections.isNullOrEmpty()) {
-                requireView().home_page_no_record_image.apply {
-                    alpha = 1.0f
-                    visibility = View.VISIBLE
+
+            GlobalScope.launch(Dispatchers.IO) {
+                // 等待view初始化完成
+                while (view == null) {
+                    delay(50)
                 }
-            } else {
-                requireView().home_page_no_record_image.apply {
-                    alpha = 0.0f
-                    visibility = View.INVISIBLE
+
+                // 在IO线程中等待好了再回到主线程
+                withContext(Dispatchers.Main) {
+                    if (sectionAdapter.sections.isNullOrEmpty()) {
+                        requireView().home_page_no_record_image.apply {
+                            alpha = 1.0f
+                            visibility = View.VISIBLE
+                        }
+                    } else {
+                        requireView().home_page_no_record_image.apply {
+                            alpha = 0.0f
+                            visibility = View.INVISIBLE
+                        }
+                    }
                 }
             }
         }

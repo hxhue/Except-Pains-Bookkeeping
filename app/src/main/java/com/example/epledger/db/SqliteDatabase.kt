@@ -1,49 +1,18 @@
 package com.example.epledger.db
+import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import androidx.core.database.getStringOrNull
 import com.example.epledger.model.Category
 import com.example.epledger.model.Record
 import com.example.epledger.model.Source
+import java.lang.RuntimeException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
-class SqliteDatabase : LedgerDatabase {
-    val im=ImportDataFromExcel();
-    val simpleFormat = SimpleDateFormat("yyyy/MM/dd hh:mm", Locale.US)
-
-    /*val records: MutableList<Record> = run {
-        val simpleFormat = SimpleDateFormat("yyyy/MM/dd hh:mm", Locale.US)
-        val rec1 = Record().apply {
-            ID = 11
-            moneyAmount = -2021.0
-            category = "Digital"
-            source = "Alipay"
-            mDate = simpleFormat.parse("2020/12/31 12:13")!!
-            note = "买了一个新的。"
-        }
-        val rec2 = Record().apply {
-            ID = 13
-            moneyAmount = -29.9
-            category = "Study"
-            mDate = simpleFormat.parse("2021/01/01 14:37")!!
-            note = "这是黄冈密卷，妈妈说这是她对我的爱。"
-            starred = true
-        }
-        val rec3 = rec1.getCopy().apply {
-            ID = 12
-            moneyAmount = -3099.0
-            source = "Wechat"
-            mDate = simpleFormat.parse("2020/12/31 08:19")!!
-            starred = true
-            note = "我是有钱人。"
-        }
-        val rec4 = rec3.getCopy().apply { ID = 17 }
-        val rec5 = rec4.getCopy().apply { ID = 18 }
-        // 不完整的记录也是有ID的，因为已经记录在数据库中了
-        val incompleteRec1 = Record().apply { ID = 20 }
-        arrayListOf(rec1, rec2, rec3, rec4, rec5, incompleteRec1)
-    }*/
+class SqliteDatabase(context: Context) : LedgerDatabase() {
+    val im = ImportDataFromExcel(context)
+    private val simpleFormat = SimpleDateFormat("yyyy/MM/dd hh:mm", Locale.US)
 
     override fun getRecordsOrderByDate(): List<Record> {
         val sqLiteDatabase: SQLiteDatabase = im.dbHelper.getReadableDatabase()
@@ -59,20 +28,24 @@ class SqliteDatabase : LedgerDatabase {
                 val from_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.from_id))
                 val type_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.type_id))
                 val s = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.star))==1
-                val from1 = im.get_id_from(from_id, sqLiteDatabase)
-                val type1 = im.get_id_type(type_id, sqLiteDatabase)
+//                val from1 = im.get_id_from(from_id, sqLiteDatabase)
+//                val type1 = im.get_id_type(type_id, sqLiteDatabase)
                 val r = b.apply {
-                    ID =t
-                    moneyAmount =cursor.getDouble(cursor.getColumnIndex(MySQLiteOpenHelper.account))
-                    source = from1
-                    category=type1
-                    mDate = simpleFormat.parse(cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.date1)))
+                    id =t
+                    money = cursor.getDouble(cursor.getColumnIndex(MySQLiteOpenHelper.account))
+
+                    // 2021-06-02 17:39:24
+                    // We use int for these fields now
+                    sourceID = if (from_id < 0) null else from_id
+                    categoryID = if (type_id < 0) null else type_id
+
+                    date = simpleFormat.parse(cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.date1)))
                     starred = s
                     //screenshot: Bitmap? = null
                     screenshotPath=cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.bitmap))
-                    note = cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.date1))
+                    note = cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.memo))
                 }
-                if(!r.isComplete()) res.add(r)
+                if(r.isComplete()) res.add(r)
             }
             cursor.close()
         }
@@ -94,18 +67,22 @@ class SqliteDatabase : LedgerDatabase {
                 val from_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.from_id))
                 val type_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.type_id))
                 val s = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.star))==1
-                val from1 = im.get_id_from(from_id, sqLiteDatabase)
-                val type1 = im.get_id_type(type_id, sqLiteDatabase)
+//                val from1 = im.get_id_from(from_id, sqLiteDatabase)
+//                val type1 = im.get_id_type(type_id, sqLiteDatabase)
                 val r = b.apply {
-                    ID =t
-                    moneyAmount =cursor.getDouble(cursor.getColumnIndex(MySQLiteOpenHelper.account))
-                    source = from1
-                    category=type1
-                    mDate = simpleFormat.parse(cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.date1)))
+                    id =t
+                    money =cursor.getDouble(cursor.getColumnIndex(MySQLiteOpenHelper.account))
+
+                    // 2021-06-02 17:40:41
+                    // We use int for these fields now
+                    sourceID = if (from_id < 0) null else from_id
+                    categoryID = if (type_id < 0) null else type_id
+
+                    date = simpleFormat.parse(cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.date1)))
                     starred = s
                     //screenshot: Bitmap? = null
                     screenshotPath=cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.bitmap))
-                    note = cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.date1))
+                    note = cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.memo))
                 }
                 if(!r.isComplete()) res.add(r)
             }
@@ -130,18 +107,22 @@ class SqliteDatabase : LedgerDatabase {
                 val from_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.from_id))
                 val type_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.type_id))
                 val s = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.star))==1
-                val from1 = im.get_id_from(from_id, sqLiteDatabase)
-                val type1 = im.get_id_type(type_id, sqLiteDatabase)
+//                val from1 = im.get_id_from(from_id, sqLiteDatabase)
+//                val type1 = im.get_id_type(type_id, sqLiteDatabase)
                 val r = b.apply {
-                    ID =t
-                    moneyAmount =cursor.getDouble(cursor.getColumnIndex(MySQLiteOpenHelper.account))
-                    source = from1
-                    category=type1
-                    mDate =simpleFormat.parse(cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.date1)))
+                    id =t
+                    money =cursor.getDouble(cursor.getColumnIndex(MySQLiteOpenHelper.account))
+
+                    // 2021-06-02 17:40:56
+                    // We use int for these fields now
+                    sourceID = if (from_id < 0) null else from_id
+                    categoryID = if (type_id < 0) null else type_id
+
+                    date =simpleFormat.parse(cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.date1)))
                     starred = s
                     //screenshot: Bitmap? = null
                     screenshotPath=cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.bitmap))
-                    note = cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.date1))
+                    note = cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.memo))
                 }
                 res.add(r)
             }
@@ -160,17 +141,20 @@ class SqliteDatabase : LedgerDatabase {
 
     override fun insertRecord(record: Record): Long {
         val sqLiteDatabase: SQLiteDatabase = im.dbHelper.getWritableDatabase()
-        val typeid=im.SelectTypeId(record.category,sqLiteDatabase)
-        val fromid=im.SelectFromId(record.source,sqLiteDatabase)
+
+//        val typeid = if (record.category == null) -1 else im.SelectTypeId(record.category,sqLiteDatabase)
+//        val fromid = if (record.source == null) -1 else im.SelectFromId(record.source,sqLiteDatabase)
+
+        // 2021-06-02 17:42:38
+        // We use int for these fields now
+        val typeid = record.categoryID ?: -1
+        val fromid = record.sourceID ?: -1
+
         val simpleFormat = SimpleDateFormat("yyyy/MM/dd hh:mm", Locale.US)
-        val s=0
-        if (record.starred)
-        {
-            val s=1
-        }
-        val c=im.getContentValues(simpleFormat.format(record.mDate),record.moneyAmount,typeid,fromid,record.note,record.screenshotPath,s)
+        val s = if (record.starred) 1 else 0
+        val c=im.getContentValues(simpleFormat.format(record.date),record.money,typeid,fromid,record.note,record.screenshotPath,s)
         sqLiteDatabase.insert(MySQLiteOpenHelper.TABLE_NAME, null, c)
-        val id=im.FindRecordID(fromid,typeid,record.moneyAmount,sqLiteDatabase)
+        val id=im.FindRecordID(fromid,typeid,record.money,sqLiteDatabase)
         return id
     }
 
@@ -182,15 +166,31 @@ class SqliteDatabase : LedgerDatabase {
 
     override fun updateRecord(record: Record) {
         val sqLiteDatabase: SQLiteDatabase = im.dbHelper.getWritableDatabase()
-        val typeid=im.SelectTypeId(record.category,sqLiteDatabase)
-        val fromid=im.SelectFromId(record.source,sqLiteDatabase)
-        val s=0
-        if (record.starred)
-        {
-            val s=1
+
+        // Just for sure, we check if the record is in database
+        // Checking: step 1
+        if (record.id == null) {
+            throw RuntimeException("This record have null ID")
         }
-        val c=im.getContentValues(simpleFormat.format(record.mDate),record.moneyAmount,typeid,fromid,record.note,record.screenshotPath,s)
-        im.Update(record.ID ,c,sqLiteDatabase)
+        // Checking: step 2
+//        val cursor = sqLiteDatabase.rawQuery("select * from " + MySQLiteOpenHelper.TABLE_NAME +
+//                " where record_id=${record.ID}", null)
+//        if (cursor.moveToNext()) {
+//            throw RuntimeException("This record is never in database")
+//        }
+        // The way of checking may be wrong...
+
+//        val typeid = if (record.category == null) -1 else im.SelectTypeId(record.category,sqLiteDatabase)
+//        val fromid = if (record.source == null) - 1 else im.SelectFromId(record.source,sqLiteDatabase)
+
+        // 2021-06-02 17:42:38
+        // We use int for these fields now
+        val typeid = record.categoryID ?: -1
+        val fromid = record.sourceID ?: -1
+
+        val s = if (record.starred) 1 else 0
+        val c=im.getContentValues(simpleFormat.format(record.date),record.money,typeid,fromid,record.note,record.screenshotPath,s)
+        im.Update(record.id, c, sqLiteDatabase)
     }
 
     override fun getAllSources(): MutableList<Source> {
@@ -264,6 +264,30 @@ class SqliteDatabase : LedgerDatabase {
         return res
     }
 
+    override fun insertCategory(category: Category): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun updateCategory(category: Category) {
+        TODO("Not yet implemented")
+    }
+
+    override fun deleteCategoryByID(id: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun insertSource(source: Source): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun updateSource(source: Source) {
+        TODO("Not yet implemented")
+    }
+
+    override fun deleteSourceByID(id: Int) {
+        TODO("Not yet implemented")
+    }
+
     override fun siftRecords(
             dateStart:Date,
             dateEnd: Date,
@@ -275,7 +299,6 @@ class SqliteDatabase : LedgerDatabase {
         // 编译错误：Class 'MemoryDatabase' is not abstract and does not implement abstract member public abstract fun siftRecords(dateStart: String, dateEnd: String, sources: List<Source>, categories: List<Category>): List<Record> defined in com.example.epledger.db.LedgerDatabase
         // 解决方式：补充了空实现以通过编译。请检查是否有实现没有被commit。
         //TODO("Not yet implemented")
-        val im=ImportDataFromExcel();
         val sqLiteDatabase: SQLiteDatabase = im.dbHelper.getReadableDatabase()
         val simpleFormat = SimpleDateFormat("yyyy/MM/dd")
         val start=simpleFormat.format(dateStart)
