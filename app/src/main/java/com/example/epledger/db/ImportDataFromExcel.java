@@ -6,6 +6,9 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 //import android.support.v7.app.AppCompatActivity;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceManager;
+
 import com.example.epledger.model.Category;
 import com.example.epledger.model.Record;
 import com.example.epledger.model.Source;
@@ -48,17 +51,23 @@ public class ImportDataFromExcel {
     public void initializeDatabase() {
         Context c = mContext;
         dbHelper = new MySQLiteOpenHelper(c,"test");
-        SQLiteDatabase db=dbHelper.getWritableDatabase();
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        List<Category> categoriesToAdd = Category.Companion.getDefaultCategories(mContext);
-        for (Category item: categoriesToAdd) {
-            AddNewType(db, item.getName(), item.getIconResID());
-        }
+        // Check if it's the first time we open the app,
+        // if that's the case, we create default categories and sources.
+        SharedPreferences preference = PreferenceManager.getDefaultSharedPreferences(c);
+        if (!preference.getBoolean("db_init_finished", false)) {
+            List<Category> categoriesToAdd = Category.Companion.getDefaultCategories(mContext);
+            for (Category item: categoriesToAdd) {
+                AddNewType(db, item.getName(), item.getIconResID());
+            }
 
-        List<Source> sourcesToAdd = Source.Companion.getDefaultSources(mContext);
-        for (Source item: sourcesToAdd) {
-            AddNewFrom(db, item.getName());
+            List<Source> sourcesToAdd = Source.Companion.getDefaultSources(mContext);
+            for (Source item: sourcesToAdd) {
+                AddNewFrom(db, item.getName());
+            }
         }
+        preference.edit().putBoolean("db_init_finished", true).apply();
 
         db.close();
     }

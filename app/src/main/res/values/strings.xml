@@ -73,37 +73,37 @@
     <string name="prefer_item_qa_noti">Show in notification center</string>
     <string name="prefer_item_qa_noti_sum">Recommended</string>
     <string name="prefer_cate_data">Data</string>
-    <string name="prefer_item_export_json">Export as JSON</string>
-    <string name="prefer_item_export_json_sum">When you want to restore data in the future</string>
+    <string name="prefer_item_export_db">Export Database</string>
+    <string name="prefer_item_export_db_sum">When you want to restore data in the future</string>
     <string name="prefer_item_export_csv">Export as CSV</string>
     <string name="prefer_item_export_csv_sum">When you want to view data in your computer</string>
-    <string name="prefer_item_import_json">Import from JSON</string>
-    <string name="prefer_item_import_json_sum">When you have a backup from this app</string>
+    <string name="prefer_item_import_db">Import Database</string>
+    <string name="prefer_item_import_db_sum">When you have a backup from this app</string>
     <string name="prefer_item_import_alipay">Import from CSV(Alipay)</string>
     <string name="prefer_item_import_alipay_sum">When you have data exported from Alipay</string>
     <string name="prefer_item_import_wechat">Import from CSV(Wechat)</string>
     <string name="prefer_item_import_wechat_sum">When you have data exported from Wechat</string>
     <string name="specification_title">Specifications</string>
-    <string name="specification_msg"><b>1 Quick-Action</b>
-        <font size="4">\n\n</font>Quick-Action is a small window which is supposed to be fast so it can offer you a convenient way of recording income and expenditure.
+    <string name="specification_msg"><b>1 Quick Actions</b>
+        <font size="4">\n\n</font><i>Quick Actions</i> is a small window which is supposed to be fast so it can offer you a convenient way of recording income and expenditure.
         <font size="6">\n\n</font><b>︎︎1.1 Brief Mode</b>
         <font size="4">\n\n</font>Date and time will be hidden in window and set to current time. If you scarcely adjust them, turning on this feature will give you a cleaner view.
         <font size="6">\n\n</font><b>1.2 Take Screenshot Immediately</b>
         <font size="4">\n\n</font>Screenshots are designed for situations where you barely have time to create a record so you want to take a screenshot and enter the details according to it later.
             We suggest you delete those screenshots to save storage space when you complete a record.
             If you frequently take screenshots, you can turn this feature on.
-        <font size="6">\n\n</font><b>1.3 Show Quick-Action in Notification Center</b>
+        <font size="6">\n\n</font><b>1.3 Show in Notification Center</b>
         <font size="4">\n\n</font>Quick-Action can be found both in quick settings as a tile button and in notification center(if you turn on this feature).
             Due to restrictions made by Google, in those latest SDKs, a tile service can not launch an activity in 5s once you press <b>HOME</b> button.
             This may lead to poor experience when you are really short of time.
         \nBesides, those SDKs do not allow permanent permission for screenshots. Turning on this feature allows saving a permission as long as the application is alive.
         <font size="12">\n\n</font><b>2 Data</b>
         <font size="4">\n\n</font>Backing up or restoring your data.
-        <font size="6">\n\n</font><b>2.1 Export as JSON</b>
-        <font size="4">\n\n</font>JSON is a flexible format easy for procedures to extract data. Exporting data as JSON allows future restoring.
+        <font size="6">\n\n</font><b>2.1 Export Database</b>
+        <font size="4">\n\n</font>Exporting database allows future restoring.
         <font size="6">\n\n</font><b>2.2 Export as CSV</b>
         <font size="4">\n\n</font>CSV is just like a spreadsheet but in a simpler format. You can view it in your computer.
-        <font size="6">\n\n</font><b>2.3 Import from JSON</b>
+        <font size="6">\n\n</font><b>2.3 Import Database</b>
         <font size="4">\n\n</font>For Data restoring.
         <font size="6">\n\n</font><b>2.4 Import from CSV(Alipay)</b>
         <font size="4">\n\n</font>You should follow the instructions on Alipay official website to export your income and expenditure details as CSV.
@@ -114,18 +114,16 @@
         <font size="12">\n\n</font><b>3 Inbox</b>
         <font size="6">\n\n</font><b>3.1 Star</b>
         <font size="4">\n\n</font>Why should you star records sometimes?
-        Cause they are really worth their prices, like a tuxedo for a banquet or a diamond ring for your lovely fiancee?
-        That way you should just create a new tag called Worthwhile and assign it to those records.
-        \nStars are for records that may change in near future.
         For example, if you lend a few bucks to your friend and he‘ll repay them in a couple of days,
         you can mark the record as starred.
         When you want to edit it days later, you can find it quickly.
-        <font size="6">\n\n</font><b>3.2 Badge</b>
-        <font size="4">\n\n</font>The badge on Inbox icon is used to indicate how many incomplete records you have.
+        <font size="6">\n\n</font><b>3.2 Incomplete records</b>
+        <font size="4">\n\n</font>Incomplete records are also shown here, the number of which is represented as a badge on the page icon.
         Usually we encourage keeping a few of them because you may just don’t have time, but they are harmful to statistics.
-        When you see a badge with number on Inbox icon, you should complete the records if you have time.
-        <font size="6">\n\n</font><b>3.3 Screenshots</b>
-        <font size="4">\n\n</font>Those records with screenshots will be listed in the inbox as well.
+        When you see a badge with number on Inbox icon, you should complete the records if you have time. <b>Screenshots within incomplete
+            records are deleted implicitly when you finish them.</b>
+        <font size="12">\n\n</font><b>4 List</b>
+        <font size="4">\n\n</font>You view a item by a short click, while delete one by a long click.
     </string>
     <string name="menu_title_inbox_notification">Notification</string>
     <string name="inbox_label_star">Starred</string>
@@ -200,7 +198,7 @@
     <string name="new_category">New Category</string>
     <string name="discard_changes_confirm">Are you sure about discarding all the changes?</string>
     <string name="restore_prev_state">Previous state restored.</string>
-    <string name="source_name_empty_prompt">You can\'t create a source whose name is empty. Please input some useful information.</string>
+    <string name="source_name_invalid_prompt">You can\'t create a source whose name is empty or duplicate. Please check your input.</string>
     <string name="record_incomplete_prompt">This record is considered incomplete and cannot be submitted. Please at least provide information about money (which cannot be 0.0 or -0.0) and category.</string>
     <string name="incomplete_item_removal_confirm">Are you sure about deleting this item? It is an incomplete item, which means you might have decided to create a placeholder record.</string>
     <string name="no_unhandled_records">No unhandled records.</string>
