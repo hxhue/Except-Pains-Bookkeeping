@@ -48,7 +48,7 @@ class ChartsFragment: Fragment() {
     private val ONEDAY=24*60*60*1000
     private var dateRangeIsSet=false
     private lateinit var pieChart: PieChart
-//    private lateinit var lineChart: LineChart
+    //    private lateinit var lineChart: LineChart
     private lateinit var barChart: BarChart
     lateinit var billList:List<Record>
     private lateinit var pieSwitch:SwitchMaterial
@@ -458,7 +458,6 @@ class ChartsFragment: Fragment() {
 //        lineChart.invalidate()
         lineChart.animateXY(300,300, EaseInOutBack)
     }
-
  */
 
     /**
