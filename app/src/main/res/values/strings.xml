@@ -65,7 +65,7 @@
     <string name="gift_type_chip">礼物</string>
     <string name="red_envelope_type_chip">红包</string>
     <string name="donate_type_chip">捐赠</string>
-    <string name="set_date_range_button">设置日期范围</string>
+    <string name="set_date_range_button">设置</string>
     <string name="prefer_cate_qa">Quick Action</string>
     <string name="prefer_item_brief">Brief mode</string>
     <string name="prefer_item_shot">Take screenshot on start</string>
@@ -206,7 +206,7 @@
     <string name="no_unhandled_records">No unhandled records.</string>
     <string name="clear_all_btn">Clear all</string>
     <string name="confirm">Confirm</string>
-    <string name="select_all_btn">Select all</string>
+    <string name="select_all_btn">全选/清空</string>
     <string name="home_page_the_records_are_empty">No records</string>
     <string name="inbox_page_no_need_to_handle">All records are handled</string>
     <string name="alipay">Alipay</string>
@@ -222,13 +222,25 @@
     <string name="present">Present</string>
     <string name="switch_income_cost">切换收支</string>
     <string name="cost">支出</string>
-    <string name="income">收入</string>
     <string name="cancel">取消</string>
     <string name="sift_conditions">筛选条件</string>
     <string name="date_range">日期范围</string>
     <string name="date_start">起始日期</string>
     <string name="date_end">终止日期</string>
     <string name="show_date_range">%1$s - %2$s</string>
+    <string name="recent_14_days">最近14天</string>
+    <string name="label">menu hint</string>
+    <string name="date_menu_hint">筛选范围</string>
+    <string name="recent_7_days">最近7天</string>
+    <string name="sift_by_yourself">手动筛选</string>
+    <string name="category_stats">分类统计</string>
+    <string name="consume_tendency">消费趋势</string>
+    <string name="overview">收支总览</string>
+    <string name="income">收入</string>
+    <string name="expenditure">支出</string>
+    <string name="avg_expenditure">日均支出</string>
+    <string name="balance">结余</string>
+    <string name="cancel_select_all">取消全选</string>
 
 
 </resources>
