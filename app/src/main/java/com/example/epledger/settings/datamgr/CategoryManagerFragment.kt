@@ -52,19 +52,9 @@ class CategoryManagerFragment: NavigationFragment() {
             val dialog = CategoryItemDialogFragment()
             dialog.setCategorySubmitListener(object : CategoryItemDialogFragment.CategorySubmitListener {
                 override fun onCategorySubmit(category: Category) {
-                    // TODO: insert this new category into database
                     dbModel.insertCategory(category) {
                         recyclerViewAdapter.notifyItemInserted(dbModel.requireCategories().size)
                     }
-//                    GlobalScope.launch(Dispatchers.IO) {
-//                        category.ID = AppDatabase.insertCategory(category)
-//                        val categories = dbModel.categories.value!!
-//                        val size = categories.size
-//                        categories.add(category)
-//                        withContext(Dispatchers.Main) {
-//                            recyclerViewAdapter.notifyItemInserted(size)
-//                        }
-//                    }
                 }
             })
             dialog.show(requireActivity().supportFragmentManager, null)
@@ -115,14 +105,6 @@ class CategoryManagerFragment: NavigationFragment() {
                                 this@CategoryAdapter.notifyItemRemoved(position)
                                 this@CategoryAdapter.notifyItemRangeChanged(position, categoryList.size)
                             }
-//                            GlobalScope.launch(Dispatchers.IO) {
-//                                AppDatabase.deleteCategoryByID(categoryList[position].ID!!)
-//                                categoryList.removeAt(position)
-//                                withContext(Dispatchers.Main) {
-//                                    this@CategoryAdapter.notifyItemRemoved(position)
-//                                    this@CategoryAdapter.notifyItemRangeChanged(position, categoryList.size)
-//                                }
-//                            }
                         }
                 dialog.show()
                 true
@@ -137,13 +119,6 @@ class CategoryManagerFragment: NavigationFragment() {
                         dbModel.updateCategory(category) {
                             this@CategoryAdapter.notifyItemChanged(position)
                         }
-//                        GlobalScope.launch(Dispatchers.IO) {
-//                            AppDatabase.updateCategory(category)
-//                            categoryList[position] = category
-//                            withContext(Dispatchers.Main) {
-//                                this@CategoryAdapter.notifyItemChanged(position)
-//                            }
-//                        }
                     }
                 })
                 dialog.show(fragmentManager, null)

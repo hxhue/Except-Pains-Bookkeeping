@@ -1,6 +1,7 @@
 package com.example.epledger
 
 import android.app.Activity
+import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.util.Log
@@ -42,19 +43,12 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Init AppDatabase
-        AppDatabase = SqliteDatabase(this.applicationContext)
-//        AppDatabase = MemoryDatabase(this.applicationContext)
-
+        // 加载模块
+        loadModules()
         // 禁用黑暗模式
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-
         // 界面初始化
         setupViews()
-
-        // 加载其他模块
-        loadModules()
     }
 
     private fun setupViews() {
@@ -123,8 +117,14 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         val ctx = this.applicationContext
         loadNotificationModule(ctx)
         loadQuickActionModule(ctx)
-        // 创建cache的视图
         createViewCache()
+        loadDatabaseModule(ctx)
+    }
+
+    private fun loadDatabaseModule(ctx: Context) {
+        // Init AppDatabase
+        AppDatabase = SqliteDatabase(this.applicationContext)
+//        AppDatabase = MemoryDatabase(this.applicationContext)
     }
 
     private fun createViewCache() {
