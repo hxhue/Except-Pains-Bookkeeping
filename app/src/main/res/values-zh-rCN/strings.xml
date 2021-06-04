@@ -187,6 +187,10 @@
     <string name="confirm">确认</string>
     <string name="select_all_btn">全选/清空</string>
     <string name="home_page_the_records_are_empty">记录为空</string>
+    <string name="filter_title">筛选</string>
+    <string name="to">到</string>
+    <string name="amount_range">金额范围</string>
+    <string name="filter_incomplete_prompt">这个筛选条件不完整而不能提交。请完善筛选信息后提交。</string>
     <string name="switch_income_cost">切换收支</string>
     <string name="cost">支出</string>
     <string name="income">收入</string>
@@ -222,4 +226,7 @@
     <string name="balance">结余</string>
     <string name="cancel_select_all">取消全选</string>
     <string name="please_set_date_range">请设置日期范围</string>
+    <string name="please_select_data_range">请选择日期范围</string>
+    <string name="from">从</string>
+    <string name="filter_result">筛选结果</string>
 </resources>

@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:id="@+id/filter_scrollview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fadeScrollbars="false"
+            android:scrollbarAlwaysDrawVerticalTrack="true"
+            android:scrollbarFadeDuration="0">
+
+            <View
+                android:id="@+id/filter_date_compo"
+                android:layout_width="0dp"
+                android:layout_height="70dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <EditText
+                android:id="@+id/filter_date_text_left"
+                android:layout_width="0dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="14dp"
+                android:layout_marginEnd="8dp"
+                android:background="@null"
+                android:cursorVisible="false"
+                android:ems="4"
+                android:focusable="false"
+                android:inputType="date"
+                android:textAlignment="viewStart"
+                android:textIsSelectable="false"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toStartOf="@+id/filter_date_label3"
+                app:layout_constraintStart_toEndOf="@+id/filter_date_label2"
+                app:layout_constraintTop_toBottomOf="@+id/filter_date_label" />
+
+            <TextView
+                android:id="@+id/filter_date_label3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="28dp"
+                android:text="@string/to"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/filter_date_label2"
+                app:layout_constraintTop_toBottomOf="@+id/filter_date_label" />
+
+            <TextView
+                android:id="@+id/filter_date_label2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/from"
+                app:layout_constraintStart_toStartOf="@+id/filter_date_compo"
+                app:layout_constraintTop_toBottomOf="@+id/filter_date_label" />
+
+            <TextView
+                android:id="@+id/filter_date_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/date_range"
+                app:layout_constraintStart_toStartOf="@+id/filter_date_compo"
+                app:layout_constraintTop_toTopOf="@+id/filter_date_compo" />
+
+            <Button
+                android:id="@+id/filter_date_button"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="28dp"
+                android:layout_marginBottom="8dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:text="@string/detail_btn_select"
+                android:textColor="@color/lightColorPrimary"
+                app:layout_constraintBottom_toTopOf="@+id/filter_date_text_right"
+                app:layout_constraintEnd_toEndOf="@+id/filter_date_compo"
+                app:layout_constraintTop_toTopOf="@id/filter_date_compo" />
+
+            <EditText
+                android:id="@+id/filter_date_text_right"
+                android:layout_width="0dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="14dp"
+                android:layout_marginEnd="28dp"
+                android:background="@null"
+                android:cursorVisible="false"
+                android:ems="4"
+                android:focusable="false"
+                android:inputType="date"
+                android:textAlignment="viewStart"
+                android:textIsSelectable="false"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="@+id/filter_date_compo"
+                app:layout_constraintStart_toEndOf="@+id/filter_date_label3"
+                app:layout_constraintTop_toBottomOf="@+id/filter_date_label" />
+
+            <View
+                android:id="@+id/filter_src_compo"
+                android:layout_width="0dp"
+                android:layout_height="70dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/filter_date_compo" />
+
+            <TextView
+                android:id="@+id/filter_src_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/sources"
+                app:layout_constraintStart_toStartOf="@id/filter_src_compo"
+                app:layout_constraintTop_toTopOf="@id/filter_src_compo" />
+
+            <HorizontalScrollView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="28dp"
+                android:layout_marginEnd="24dp"
+                android:scrollbars="none"
+                app:layout_constraintEnd_toEndOf="@id/filter_src_compo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/filter_src_compo">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/filter_src_chipgroup"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:singleLine="true" />
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <View
+                android:id="@+id/filter_type_compo"
+                android:layout_width="0dp"
+                android:layout_height="70dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/filter_src_compo" />
+
+            <TextView
+                android:id="@+id/filter_type_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/detail_type"
+                app:layout_constraintStart_toStartOf="@id/filter_type_compo"
+                app:layout_constraintTop_toTopOf="@id/filter_type_compo" />
+
+            <HorizontalScrollView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="28dp"
+                android:layout_marginEnd="24dp"
+                android:scrollbars="none"
+                app:layout_constraintEnd_toEndOf="@id/filter_type_compo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/filter_type_compo">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/filter_type_chipgroup"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:singleLine="true" />
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <EditText
+                android:id="@+id/filter_money_min"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:ems="4"
+                android:inputType="numberDecimal|numberSigned"
+                android:textAlignment="center"
+                app:layout_constraintEnd_toStartOf="@+id/filter_money_label3"
+                app:layout_constraintStart_toEndOf="@+id/filter_money_label2"
+                app:layout_constraintTop_toBottomOf="@+id/filter_money_label1" />
+
+            <View
+                android:id="@+id/filter_money_screenshot_compo"
+                android:layout_width="0dp"
+                android:layout_height="70dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/filter_type_compo" />
+
+            <EditText
+                android:id="@+id/filter_money_max"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="28dp"
+                android:ems="4"
+                android:inputType="numberDecimal|numberSigned"
+                android:textAlignment="center"
+                app:layout_constraintEnd_toEndOf="@+id/filter_money_screenshot_compo"
+                app:layout_constraintStart_toEndOf="@+id/filter_money_label3"
+                app:layout_constraintTop_toBottomOf="@+id/filter_money_label1" />
+
+            <TextView
+                android:id="@+id/filter_money_label1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/amount_range"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/filter_money_screenshot_compo" />
+
+            <TextView
+                android:id="@+id/filter_money_label2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/from"
+                app:layout_constraintStart_toStartOf="@+id/filter_money_screenshot_compo"
+                app:layout_constraintTop_toBottomOf="@+id/filter_money_label1" />
+
+            <TextView
+                android:id="@+id/filter_money_label3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="28dp"
+                android:gravity="center_horizontal"
+                android:text="@string/to"
+                app:layout_constraintEnd_toEndOf="@+id/filter_money_screenshot_compo"
+                app:layout_constraintStart_toEndOf="@+id/filter_money_label2"
+                app:layout_constraintTop_toBottomOf="@+id/filter_money_label1" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
