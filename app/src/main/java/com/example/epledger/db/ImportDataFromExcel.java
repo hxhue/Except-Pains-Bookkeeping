@@ -78,7 +78,7 @@ public class ImportDataFromExcel {
         }
 
         Source[] sourcesToAdd = new Source[] {
-                new Source("Alipay2", 1),
+                new Source("Alipay", 1),
                 new Source("Wechat", 2),
                 new Source("Cash", 3),
         };
@@ -255,7 +255,7 @@ public class ImportDataFromExcel {
             date=date.substring(0,date.length()-3);
             date=date.replaceAll("-","/");
             System.out.println(date);
-            date=simpleFormat.format(date);
+            //date=simpleFormat.format(date);
             String state=lines[4].trim();
             //System.out.println(state=="支出");
             if(state!=null)
@@ -303,27 +303,30 @@ public class ImportDataFromExcel {
             bfw=new BufferedWriter(new OutputStreamWriter(new FileOutputStream(savefile),"gbk"));
             //bfw.newLine();
             if (rowCount > 0){
-
-                for (int i = 2; i < colCount; i++) {
-                    if (i != colCount - 1)
-                        bfw.write(cursor.getColumnName(i) + ',');
-                    else
-                        bfw.write(cursor.getColumnName(i));
-                }
-
+                bfw.write("日期"+ ',');
+                bfw.write("收支"+ ',');
+                bfw.write("金额"+ ',');
+                bfw.write("类型"+ ',');
+                bfw.write("来源"+ ',');
+                bfw.write("备注");
                 bfw.newLine();
-
                 for (int i = 0; i < rowCount; i++) {
                     cursor.moveToPosition(i);
-                    Log.v("导出数据", "正在导出第" + (i + 1) + "条");
-                    for (int j = 2; j < colCount; j++) {
-                        String tmp=cursor.getString(j);
-                        if(cursor.getString(j)==null) tmp="";
-                        if (j != colCount - 1)
-                            bfw.write(tmp + ',');
-                        else
-                            bfw.write(tmp);
+                    if(cursor.getDouble(3)==0||cursor.getInt(4)<=0) continue;
+                    String tmp=cursor.getString(2);
+                    bfw.write(tmp + ',');
+                    double d=cursor.getDouble(3);
+                    if(d<0){
+                        d=-d;
+                        bfw.write("支出"+',');
                     }
+                    else bfw.write("收入"+',');
+                    bfw.write(Double.toString(d)+',');
+                    int TypeId=cursor.getInt(4);
+                    bfw.write(get_id_type(TypeId,db)+',');
+                    int FromId=cursor.getInt(5);
+                    bfw.write(get_id_from(FromId,db)+',');
+                    bfw.write(cursor.getString(6));
                     bfw.newLine();
                 }}
 
@@ -463,13 +466,11 @@ public class ImportDataFromExcel {
     public  void DeleteID(Long rid,SQLiteDatabase db)
     {
         int m=db.delete(MySQLiteOpenHelper.TABLE_NAME,"record_id=?",new String[]{Long.toString(rid)});
-        System.out.println("我被删除了");
         System.out.println(m);
     }
     public void Update(Long rid,ContentValues c,SQLiteDatabase db)
     {
         int m=db.update(MySQLiteOpenHelper.TABLE_NAME,c, "record_id=?",new String[]{Long.toString(rid)});
-        System.out.println("我被更新了");
         System.out.println(m);
     }
     //查询SQLite数据库。读出所有数据内容。

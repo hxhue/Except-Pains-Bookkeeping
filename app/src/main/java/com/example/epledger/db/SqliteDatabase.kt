@@ -39,13 +39,9 @@ class SqliteDatabase(context: Context) : LedgerDatabase() {
 
                     // 2021-06-02 17:39:24
                     // We use int for these fields now
-                    sourceID = if (from_id < 0) null else from_id
-                    categoryID = if (type_id < 0) null else type_id
-                    System.out.print("字符串为：")
-                    System.out.println(date1)
+                    sourceID = if (from_id <= 0) null else from_id
+                    categoryID = if (type_id <= 0) null else type_id
                     date = simpleFormat.parse(date1)
-                    System.out.print("日期为：")
-                    System.out.println(date)
                     starred = s
                     //screenshot: Bitmap? = null
                     screenshotPath=cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.bitmap))
@@ -81,8 +77,8 @@ class SqliteDatabase(context: Context) : LedgerDatabase() {
 
                     // 2021-06-02 17:40:41
                     // We use int for these fields now
-                    sourceID = if (from_id < 0) null else from_id
-                    categoryID = if (type_id < 0) null else type_id
+                    sourceID = if (from_id <= 0) null else from_id
+                    categoryID = if (type_id <= 0) null else type_id
 
                     date = simpleFormat.parse(cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.date1)))
                     starred = s
@@ -90,8 +86,11 @@ class SqliteDatabase(context: Context) : LedgerDatabase() {
                     screenshotPath=cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.bitmap))
                     note = cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.memo))
                 }
+                System.out.println(type_id)
                 if(!r.isComplete()) res.add(r)
             }
+            System.out.print("一共有：")
+            System.out.print(res.size)
             cursor.close()
         }
         return res

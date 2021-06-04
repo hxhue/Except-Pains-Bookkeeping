@@ -42,7 +42,7 @@ class SettingsFragment: PreferenceFragmentCompat(), SharedPreferences.OnSharedPr
         else if(mode==3&&path!="")
         {
             val f=FileManager(this.context)
-            f.reloadDb("/data/data/com.example.epledger/databases/Database")
+            f.reloadDb(path)
         }
 
     }
@@ -80,7 +80,7 @@ class SettingsFragment: PreferenceFragmentCompat(), SharedPreferences.OnSharedPr
         // Data
         val eJSON = preferenceScreen.findPreference<Preference>("data_export_json")
         eJSON?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-            Toast.makeText(requireContext(), "数据库文件已保存在Andriod/data/data/com.example.epledger/databases/Database中", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "数据库文件已保存在Andriod/data/data/com.example.epledger/files/Database中", Toast.LENGTH_SHORT).show()
             val file=FileManager(this.context)
             file.writeDb()
             true
