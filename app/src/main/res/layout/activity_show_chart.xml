@@ -201,6 +201,18 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="0dp" />
+            
+            <TextView
+                android:id="@+id/noDataTextView"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_below="@id/pieSwitch"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="0dp"
+                android:textSize="18sp"
+                android:gravity="center"
+                />
 
             <View
                 android:id="@+id/barBeginLine"

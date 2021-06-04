@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import com.example.epledger.model.Category
+import com.example.epledger.model.Filter
 import com.example.epledger.model.Record
 import com.example.epledger.model.Source
 import java.lang.IllegalArgumentException
@@ -107,6 +108,11 @@ abstract class LedgerDatabase {
      * 删除数据库中的一条来源（账户）信息。
      */
     abstract fun deleteSourceByID(id: Int)
+
+    /**
+     * 通过filter筛选记录，默认按日期从早到晚排序
+     */
+    abstract fun filterRecords(filter: Filter): List<Record>
 
 }
 
@@ -286,5 +292,20 @@ class MemoryDatabase(private val context: Context) : LedgerDatabase() {
         sources.removeAll {
             it.ID == id
         }
+    }
+
+    // TODO: 现在还不知道应该用id还是string索引category和source，之后再改
+    override fun filterRecords(filter: Filter): List<Record> {
+        val result = ArrayList<Record>()
+        records.filter { filter.minAmount <= it.money &&
+                it.money <= filter.maxAmount &&
+                filter.startDate <= it.date &&
+                it.date <= filter.endDate &&
+                filter.sources.contains(it.sourceID) &&
+                filter.categories.contains(it.categoryID)
+        }
+                .sortedWith(Record.dateReverseComparator)
+                .forEach {result.add(it)}
+        return result
     }
 }

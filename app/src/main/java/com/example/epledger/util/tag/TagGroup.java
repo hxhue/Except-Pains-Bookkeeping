@@ -3,40 +3,36 @@ package com.example.epledger.util.tag;
 import android.content.Context;
 import android.view.LayoutInflater;
 
+import androidx.core.util.Pair;
+
 import com.example.epledger.R;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TagGroup {
     private Context mContext;
     private LayoutInflater mLayoutInflater;
     private ChipGroup mChipGroup;
-    public static List<BaseTag> sTagList;
-
-    private void initTagList() {
-        List<String> tagString = Arrays.asList("餐饮", "教育", "交通", "娱乐", "书籍", "服装", "数码");
-        for (String tag: tagString) {
-            sTagList.add(new BaseTag(tag));
-        }
-    }
+    private List<BaseTag> mTagList;
 
     private void addChip(BaseTag tag) {
         Chip chip = (Chip) mLayoutInflater.inflate(R.layout.row_tag_view, mChipGroup, false);
         chip.setText(tag.getName());
+        chip.setCheckable(true);
+        chip.setChecked(tag.isChecked());
+        chip.setId(tag.getId());
         mChipGroup.addView(chip);
     }
 
-    public TagGroup(Context context, ChipGroup chipGroup) {
+    public TagGroup(Context context, ChipGroup chipGroup, List<BaseTag> baseTagList) {
         mContext = context;
         mChipGroup = chipGroup;
         mLayoutInflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
-        if (sTagList == null) {
-            initTagList();
-        }
-        for (BaseTag tag: sTagList) {
+        mTagList = baseTagList;
+        for (BaseTag tag: mTagList) {
             addChip(tag);
         }
     }
@@ -45,13 +41,38 @@ public class TagGroup {
         if (tags == null) {
             return;
         }
-        sTagList.addAll(tags);
-        for (BaseTag tag: sTagList) {
+        mTagList.addAll(tags);
+        for (BaseTag tag: mTagList) {
             addChip(tag);
         }
     }
 
     public List<Integer> getAllSelectedTags() {
         return mChipGroup.getCheckedChipIds();
+    }
+
+    public List<Integer> getAllUnSelectedTags() {
+        List<Integer> unSelected = new ArrayList<>();
+        for (int i = 0; i < mChipGroup.getChildCount(); i++) {
+            Chip chip = (Chip) mChipGroup.getChildAt(i);
+            if (!chip.isChecked()) {
+                unSelected.add(chip.getId());
+            }
+        }
+        return unSelected;
+    }
+
+    // 得到所有的tags，first是id，second是是否选中
+    public List<Pair<Integer, Boolean>> getAllTags() {
+        List<Pair<Integer, Boolean>> tags = new ArrayList<>();
+        for (int i = 0; i < mChipGroup.getChildCount(); i++) {
+            Chip chip = (Chip) mChipGroup.getChildAt(i);
+            tags.add(new Pair<>(chip.getId(), chip.isChecked()));
+        }
+        return tags;
+    }
+
+    public void clearChecked() {
+        mChipGroup.clearCheck();
     }
 }
