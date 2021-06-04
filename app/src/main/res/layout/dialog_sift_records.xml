@@ -78,35 +78,33 @@
 
         <Button
             android:id="@+id/selectAllCategoriesBtn"
-            android:layout_width="200dp"
+            style="?attr/buttonBarPositiveButtonStyle"
+            android:layout_width="wrap_content"
             android:layout_height="49dp"
-            android:layout_alignStart="@+id/setDateRangeButton"
+            android:layout_alignStart="@+id/selectAllAccountsBtn"
             android:layout_alignTop="@id/expenseTypeTextView"
-            android:layout_alignEnd="@+id/setDateRangeButton"
+            android:layout_alignEnd="@+id/selectAllAccountsBtn"
             android:layout_alignBottom="@id/expenseTypeTextView"
-            android:layout_marginStart="0dp"
             android:layout_marginTop="0dp"
-            android:layout_marginEnd="0dp"
             android:text="@string/select_all_btn" />
 
         <Button
             android:id="@+id/selectAllAccountsBtn"
-            android:layout_width="200dp"
+            style="?attr/buttonBarPositiveButtonStyle"
+            android:layout_width="wrap_content"
             android:layout_height="49dp"
-            android:layout_alignStart="@+id/selectAllCategoriesBtn"
             android:layout_alignTop="@+id/accountTextView"
-            android:layout_alignEnd="@+id/setDateRangeButton"
+            android:layout_alignParentEnd="true"
             android:layout_alignBottom="@+id/accountTextView"
-            android:layout_marginStart="0dp"
-            android:layout_marginTop="0dp"
-            android:layout_marginEnd="0dp"
-            android:layout_marginBottom="0dp"
+            android:layout_marginTop="-2dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="2dp"
             android:text="@string/select_all_btn" />
 
         <ScrollView
             android:id="@+id/typeScrollView"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="wrap_content"
             android:layout_below="@id/expenseTypeTextView"
             android:layout_alignStart="@+id/expenseTypeTextView"
             android:layout_alignEnd="@+id/selectAllCategoriesBtn"
@@ -129,11 +127,12 @@
 
         <Button
             android:id="@+id/setDateRangeButton"
+            style="?attr/buttonBarPositiveButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="49dp"
             android:layout_below="@id/typeScrollView"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="24dp"
+            android:layout_alignStart="@id/selectAllAccountsBtn"
+            android:layout_alignEnd="@id/selectAllAccountsBtn"
             android:layout_marginTop="12dp"
             android:text="@string/set_date_range_button" />
 
@@ -141,10 +140,10 @@
             android:id="@+id/dateRangeDisplay"
             android:layout_width="wrap_content"
             android:layout_height="49dp"
+            android:textSize="18sp"
             android:layout_below="@id/dateRangeTextView"
             android:layout_alignParentStart="true"
             android:layout_alignParentEnd="true"
-            android:layout_marginTop="12dp"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
             android:gravity="center"
