@@ -5,12 +5,6 @@ import java.util.*
 import kotlin.Comparator
 
 class RecordGroup(var date: Date, var records: MutableList<Record>) {
-//
-//    // TODO: 2021/5/23 准备删掉
-//    enum class SectionType {
-//        STARRED, INCOMPLETE, SCREENSHOTS, EVENTS
-//    }
-
     companion object  {
         val dateReverseComparator = Comparator<RecordGroup> { o1, o2 ->
             if (o1 == null || o2 == null) {

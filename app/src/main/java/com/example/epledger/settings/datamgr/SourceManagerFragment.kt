@@ -85,7 +85,7 @@ class SourceManagerFragment: NavigationFragment() {
             // Short click to modify name
             view.setOnClickListener {
                 val adapter = this
-                val dialog = createSourceDialog(ctx, sourceList[position].name, dbModel, object : OnSourceSubmitListener {
+                val dialog = createSourceDialog(ctx, sourceList[position], dbModel, object : OnSourceSubmitListener {
                     override fun onSourceSubmit(sourceName: String) {
                         // This is safe because update CAN happen multiple times
                         sourceList[position].name = sourceName
@@ -129,7 +129,7 @@ class SourceManagerFragment: NavigationFragment() {
  * @param sourceName: 已有source的名称。如果为空，表明是正在新建一个source
  * @param onSubmitListener: 提交时的回调接口
  */
-private fun createSourceDialog(ctx: Context, sourceName: CharSequence?, dbModel: DatabaseModel,
+private fun createSourceDialog(ctx: Context, source: Source?, dbModel: DatabaseModel,
                                onSubmitListener: OnSourceSubmitListener): Dialog {
     val inflater = LayoutInflater.from(ctx)
     val contentView  = inflater.inflate(R.layout.dialog_text_input, null).apply {
@@ -138,10 +138,10 @@ private fun createSourceDialog(ctx: Context, sourceName: CharSequence?, dbModel:
             ViewGroup.LayoutParams.MATCH_PARENT
         )
         // 如果这是一个已存在的source记录，则在文本框中显示当前的名称
-        sourceName?.let {
+        source?.name.let {
             this.string_input_edittext.apply {
                 // 设置文本
-                setText(sourceName)
+                setText(it)
                 // 把输入光标移动到文本最后面
                 setSelection(text.length)
             }
@@ -153,9 +153,10 @@ private fun createSourceDialog(ctx: Context, sourceName: CharSequence?, dbModel:
         .setNegativeButton(R.string.no) { _, _ -> /**/ }
         .setPositiveButton(R.string.ok) { _, _ ->
             val stringToSubmit = contentView.string_input_edittext.text.toString()
+            val newSource = Source(stringToSubmit, source?.ID)
 
             // Check if it's empty or duplicate
-            if (checkNewSourceName(dbModel, stringToSubmit)) {
+            if (checkNewSourceName(dbModel, newSource)) {
                 onSubmitListener.onSourceSubmit(stringToSubmit)
             } else {
                 val emptyCheckFailureDialog = MaterialAlertDialogBuilder(ctx)
@@ -165,7 +166,7 @@ private fun createSourceDialog(ctx: Context, sourceName: CharSequence?, dbModel:
                 emptyCheckFailureDialog.show()
             }
         }
-        .setTitle(if (sourceName != null) {
+        .setTitle(if (source?.ID != null) {
             ctx.getString(R.string.modify_name)
         } else {
             ctx.getString(R.string.new_source)
@@ -181,8 +182,12 @@ private fun createSourceDialog(ctx: Context, sourceName: CharSequence?, dbModel:
     return dialog
 }
 
-private fun checkNewSourceName(dbModel: DatabaseModel, name: String?): Boolean {
-    return (!name.isNullOrBlank()) && (dbModel.findSource(name) == null)
+private fun checkNewSourceName(dbModel: DatabaseModel, source: Source): Boolean {
+    if (source.name.isBlank()) {
+        return false
+    }
+    val sourceInModel = dbModel.findSource(source.name)
+    return (sourceInModel == null) || (sourceInModel.ID == source.ID)
 }
 
 private interface OnSourceSubmitListener {
