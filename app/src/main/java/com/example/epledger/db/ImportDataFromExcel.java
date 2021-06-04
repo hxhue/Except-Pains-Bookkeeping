@@ -143,7 +143,7 @@ public class ImportDataFromExcel {
     public ArrayList<Record> FindTimeFrom(SQLiteDatabase sqLiteDatabase, String start, String end, List<String>s, List<String>c) throws ParseException {
         //SQLiteDatabase sqLiteDatabase=dbHelper.getReadableDatabase();
         ArrayList<Record> sum=new ArrayList<>();
-        if(s==null)
+        if(s.size()==0)
         {
             for(int j=0;j<c.size();j++)
             {
@@ -366,8 +366,14 @@ public class ImportDataFromExcel {
                 b.setMoney(cursor.getDouble(cursor.getColumnIndex(MySQLiteOpenHelper.account)));
                 int type_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.type_id));
                 int from_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.from_id));
-                b.setSourceID( get_id_from(from_id,db));
-                b.setCategory(get_id_type(type_id,db));
+//                b.setSource( get_id_from(from_id,db));
+//                b.setCategory(get_id_type(type_id,db));
+
+                // 2021-06-02 18:08:45
+                // Now these fields are of type (Int?)
+                b.setSourceID(from_id);
+                b.setCategoryID(type_id);
+
                 b.setNote(cursor.getString(cursor.getColumnIndex(MySQLiteOpenHelper.memo)));
                 int isstar=cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.star));
                 b.setStarred(isstar==1);

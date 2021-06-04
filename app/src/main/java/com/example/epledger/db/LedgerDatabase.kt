@@ -221,9 +221,9 @@ class MemoryDatabase(private val context: Context) : LedgerDatabase() {
 //        for(cat in categories)
 //            categoryStrs.add(cat.name)
         val result=ArrayList<Record>()
-        records.filter { it.date>dateStart&&it.date<dateEnd&&sources.contains(it.sourceID)&&categories.contains(it.categoryID)}
+        /*records.filter { it.date>dateStart&&it.date<dateEnd&&sources.contains(it.sourceID)&&categories.contains(it.categoryID)}
                 .sortedWith(Record.dateReverseComparator)
-                .forEach { result.add(it) }
+                .forEach { result.add(it) }*/
         return result
     }
 
