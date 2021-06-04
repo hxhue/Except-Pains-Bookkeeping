@@ -110,7 +110,7 @@ public class FilterDialogFragment extends DialogFragment {
                             // 构建筛选条件Filter
                             Filter filter = new Filter(
                                     DateFormat.getDateInstance().parse(filterDateTextLeft.getText().toString()),
-                                    DateFormat.getDateInstance().parse(filterDateTextRight.getText().toString()),
+                                    addOneDay(DateFormat.getDateInstance().parse(filterDateTextRight.getText().toString())),
                                     Double.parseDouble(filterMoneyMin.getText().toString()),
                                     Double.parseDouble(filterMoneyMax.getText().toString()),
                                     categoryTagGroup.getAllSelectedTags(),
@@ -186,6 +186,13 @@ public class FilterDialogFragment extends DialogFragment {
 
     private void updateSourceViewModel(List<Source> sourceList) {
         filterSourceViewModel.update(sourceList);
+    }
+
+    private Date addOneDay(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.add(Calendar.DATE, 1);
+        return new Date(cal.getTimeInMillis());
     }
 
     // 把日期保留到天
