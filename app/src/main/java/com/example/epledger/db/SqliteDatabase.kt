@@ -9,6 +9,7 @@ import com.example.epledger.model.Source
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+
 class SqliteDatabase(context: Context) : LedgerDatabase {
     val im = ImportDataFromExcel(context)
     val simpleFormat = SimpleDateFormat("yyyy/MM/dd hh:mm", Locale.US)
@@ -40,7 +41,8 @@ class SqliteDatabase(context: Context) : LedgerDatabase {
                     screenshotPath=cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.bitmap))
                     note = cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.memo))
                 }
-                if(r.isComplete()) res.add(r)
+                if(r.isComplete())
+                    res.add(r)
             }
             cursor.close()
         }
@@ -141,6 +143,9 @@ class SqliteDatabase(context: Context) : LedgerDatabase {
         val c=im.getContentValues(simpleFormat.format(record.mDate),record.moneyAmount,typeid,fromid,record.note,record.screenshotPath,s)
         sqLiteDatabase.insert(MySQLiteOpenHelper.TABLE_NAME, null, c)
         val id=im.FindRecordID(fromid,typeid,record.moneyAmount,sqLiteDatabase)
+        sqLiteDatabase.close()
+        //val d=im.getContentValues(simpleFormat.format(record.mDate),250.0,typeid,fromid,"Am I right？",record.screenshotPath,s)
+
         return id
     }
 
@@ -163,6 +168,7 @@ class SqliteDatabase(context: Context) : LedgerDatabase {
         }
         val c=im.getContentValues(simpleFormat.format(record.mDate),record.moneyAmount,typeid,fromid,record.note,record.screenshotPath,s)
         im.Update(record.ID ,c,sqLiteDatabase)
+        sqLiteDatabase.close()
     }
 
     override fun getAllSources(): MutableList<Source> {
@@ -237,27 +243,45 @@ class SqliteDatabase(context: Context) : LedgerDatabase {
     }
 
     override fun insertCategory(category: Category): Int {
-        TODO("Not yet implemented")
+        val sqLiteDatabase: SQLiteDatabase = im.dbHelper.getWritableDatabase()
+        im.AddNewType(sqLiteDatabase,category.name,category.iconResID)
+        val res=im.SelectTypeId(category.name,sqLiteDatabase)
+        print("我被插入了类型，")
+        println(category.name)
+        return res
     }
 
     override fun updateCategory(category: Category) {
-        TODO("Not yet implemented")
+
+        val sqLiteDatabase: SQLiteDatabase = im.dbHelper.getWritableDatabase()
+        category.ID?.let { im.updateType(sqLiteDatabase,category.name,category.iconResID, it) }
     }
 
     override fun deleteCategoryByID(id: Int) {
-        TODO("Not yet implemented")
+
+        val sqLiteDatabase: SQLiteDatabase = im.dbHelper.getWritableDatabase()
+        im.deleteType(sqLiteDatabase,id)
     }
 
     override fun insertSource(source: Source): Int {
-        TODO("Not yet implemented")
+        val sqLiteDatabase: SQLiteDatabase = im.dbHelper.getWritableDatabase()
+        im.AddNewFrom(sqLiteDatabase,source.name)
+        print("我被插入了来源，")
+        println(source.name)
+        val res=im.SelectFromId(source.name,sqLiteDatabase)
+        return res
     }
 
     override fun updateSource(source: Source) {
-        TODO("Not yet implemented")
+
+        val sqLiteDatabase: SQLiteDatabase = im.dbHelper.getWritableDatabase()
+        source.ID?.let { im.updateFrom(sqLiteDatabase,source.name, it) }
     }
 
     override fun deleteSourceByID(id: Int) {
-        TODO("Not yet implemented")
+
+        val sqLiteDatabase: SQLiteDatabase = im.dbHelper.getWritableDatabase()
+        im.deleteFrom(sqLiteDatabase,id)
     }
 
     override fun siftRecords(
@@ -270,7 +294,6 @@ class SqliteDatabase(context: Context) : LedgerDatabase {
         // After merging 2d10d9c
         // 编译错误：Class 'MemoryDatabase' is not abstract and does not implement abstract member public abstract fun siftRecords(dateStart: String, dateEnd: String, sources: List<Source>, categories: List<Category>): List<Record> defined in com.example.epledger.db.LedgerDatabase
         // 解决方式：补充了空实现以通过编译。请检查是否有实现没有被commit。
-        //TODO("Not yet implemented")
         val sqLiteDatabase: SQLiteDatabase = im.dbHelper.getReadableDatabase()
         val simpleFormat = SimpleDateFormat("yyyy/MM/dd")
         val start=simpleFormat.format(dateStart)

@@ -1,5 +1,5 @@
 ext {
-    defaultMinSdkVersion = 24
+    defaultMinSdkVersion = 27
     var = '6.5'
     var1 = var
 }// Top-level build file where you can add configuration options common to all sub-projects/modules.
