@@ -54,7 +54,7 @@ public class FileManager {
     }
 
     public void writeDb() throws IOException, JSONException {
-        String fullPath = "/data/data/com.example.epledger/databases/Database";
+        String fullPath = "/data/data/com.example.epledger/files/Database";
         String datapath="/data/data/com.example.epledger/databases/test";
         File savefile=new File(datapath);
         //System.out.println(sdCardDir+"/SqliteDatabase.csv");
