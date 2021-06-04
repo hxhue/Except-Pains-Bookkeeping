@@ -134,6 +134,7 @@ class ChartsFragment: Fragment() {
             when(position){
                 0 -> {
                     getSiftedBills(view, 14)
+                    Toast.makeText(context, billList.size.toString() + " records found.", Toast.LENGTH_SHORT).show()
                     drawChart(view, pieSwitch.isChecked, 14, true)
                     menuTextTmp = getString(R.string.recent_14_days)
                     updateTable(14)
@@ -141,6 +142,7 @@ class ChartsFragment: Fragment() {
                 }
                 1 -> {
                     getSiftedBills(view, 7)
+                    Toast.makeText(context, billList.size.toString() + " records found.", Toast.LENGTH_SHORT).show()
                     drawChart(view, pieSwitch.isChecked, 7, true)
                     menuTextTmp = getString(R.string.recent_7_days)
                     updateTable(7)
@@ -162,14 +164,15 @@ class ChartsFragment: Fragment() {
                     .setPositiveButton(R.string.sift){ _, _->
                         submittedTypeChipIds= expenseTypeChipGroup.checkedChipIds as ArrayList<Int>
                         submittedAccountChipIds=accountChipGroup.checkedChipIds as ArrayList<Int>
-                        refresh()
+                        getSiftedBills(mainView)
+                        drawChart(mainView, pieSwitch.isChecked, -1, false)
+                        Toast.makeText(context, billList.size.toString() + " records found.", Toast.LENGTH_SHORT).show()
                         menuTextTmp=getString(R.string.sift_by_yourself)
                         dateRangePicker.selection?.let{ it1->
                             dateRangeTitle.text=getString(R.string.show_date_range, utc2str(it1.first), utc2str(it1.second)
                             )
                         }
                         updateTable(getDayNum())
-                        Toast.makeText(context, billList.size.toString() + " records found.", Toast.LENGTH_SHORT).show()
                     }
                     .setTitle(R.string.sift_conditions)
                     .create()
@@ -579,20 +582,29 @@ class ChartsFragment: Fragment() {
 
     /**
      * 根据当前menu的选择项更新数据并重新生成所有图表
+     * 该函数应用协程使fragment切换更流畅，目前仅限onResume()时使用
      */
     private fun refresh(){
-        when(autoComplete.text.toString()){
-            getString(R.string.recent_14_days) -> {
-                getSiftedBills(mainView, 14)
-                drawChart(mainView, pieSwitch.isChecked, 14, true)
-            }
-            getString(R.string.recent_7_days) -> {
-                getSiftedBills(mainView, 7)
-                drawChart(mainView, pieSwitch.isChecked, 7, true)
-            }
-            getString(R.string.sift_by_yourself) -> {
-                getSiftedBills(mainView)
-                drawChart(mainView, pieSwitch.isChecked, -1, false)
+        GlobalScope.launch(Dispatchers.IO){
+            when(autoComplete.text.toString()){
+                getString(R.string.recent_14_days) -> {
+                    getSiftedBills(mainView, 14)
+                    withContext(Dispatchers.Main) {
+                        drawChart(mainView, pieSwitch.isChecked, 14, true)
+                    }
+                }
+                getString(R.string.recent_7_days) -> {
+                    getSiftedBills(mainView, 7)
+                    withContext(Dispatchers.Main) {
+                        drawChart(mainView, pieSwitch.isChecked, 7, true)
+                    }
+                }
+                getString(R.string.sift_by_yourself) -> {
+                    getSiftedBills(mainView)
+                    withContext(Dispatchers.Main) {
+                        drawChart(mainView, pieSwitch.isChecked, -1, false)
+                    }
+                }
             }
         }
     }
