@@ -4,6 +4,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import androidx.core.database.getStringOrNull
 import com.example.epledger.model.Category
+import com.example.epledger.model.Filter
 import com.example.epledger.model.Record
 import com.example.epledger.model.Source
 import com.example.epledger.chart.ChartsFragment
@@ -309,6 +310,10 @@ class SqliteDatabase(context: Context) : LedgerDatabase() {
 
         val sqLiteDatabase: SQLiteDatabase = im.dbHelper.getWritableDatabase()
         im.deleteFrom(sqLiteDatabase,id)
+    }
+
+    override fun filterRecords(filter: Filter): List<Record> {
+        TODO("Not yet implemented")
     }
 
     override fun siftRecords(

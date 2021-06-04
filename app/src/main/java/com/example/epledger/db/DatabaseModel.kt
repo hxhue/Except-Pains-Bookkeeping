@@ -7,10 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.epledger.home.SectionAdapter
 import com.example.epledger.inbox.InboxFragment
-import com.example.epledger.model.Record
-import com.example.epledger.model.Category
-import com.example.epledger.model.RecordGroup
-import com.example.epledger.model.Source
+import com.example.epledger.model.*
 import com.example.epledger.nav.MainScreen
 import kotlinx.coroutines.*
 import java.lang.RuntimeException
@@ -25,6 +22,7 @@ class DatabaseModel: ViewModel() {
     val groupedRecords = MutableLiveData<MutableList<RecordGroup>>(ArrayList(0))
     val incompleteRecords = MutableLiveData<MutableList<Record>>(ArrayList(0))
     val starredRecords = MutableLiveData<MutableList<Record>>(ArrayList(0))
+    val filterGroupedRecords = MutableLiveData<List<RecordGroup>>(ArrayList(0))
 
     private val sourceMap = SparseArray<Source>(16)
     private val sourceNameMap = HashMap<String, Source>(16)
@@ -76,6 +74,7 @@ class DatabaseModel: ViewModel() {
             groupedRecords.postValue(groupResult)
             incompleteRecords.postValue(incompleteRecordsToPost)
             starredRecords.postValue(starredRecordsToPost)
+            filterGroupedRecords.postValue(groupResult)
 
             // So we can use this flag to indicate whether database is loading or already loaded
             // That will be helpful for home page to know whether it should show an empty box picture
@@ -93,6 +92,16 @@ class DatabaseModel: ViewModel() {
 
     fun requireGroupedRecords(): MutableList<RecordGroup> {
         return groupedRecords.value!!
+    }
+
+    fun requireGroupedRecordsByFilter(filter: Filter): List<RecordGroup> {
+        filterGroupedRecords.postValue(filterGroupedRecordsByFilter(filter))
+        return filterGroupedRecords.value!!
+    }
+
+    private fun filterGroupedRecordsByFilter(filter: Filter): List<RecordGroup> {
+        val records = AppDatabase.filterRecords(filter)
+        return groupRecordsByDate(records)
     }
 
     enum class DataModificationMethod {
