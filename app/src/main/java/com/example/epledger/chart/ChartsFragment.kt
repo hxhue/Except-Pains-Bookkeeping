@@ -43,6 +43,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import android.graphics.Typeface;
+import kotlinx.android.synthetic.main.activity_show_chart.*
+
 
 class ChartsFragment: Fragment() {
     private val ONEDAY=24*60*60*1000
@@ -73,8 +76,9 @@ class ChartsFragment: Fragment() {
     private lateinit var tableData2:TextView
     private lateinit var tableData3:TextView
     private lateinit var tableData4:TextView
-    private val barYAxisValueFormatter=BarYAxisValueFormatter()
+    private val barChartValueFormatter=BarChartValueFormatter()
     private lateinit var percentFormatter:PercentFormatter
+    private lateinit var noDataTextView: TextView
 
     // This is a database model used for accessing running data.
     // But do not use it without knowing what it's truly for.
@@ -116,6 +120,7 @@ class ChartsFragment: Fragment() {
         tableData2=view.findViewById(R.id.tableData2)
         tableData3=view.findViewById(R.id.tableData3)
         tableData4=view.findViewById(R.id.tableData4)
+        noDataTextView=view.findViewById(R.id.noDataTextView)
         percentFormatter=PercentFormatter(pieChart)
         billList=ArrayList()
         //创建exposed dropdown menu
@@ -131,7 +136,6 @@ class ChartsFragment: Fragment() {
                     getSiftedBills(view, 14)
                     drawChart(view, pieSwitch.isChecked, 14, true)
                     menuTextTmp = getString(R.string.recent_14_days)
-                    dateRangeTitle.text = ""
                     updateTable(14)
                     dateRangeTitle.text = getRecentDateRangeStr(14)
                 }
@@ -139,11 +143,11 @@ class ChartsFragment: Fragment() {
                     getSiftedBills(view, 7)
                     drawChart(view, pieSwitch.isChecked, 7, true)
                     menuTextTmp = getString(R.string.recent_7_days)
-                    dateRangeTitle.text = ""
                     updateTable(7)
                     dateRangeTitle.text = getRecentDateRangeStr(7)
                 }
                 2 -> {
+                    initChips()
                     dialog.show()
                 }
             }
@@ -171,11 +175,10 @@ class ChartsFragment: Fragment() {
                     .create()
         }!!
         dialog.setOnShowListener {
-            if(!dateRangeIsSet){
-                dateRangeDisplay.text=getString(R.string.show_date_range, utc2str(Date().time - ONEDAY * 13), utc2str(Date().time))
-            }else{
-                dateRangeDisplay.text=getString(R.string.show_date_range, dateRangePicker.selection?.let { it1 -> utc2str(it1.first) },
-                        dateRangePicker.selection?.let { it1 -> utc2str(it1.second) })
+            if(dateRangeIsSet){
+//                dateRangeDisplay.text=getString(R.string.show_date_range, dateRangePicker.selection?.let { it1 -> utc2str(it1.first) },
+//                        dateRangePicker.selection?.let { it1 -> utc2str(it1.second) })
+                dateRangeDisplay.text=getRecentDateRangeStr(getDayNum())
             }
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled=dateRangeIsSet
         }
@@ -215,7 +218,8 @@ class ChartsFragment: Fragment() {
             setTransparentCircleAlpha(120)
             description.isEnabled=false
             legend.isEnabled=false
-            setNoDataText("No records available!")
+            setNoDataText("")
+//            setNoDataText("此收支类型无数据")
         }
         barChart.apply{
             xAxis.granularity=1f
@@ -227,7 +231,8 @@ class ChartsFragment: Fragment() {
             axisLeft.apply {
                 setDrawGridLines(false)
                 axisMinimum=0F
-                valueFormatter=barYAxisValueFormatter
+                valueFormatter=barChartValueFormatter
+                textSize=12F
             }
             axisRight.apply {
                 isEnabled=false
@@ -235,6 +240,7 @@ class ChartsFragment: Fragment() {
             xAxis.apply {
                 position=XAxis.XAxisPosition.BOTTOM
                 setDrawGridLines(false)
+                textSize=12F
             }
             setDrawValueAboveBar(true)
             legend.isEnabled=false
@@ -266,6 +272,7 @@ class ChartsFragment: Fragment() {
         dateRangePicker.addOnPositiveButtonClickListener{
             dateRangeIsSet=true
             dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).isEnabled=true
+            dateRangeDisplay.text=getRecentDateRangeStr(getDayNum())
         }
 
         val setDateRangeBtn= siftDialogView.findViewById<View>(R.id.setDateRangeButton) as Button
@@ -327,6 +334,7 @@ class ChartsFragment: Fragment() {
     private val typeSumMap=HashMap<String, Double>()
     private val entries: MutableList<PieEntry> = ArrayList()
     private fun drawPieChart(view: View, costOrIncome: Boolean){
+        var hasData=false
         GlobalScope.launch(Dispatchers.IO){
             /**
              * 设置数据
@@ -338,6 +346,7 @@ class ChartsFragment: Fragment() {
                         val cat= bill.categoryID?.let { dbModel.findCategory(it) }
                         if (cat != null) {
                             typeSumMap[cat.name] = typeSumMap.getOrDefault(cat.name, 0.0).plus(bill.money * (-1.0))
+                            hasData=true
                         }
                     }
                 }
@@ -347,30 +356,32 @@ class ChartsFragment: Fragment() {
                         val cat= bill.categoryID?.let { dbModel.findCategory(it) }
                         if (cat != null) {
                             typeSumMap[cat.name] = typeSumMap.getOrDefault(cat.name, 0.0).plus(bill.money)
+                            hasData=true
                         }
                     }
                 }
             }
+            if(hasData){
+                noDataTextView.text=""
+                entries.clear()
+                for(entry in typeSumMap){
+                    entries.add(PieEntry(entry.value.toFloat(), entry.key))
+                }
+                val set = PieDataSet(entries, "type proportion")
+                set.sliceSpace= 2F
+                set.setColors(
+                        intArrayOf(
+                                R.color.pieColor1, R.color.pieColor2, R.color.pieColor3, R.color.pieColor4, R.color.pieColor5, R.color.pieColor6, R.color.pieColor7
+                        ), context
+                )
+                val data = PieData(set)
+                data.setValueFormatter(percentFormatter)
+                data.setValueTextSize(14F)
+                pieChart.data = data
 
-            entries.clear()
-            for(entry in typeSumMap){
-                entries.add(PieEntry(entry.value.toFloat(), entry.key))
-            }
-            val set = PieDataSet(entries, "type proportion")
-            set.sliceSpace= 2F
-            set.setColors(
-                    intArrayOf(
-                            R.color.pieColor1, R.color.pieColor2, R.color.pieColor3, R.color.pieColor4, R.color.pieColor5, R.color.pieColor6, R.color.pieColor7
-                    ), context
-            )
-            val data = PieData(set)
-            data.setValueFormatter(percentFormatter)
-            data.setValueTextSize(14F)
-            pieChart.data = data
-
-            /**
-             * 设置中心环文字和MarkerView
-             */
+                /**
+                 * 设置中心环文字和MarkerView
+                 */
 //            pieChart.setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
 //                override fun onNothingSelected() {
 //                    pieChart.centerText = ""
@@ -383,15 +394,19 @@ class ChartsFragment: Fragment() {
 //                    pieChart.centerText = ""
 //                }
 //            })
-            val markerView=MyMarkerView(context, R.layout.marker)
-            markerView.getViewHW(pieChart)
-            pieChart.marker=markerView
+                val markerView=MyMarkerView(context, R.layout.marker)
+                markerView.getViewHW(pieChart)
+                pieChart.marker=markerView
 
+
+            }else{
+                pieChart.data=null
+                noDataTextView.text="此收支类型无数据"
+            }
             withContext(Dispatchers.Main){
                 pieChart.animateXY(500, 500)
             }
         }
-
     }
 /*
     fun drawLineChart(view: View){
@@ -467,7 +482,7 @@ class ChartsFragment: Fragment() {
     private val baseCalendar: Calendar = Calendar.getInstance()
     private val mp=HashMap<Int, Double>()
     private val barEntries=ArrayList<BarEntry>()
-    private fun drawBarChart(view: View, dayNum: Int, dayNumEnabled: Boolean){
+    private fun drawBarChart(view: View, days: Int, dayNumEnabled: Boolean){
         //先根据dateRange指定日期范围，创建并初始化map<日期，支出金额>的每一个条目，然后将支出条目的金额加到对应日期上，最后生成barChart。
         //创建一个开始date（0点），然后用每个支出条目的date减该date并除以一天的时间，就得到对应天数
         GlobalScope.launch(Dispatchers.IO){
@@ -478,7 +493,7 @@ class ChartsFragment: Fragment() {
             val endDate=Date((Date().time + ONEDAY))//第二天的零点
 
             if(dayNumEnabled){
-                baseDate.time=Date().time-ONEDAY*(dayNum-1)
+                baseDate.time=Date().time-ONEDAY*(days-1)
             }else{
                 if(dateRangeIsSet&&autoComplete.text.toString()==getString(R.string.sift_by_yourself)){
                     baseDate.time= dateRangePicker.selection?.first ?: baseDate.time
@@ -529,8 +544,8 @@ class ChartsFragment: Fragment() {
 
             for(record in billList){
                 if(record.money<0){
-                    val idx=(record.date.time-baseDate.time)/ONEDAY
-                    mp[idx.toInt()]?.minus(record.money)?.let { mp.put(idx.toInt(), it) }
+                    idx= ((record.date.time-baseDate.time)/ONEDAY).toInt()
+                    mp[idx]?.minus(record.money)?.let { mp.put(idx, it) }
                 }
             }
             barEntries.clear()
@@ -548,6 +563,8 @@ class ChartsFragment: Fragment() {
             val barDataSets=ArrayList<IBarDataSet>();
             barDataSets.add(setCost)
             val data=BarData(barDataSets)
+            data.setValueTextSize(14F)
+            data.setValueFormatter(barChartValueFormatter)
             barChart.data=data
             //数据设置完成
 
@@ -565,26 +582,18 @@ class ChartsFragment: Fragment() {
      * 根据当前menu的选择项更新数据并重新生成所有图表
      */
     private fun refresh(){
-        GlobalScope.launch(Dispatchers.IO){
-            when(autoComplete.text.toString()){
-                getString(R.string.recent_14_days) -> {
-                    getSiftedBills(mainView, 14)
-                    withContext(Dispatchers.Main) {
-                        drawChart(mainView, pieSwitch.isChecked, 14, true)
-                    }
-                }
-                getString(R.string.recent_7_days) -> {
-                    getSiftedBills(mainView, 7)
-                    withContext(Dispatchers.Main) {
-                        drawChart(mainView, pieSwitch.isChecked, 7, true)
-                    }
-                }
-                getString(R.string.sift_by_yourself) -> {
-                    getSiftedBills(mainView)
-                    withContext(Dispatchers.Main) {
-                        drawChart(mainView, pieSwitch.isChecked, -1, false)
-                    }
-                }
+        when(autoComplete.text.toString()){
+            getString(R.string.recent_14_days) -> {
+                getSiftedBills(mainView, 14)
+                drawChart(mainView, pieSwitch.isChecked, 14, true)
+            }
+            getString(R.string.recent_7_days) -> {
+                getSiftedBills(mainView, 7)
+                drawChart(mainView, pieSwitch.isChecked, 7, true)
+            }
+            getString(R.string.sift_by_yourself) -> {
+                getSiftedBills(mainView)
+                drawChart(mainView, pieSwitch.isChecked, -1, false)
             }
         }
     }
@@ -653,8 +662,10 @@ class ChartsFragment: Fragment() {
             val chip = siftDialogView.findViewById<View>(id) as Chip
             catList.add(chip.text.toString())
         }
-
+//        println("getSiftedBills :billList.size1=${billList.size}")
         billList= AppDatabase.siftRecords(dateBegin, dateEnd, srcList, catList)
+//        println("getSiftedBills :billList.size2=${billList.size}")
+
         return
     }
 
@@ -680,6 +691,8 @@ class ChartsFragment: Fragment() {
      * 初始化筛选对话框的chips
      */
     private fun initChips(){
+        expenseTypeChipGroup.removeAllViews()
+        accountChipGroup.removeAllViews()
         catNames= AppDatabase.getAllCategoryNames()
         srcNames= AppDatabase.getAllSourceNames()
 
@@ -839,12 +852,15 @@ class MyMarkerView(context: Context?, layoutResource: Int) : MarkerView(context,
 /**
  * barChart Y轴的ValueFormatter，显示金额，以"¥"结尾
  */
-class BarYAxisValueFormatter : ValueFormatter() {
+class BarChartValueFormatter : ValueFormatter() {
     private val format = DecimalFormat("###,###,###,##0.0")
 
     // override this for BarChart
     override fun getBarLabel(barEntry: BarEntry?): String {
-        return format.format(barEntry?.y)+"¥"
+        if (barEntry != null&&barEntry.y==0F) {
+            return ""
+        }
+        return format.format(barEntry?.y)
     }
 
     override fun getAxisLabel(value: Float, axis: AxisBase?): String {

@@ -240,6 +240,7 @@
     <string name="avg_expenditure">日均支出</string>
     <string name="balance">结余</string>
     <string name="cancel_select_all">取消全选</string>
+    <string name="please_set_date_range">请设置日期范围</string>
 
 
 </resources>
