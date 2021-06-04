@@ -119,7 +119,7 @@ class CategoryItemDialogFragment: DialogFragment(), IconItemAdapter.OnPositionCl
                         mCategorySubmitListener!!.onCategorySubmit(categoryItem)
                     }
                 }
-                .setTitle(if (mCategoryToBind!!.ID != null) {
+                .setTitle(if (mCategoryToBind?.ID != null) {
                     getString(R.string.modify_category)
                 } else {
                     getString(R.string.new_category)
@@ -225,7 +225,8 @@ class CategoryItemDialogFragment: DialogFragment(), IconItemAdapter.OnPositionCl
         }
 
         // Check if we already have that name
-        return (dbModel.findCategory(category.name) == null)
+        val categoryInModel = dbModel.findCategory(category.name)
+        return (categoryInModel == null || categoryInModel.ID == category.ID)
     }
 
     private fun checkMaxCategoryNumber(): Boolean {
