@@ -4,13 +4,19 @@ import com.example.epledger.R
 
 object IconAsset {
     val assets = arrayOf(
+            R.drawable.ic_far_money_bill_alt,
             R.drawable.ic_fab_500px,
+            R.drawable.ic_far_futbol,
+            R.drawable.ic_far_gem,
+            R.drawable.ic_far_heart,
+            R.drawable.ic_far_meh,
+            R.drawable.ic_far_sun,
+            R.drawable.ic_far_smile,
+            R.drawable.ic_far_sticky_note,
             R.drawable.ic_fab_accessible_icon,
             R.drawable.ic_fab_bluetooth,
             R.drawable.ic_fab_bluetooth_b,
             R.drawable.ic_fab_dropbox,
-            R.drawable.ic_fab_firstdraft,
-            R.drawable.ic_fab_flickr,
             R.drawable.ic_fab_fly,
             R.drawable.ic_fab_font_awesome_flag,
             R.drawable.ic_fab_fort_awesome,
