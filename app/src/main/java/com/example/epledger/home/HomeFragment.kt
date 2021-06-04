@@ -18,6 +18,7 @@ import com.example.epledger.detail.RecordDetailFragment
 import com.example.epledger.db.DatabaseModel
 import com.example.epledger.filter.FilterCategoriesViewModel
 import com.example.epledger.filter.FilterDialogFragment
+import com.example.epledger.filter.FilterRecordFragment
 import com.example.epledger.filter.FilterSourcesViewModel
 import com.example.epledger.model.Filter
 //import com.example.epledger.model.Record
@@ -147,7 +148,9 @@ class HomeFragment : Fragment() {
                 dialog.setFilterSubmitListener(object : FilterDialogFragment.FilterSubmitListener {
                     override fun onFilterSubmit(filter: Filter?) {
                         // 筛选然后显示
-                        TODO("Not yet implemented")
+                        val fFrag = FilterRecordFragment()
+                        fFrag.bindFilter(filter)
+                        pushToStack(requireActivity().supportFragmentManager, fFrag, true)
                     }
                 })
                 dialog.show(requireActivity().supportFragmentManager, null)
@@ -156,7 +159,6 @@ class HomeFragment : Fragment() {
             R.id.reset -> {
                 filterCategoriesViewModel.reset()
                 filterSourcesViewModel.reset()
-                // TODO
                 true
             }
             R.id.more -> {
