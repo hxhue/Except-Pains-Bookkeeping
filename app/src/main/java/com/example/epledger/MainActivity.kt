@@ -1,7 +1,10 @@
 package com.example.epledger
 
+import android.Manifest
 import android.app.Activity
+import android.content.pm.PackageManager
 import android.database.sqlite.SQLiteDatabase
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -48,6 +51,17 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
         // init AppDatabase
         AppDatabase = SqliteDatabase(this.applicationContext)
+        if (Build.VERSION.SDK_INT >= 23) {
+            val REQUEST_CODE_CONTACT = 101;
+            val permissions =  Manifest.permission.WRITE_EXTERNAL_STORAGE;
+            //验证是否许可权限
+            val p= Array<String>(1){permissions}
+            if (this.checkSelfPermission(permissions) != PackageManager.PERMISSION_GRANTED) {
+                    this.requestPermissions(p, REQUEST_CODE_CONTACT);
+                    //return;
+                }
+            }
+
 
         // 禁用黑暗模式
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
