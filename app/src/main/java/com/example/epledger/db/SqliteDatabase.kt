@@ -14,7 +14,7 @@ import kotlin.collections.ArrayList
 
 class SqliteDatabase(context: Context) : LedgerDatabase() {
     val im = ImportDataFromExcel(context)
-    val simpleFormat = SimpleDateFormat("yyyy/MM/dd hh:mm", Locale.US)
+    val simpleFormat = SimpleDateFormat("yyyy/MM/dd hh:mm")
 
     override fun getRecordsOrderByDate(): List<Record> {
         val sqLiteDatabase: SQLiteDatabase = im.dbHelper.getReadableDatabase()
@@ -30,6 +30,7 @@ class SqliteDatabase(context: Context) : LedgerDatabase() {
                 val from_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.from_id))
                 val type_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.type_id))
                 val s = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.star))==1
+                val date1=cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.date1))
 //                val from1 = im.get_id_from(from_id, sqLiteDatabase)
 //                val type1 = im.get_id_type(type_id, sqLiteDatabase)
                 val r = b.apply {
@@ -40,8 +41,11 @@ class SqliteDatabase(context: Context) : LedgerDatabase() {
                     // We use int for these fields now
                     sourceID = if (from_id < 0) null else from_id
                     categoryID = if (type_id < 0) null else type_id
-
-                    date = simpleFormat.parse(cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.date1)))
+                    System.out.print("字符串为：")
+                    System.out.println(date1)
+                    date = simpleFormat.parse(date1)
+                    System.out.print("日期为：")
+                    System.out.println(date)
                     starred = s
                     //screenshot: Bitmap? = null
                     screenshotPath=cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.bitmap))
@@ -295,7 +299,6 @@ class SqliteDatabase(context: Context) : LedgerDatabase() {
         im.AddNewFrom(sqLiteDatabase,source.name)
         print("我被插入了来源，")
         println(source.name)
-        chart.addSource(source.name)
         val res=im.SelectFromId(source.name,sqLiteDatabase)
         return res
     }

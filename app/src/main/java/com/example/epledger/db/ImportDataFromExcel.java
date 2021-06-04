@@ -255,6 +255,7 @@ public class ImportDataFromExcel {
             date=date.substring(0,date.length()-3);
             date=date.replaceAll("-","/");
             System.out.println(date);
+            date=simpleFormat.format(date);
             String state=lines[4].trim();
             //System.out.println(state=="支出");
             if(state!=null)
@@ -301,28 +302,30 @@ public class ImportDataFromExcel {
             //bfw = new BufferedWriter(fw);
             bfw=new BufferedWriter(new OutputStreamWriter(new FileOutputStream(savefile),"gbk"));
             //bfw.newLine();
-            if (rowCount > 0)
-// 写入表头
+            if (rowCount > 0){
+
                 for (int i = 2; i < colCount; i++) {
                     if (i != colCount - 1)
                         bfw.write(cursor.getColumnName(i) + ',');
                     else
                         bfw.write(cursor.getColumnName(i));
                 }
-// 写好表头后换行
+
                 bfw.newLine();
-// 写入数据
+
                 for (int i = 0; i < rowCount; i++) {
                     cursor.moveToPosition(i);
                     Log.v("导出数据", "正在导出第" + (i + 1) + "条");
                     for (int j = 2; j < colCount; j++) {
+                        String tmp=cursor.getString(j);
+                        if(cursor.getString(j)==null) tmp="";
                         if (j != colCount - 1)
-                            bfw.write(cursor.getString(j) + ',');
+                            bfw.write(tmp + ',');
                         else
-                            bfw.write(cursor.getString(j));
+                            bfw.write(tmp);
                     }
                     bfw.newLine();
-                }
+                }}
 
             bfw.flush();
 // 释放缓存
