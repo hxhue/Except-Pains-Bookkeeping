@@ -11,7 +11,7 @@
             app:key="qa_notification"
             app:title="@string/prefer_item_qa_noti"
             app:summary="@string/prefer_item_qa_noti_sum"
-            app:defaultValue="false"/>
+            app:defaultValue="true"/>
 
         <SwitchPreferenceCompat
             app:key="qa_brief_mode"
@@ -50,8 +50,8 @@
 <!--        app:icon="@drawable/ic_fas_upload"-->
         <Preference
             app:key="data_export_json"
-            app:title="@string/prefer_item_export_json"
-            app:summary="@string/prefer_item_export_json_sum"/>
+            app:title="@string/prefer_item_export_db"
+            app:summary="@string/prefer_item_export_db_sum"/>
 
 <!--        app:icon="@drawable/ic_fas_chart_bar"-->
         <Preference
@@ -63,7 +63,7 @@
 <!--        app:icon="@drawable/ic_fas_download"-->
         <Preference
             app:key="data_import_json"
-            app:title="@string/prefer_item_import_json"
+            app:title="@string/prefer_item_import_db"
             />
 
 <!--        app:summary="@string/prefer_item_import_alipay_sum"-->

@@ -18,6 +18,7 @@ data class Category(
     companion object {
         fun getDefaultCategories(context: Context): MutableList<Category> {
             return arrayListOf(
+                Category(context.getString(R.string.sports), R.drawable.ic_far_futbol, 1),
                 Category(context.getString(R.string.emergency), R.drawable.ic_fas_asterisk, 2),
                 Category(context.getString(R.string.study), R.drawable.ic_fas_pencil_alt, 3),
                 Category(context.getString(R.string.food), R.drawable.ic_fas_utensils, 4),

@@ -19,48 +19,214 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/menu"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="@string/date_menu_hint">
+
+                <AutoCompleteTextView
+                    android:id="@+id/textField"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:id="@+id/dateRangeTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/menu"
+                android:layout_alignParentTop="true"
+                android:layout_toEndOf="@+id/menu"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="0dp"
+                android:layout_marginBottom="0dp"
+                android:gravity="center"
+                android:text="" />
+
+            <!--统计表格-->
+            <!--分割线-->
+            <View
+                android:id="@+id/tableBeginLine"
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_below="@id/menu"
+                android:layout_marginTop="0dp"
+                android:background="#000000"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tableTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@id/tableBeginLine"
+                android:layout_marginTop="12dp"
+                android:layout_marginStart="24dp"
+                android:gravity="center_vertical"
+                android:text="@string/overview" />
+
+            <TableLayout
+                android:id="@+id/tableLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tableTitle"
+                android:layout_marginTop="12dp"
+                android:stretchColumns="0,1"
+            >
+                <TableRow>
+                    <TextView
+                        android:id="@+id/tableItem1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/income"/>
+                    <TextView
+                        android:id="@+id/tableItem2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/expenditure"/>
+                </TableRow>
+
+                <TableRow>
+                    <TextView
+                        android:id="@+id/tableData1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center" />
+                    <TextView
+                        android:id="@+id/tableData2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center" />
+                </TableRow>
+
+                <TableRow>
+                    <View
+                        android:layout_height="5dp"
+                        android:layout_width="match_parent"/>
+                </TableRow>
+
+                <TableRow>
+                    <TextView
+                        android:id="@+id/tableItem3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/avg_expenditure"/>
+                    <TextView
+                        android:id="@+id/tableItem4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/balance"/>
+                </TableRow>
+
+                <TableRow>
+                    <TextView
+                        android:id="@+id/tableData3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center" />
+                    <TextView
+                        android:id="@+id/tableData4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center" />
+                </TableRow>
+            </TableLayout>
+
+
+            <!--分割线-->
+            <View
+                android:id="@+id/pieBeginLine"
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_below="@id/tableLayout"
+                android:layout_marginTop="12dp"
+                android:background="#000000"/>
+
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/pieTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/pieSwitch"
                 android:layout_alignBottom="@+id/pieSwitch"
-                android:layout_alignParentTop="true"
                 android:layout_marginTop="0dp"
-                android:layout_marginEnd="10dp"
+                android:layout_marginEnd="5dp"
                 android:layout_marginBottom="0dp"
                 android:layout_toStartOf="@+id/pieSwitch"
                 android:gravity="center"
                 android:text="@string/cost" />
 
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/pieTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/pieSwitch"
+                android:layout_alignBottom="@+id/pieSwitch"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="0dp"
+                android:layout_marginBottom="0dp"
+                android:layout_marginStart="24dp"
+                android:gravity="center_vertical"
+                android:text="@string/category_stats" />
+
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/pieSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
+                android:layout_below="@id/pieBeginLine"
                 android:layout_alignParentEnd="true"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="24dp"
                 android:checked="true"
                 android:text="@string/switch_income_cost" />
-            <com.github.mikephil.charting.charts.PieChart
-                android:id="@+id/pieChart"
-                android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:layout_below="@id/pieSwitch"
-                android:layout_marginTop="5dp"/>
 
-<!--                <com.github.mikephil.charting.charts.LineChart-->
+            <!--                <com.github.mikephil.charting.charts.LineChart-->
 <!--                    android:id="@+id/lineChart"-->
 <!--                    android:layout_width="match_parent"-->
 <!--                    android:layout_height="400dp"-->
 <!--                    android:layout_below="@id/pieChart"/>-->
 
+            <!--分割线-->
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/pieChart"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_below="@id/pieSwitch"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="0dp" />
+
+            <View
+                android:id="@+id/barBeginLine"
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_below="@id/pieChart"
+                android:layout_marginTop="12dp"
+                android:background="#000000"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/barTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@id/barBeginLine"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="12dp"
+                android:gravity="center_vertical"
+                android:text="@string/consume_tendency" />
+
             <com.github.mikephil.charting.charts.BarChart
                 android:id="@+id/barChart"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
-                android:layout_below="@id/pieChart"
-                android:layout_marginTop="20dp"
+                android:layout_below="@id/barTitle"
+                android:layout_marginTop="4dp"
                 android:layout_marginBottom="20dp"/>
 
 

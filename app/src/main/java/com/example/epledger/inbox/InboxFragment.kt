@@ -296,6 +296,9 @@ class InboxFragment : Fragment() {
         setUpRecyclerView(view.inbox_incomplete_recycler_view, object :
             OnRecordSubmitListener {
             override fun onRecordSubmit(adapter: EntryAdapter, record: Record) {
+                // When a record becomes complete, we delete its screenshot.
+                record.eraseScreenShot(requireContext())
+
                 // 2021-05-29 06:37:10 change insert to update
                 // 2021-06-02 09:39:50 change update back to insert:
                 //      because we've delete this record previously.
