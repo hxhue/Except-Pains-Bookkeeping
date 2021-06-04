@@ -57,7 +57,7 @@ class CategoryItemDialogFragment: DialogFragment(), IconItemAdapter.OnPositionCl
     private var mCategoryToBind: Category? = null
 
     /**
-     * You can (optionally) call this method before showing this Fragment
+     * You call this method before showing this Fragment
      */
     fun setCategorySubmitListener(listener: CategorySubmitListener) {
         mCategorySubmitListener = listener
@@ -225,63 +225,13 @@ class CategoryItemDialogFragment: DialogFragment(), IconItemAdapter.OnPositionCl
         }
 
         // Check if we already have that name
-        val categories = dbModel.requireCategories()
-        // Bad time complex but good enough in practice
-        categories.forEach {
-            if ((it.name == category.name) && !(category.ID != null && category.ID == it.ID)) {
-                return false
-            }
-        }
-        return true
+        return (dbModel.findCategory(category.name) == null)
     }
 
     private fun checkMaxCategoryNumber(): Boolean {
         val categories = dbModel.requireCategories()
         return categories.size < CATEGORY_MAX_SIZE
     }
-
-    // Some how the keyboard will cause a few events in a row
-    // So I block the listener for some time (400ms)
-    // But it still didn't work, the algorithm cheats us sometimes!!
-    // https://stackoverflow.com/a/36259261/13785815
-
-//    private fun setKeyboardVisibilityListener(rootView: View,
-//                                              onKeyboardVisibilityListener: OnKeyboardVisibilityListener) {
-//        val parentView = (rootView as ViewGroup).getChildAt(0)
-//        parentView.viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
-//            private var alreadyOpen = false
-//            private val defaultKeyboardHeightDP = 100
-//            private val EstimatedKeyboardDP = defaultKeyboardHeightDP + 48
-//            private val rect: Rect = Rect()
-//            private var blockingConsequentEvent = false
-//            override fun onGlobalLayout() {
-//                if (blockingConsequentEvent) {
-//                    return
-//                }
-//                val estimatedKeyboardHeight = TypedValue.applyDimension(
-//                    TypedValue.COMPLEX_UNIT_DIP,
-//                    EstimatedKeyboardDP.toFloat(),
-//                    parentView.resources.displayMetrics
-//                ).toInt()
-//                parentView.getWindowVisibleDisplayFrame(rect)
-//                val heightDiff: Int = parentView.rootView.height - (rect.bottom - rect.top)
-//                val isShown = heightDiff >= estimatedKeyboardHeight
-//                if (isShown == alreadyOpen) {
-//                    Log.i("Keyboard state", "Ignoring global layout change...")
-//                    return
-//                }
-//                alreadyOpen = isShown
-//                onKeyboardVisibilityListener.onVisibilityChanged(isShown)
-//
-//                // Blocking consequent events
-//                blockingConsequentEvent = true
-//                viewLifecycleOwner.lifecycleScope.launch {
-//                    delay(400)
-//                    blockingConsequentEvent = false
-//                }
-//            }
-//        })
-//    }
 
     private fun setIconRecyclerViewVisibility(visible: Boolean) {
         val recyclerView = requireView().category_edit_icon_recyclerview

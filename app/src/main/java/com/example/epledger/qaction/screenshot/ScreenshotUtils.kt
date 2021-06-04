@@ -19,7 +19,11 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.epledger.qaction.tool.Store
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.*
+import java.lang.RuntimeException
 
 const val SCREENSHOT_REQ_CODE = 1029;
 
@@ -123,6 +127,15 @@ class ScreenshotUtils {
         }
 
         /**
+         * 异步删除指定沙盒路径的图片。
+         */
+        fun removeFromSandbox(ctx: Context, path: String) {
+            GlobalScope.launch(Dispatchers.IO) {
+                File(path).delete()
+            }
+        }
+
+        /**
          * 根据文件全路径名加载Bitmap图片并返回，找不到图片时引发异常。
          */
         fun loadBitmap(ctx: Context, path: String): Bitmap {
@@ -131,7 +144,6 @@ class ScreenshotUtils {
 
         /**
          * 存储Bitmap到相册。nameWithoutExt表示文件名，但不包含末尾的文件类型扩展名。
-         * TODO: 在版本比Q更低的设备上测试。
          */
         fun saveToGallery(ctx: Context, bmp: Bitmap, nameWithoutExt: String) {
             val filename = "$nameWithoutExt.jpg"

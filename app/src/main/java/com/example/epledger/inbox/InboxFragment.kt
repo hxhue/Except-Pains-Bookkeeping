@@ -51,7 +51,7 @@ class InboxFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         menu.clear()
-        inflater.inflate(R.menu.inbox_menu, menu)
+//        inflater.inflate(R.menu.inbox_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -107,9 +107,12 @@ class InboxFragment : Fragment() {
         }
 
         if (sectionCheckSet.isEmpty()) {
-            rootView.no_sections_msg.visibility = View.VISIBLE
+            // 不再使用简单文本来提示无记录信息
+//            rootView.no_sections_msg.visibility = View.VISIBLE
+            rootView.inbox_page_no_record_image.visibility = View.VISIBLE
         } else {
-            rootView.no_sections_msg.visibility = View.GONE
+//            rootView.no_sections_msg.visibility = View.GONE
+            rootView.inbox_page_no_record_image.visibility = View.GONE
         }
     }
 
@@ -158,11 +161,11 @@ class InboxFragment : Fragment() {
      * @param onRecordSubmitListener 是在提交时提供的回调。
      * @param deleteEntryAfterSubmit 决定是否在调用onRecordSubmitRunnable.run()之后删除该项。
      */
-    private fun setUpRecyclerView(recyclerView: RecyclerView,
-                                  onRecordSubmitListener: OnRecordSubmitListener,
-                                  deleteEntryAfterSubmit: Boolean,
-                                  entryWasShownInHomePage: Boolean,
-                                  entryEditingOnOpen: Boolean = false
+    private fun setUpRecyclerView(
+        recyclerView: RecyclerView,
+        onRecordSubmitListener: OnRecordSubmitListener,
+        deleteEntryAfterSubmit: Boolean,
+        entryWasShownInHomePage: Boolean
     ) {
         val initialEntries = ArrayList<Record>(0)
         recyclerView.apply {
@@ -189,7 +192,7 @@ class InboxFragment : Fragment() {
 
                     // Manage database and view in home page
                     GlobalScope.launch(Dispatchers.IO) {
-                        AppDatabase.deleteRecordByID(recordToDelete.ID!!)
+                        AppDatabase.deleteRecordByID(recordToDelete.id!!)
                         if (entryWasShownInHomePage) {
                             dbModel.deleteRecord(recordToDelete, requireActivity().asMainActivity().homeSectionAdapter!!)
                         }
@@ -264,11 +267,11 @@ class InboxFragment : Fragment() {
                 // 1. 删除的时候要将主页面列表中的项目也一同删除（见setUpRecyclerView的另一个参数）
                 // 2. 提交的时候检查当前是否仍然在标星Section中、是否仍然在截图Section中。
 
-                require(record.ID != null)
+                require(record.id != null)
 
                 // 2021年05月27日 这里的提交并没有真正影响到数据库
                 val indexInSection = adapter.entries.indexOfFirst {
-                    record.ID == it.ID
+                    record.id == it.id
                 }
 
                 if (record.starred) {
@@ -293,9 +296,14 @@ class InboxFragment : Fragment() {
         setUpRecyclerView(view.inbox_incomplete_recycler_view, object :
             OnRecordSubmitListener {
             override fun onRecordSubmit(adapter: EntryAdapter, record: Record) {
-                // todo: check this updateRecord method
-                // 2021-05-29 06:37:10
-                dbModel.updateIncompleteRecord(record)
+                // When a record becomes complete, we delete its screenshot.
+                record.eraseScreenShot(requireContext())
+
+                // 2021-05-29 06:37:10 change insert to update
+                // 2021-06-02 09:39:50 change update back to insert:
+                //      because we've delete this record previously.
+                //      This is done by deleteEntryRunnable.
+                dbModel.insertRecord(record)
             }
         }, deleteEntryAfterSubmit = true, entryWasShownInHomePage = false)
     }
@@ -325,7 +333,7 @@ class InboxFragment : Fragment() {
         if (record.starred) {
             // insert this record to starred section
             (requireView().inbox_star_recycler_view.adapter as EntryAdapter).apply {
-                var indexToInsert = entries.indexOfFirst { it.mDate <= record.mDate }
+                var indexToInsert = entries.indexOfFirst { it.date <= record.date }
 
                 // 所有的记录日期都比当前的大时，插入到最后
                 if (indexToInsert < 0) {
@@ -340,10 +348,10 @@ class InboxFragment : Fragment() {
     }
 
     fun checkStarredSectionOnUpdate(record: Record) {
-        require(record.ID != null)
+        require(record.id != null)
 
         (requireView().inbox_star_recycler_view.adapter as EntryAdapter).apply {
-            val index = entries.indexOfFirst { record.ID == it.ID }
+            val index = entries.indexOfFirst { record.id == it.id }
 
             // 错误：2021年05月26日：如果record本身不在这个section中，直接返回
             // 修正：2021年05月27日：如果record本身不在这个section中，而又是带有标星的项目，说明需要新增一项
@@ -376,10 +384,10 @@ class InboxFragment : Fragment() {
     }
 
     fun checkStarredSectionOnRemoval(record: Record) {
-        require(record.ID != null)
+        require(record.id != null)
 
         (requireView().inbox_star_recycler_view.adapter as EntryAdapter).apply {
-            val index = entries.indexOfFirst { record.ID == it.ID }
+            val index = entries.indexOfFirst { record.id == it.id }
 
             // 如果record本身不在这个section中，直接返回
             if (index < 0) {
@@ -401,12 +409,12 @@ class InboxFragment : Fragment() {
     }
 
     fun checkIncompleteSectionOnRemoval(record: Record) {
-        if (record.ID == null) {
+        if (record.id == null) {
             return
         }
-        val id = record.ID!!
+        val id = record.id!!
         (requireView().inbox_incomplete_recycler_view.adapter as EntryAdapter).apply {
-            val indexToFind = entries.indexOfFirst { it.ID == id }
+            val indexToFind = entries.indexOfFirst { it.id == id }
             if (indexToFind < 0) {
                 return
             }

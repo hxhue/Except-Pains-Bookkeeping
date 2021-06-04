@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.epledger.R
@@ -26,7 +25,7 @@ class SourceManagerFragment: NavigationFragment() {
     private val dbModel: DatabaseModel by activityViewModels()
     private val recyclerViewAdapter by lazy {
         val sourceList = dbModel.requireSources()
-        SourceAdapter(sourceList)
+        SourceAdapter(sourceList, dbModel)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -46,13 +45,12 @@ class SourceManagerFragment: NavigationFragment() {
         // **User Intention: add a new item
         val floatingButton = view.floating_add
         floatingButton.setOnClickListener {
-            val dialog = createSourceDialog(ctx, null, object : OnSourceSubmitListener {
+            val dialog = createSourceDialog(ctx, null, dbModel, object : OnSourceSubmitListener {
                 override fun onSourceSubmit(sourceName: String) {
                     val newSource = Source(sourceName)
-                    // TODO: add source to database and **fetch its ID**
-                    val list = recyclerViewAdapter.sourceList
-                    list.add(newSource)
-                    recyclerViewAdapter.notifyItemInserted(list.size - 1)
+                    dbModel.insertSource(newSource) {
+                        recyclerViewAdapter.notifyItemInserted(recyclerViewAdapter.sourceList.size - 1)
+                    }
                 }
             })
             dialog.show()
@@ -60,7 +58,7 @@ class SourceManagerFragment: NavigationFragment() {
     }
 
     private fun setUpModel(view: View) {
-        dbModel.sources.observe(viewLifecycleOwner) {
+        dbModel.sources.observeForever {
             // Update sourceList when reference changes
             recyclerViewAdapter.sourceList = it
             recyclerViewAdapter.notifyDataSetChanged()
@@ -68,7 +66,8 @@ class SourceManagerFragment: NavigationFragment() {
     }
 
     class SourceAdapter(
-            var sourceList: MutableList<Source>
+            var sourceList: MutableList<Source>,
+            private val dbModel: DatabaseModel
     ): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         class ViewHolder(view: View): RecyclerView.ViewHolder(view) {}
@@ -86,12 +85,13 @@ class SourceManagerFragment: NavigationFragment() {
             // Short click to modify name
             view.setOnClickListener {
                 val adapter = this
-                val dialog = createSourceDialog(ctx, sourceList[position].name, object : OnSourceSubmitListener {
+                val dialog = createSourceDialog(ctx, sourceList[position].name, dbModel, object : OnSourceSubmitListener {
                     override fun onSourceSubmit(sourceName: String) {
+                        // This is safe because update CAN happen multiple times
                         sourceList[position].name = sourceName
-                        adapter.notifyItemChanged(position)
-                        // TODO: write data into database
-                        // TODO: inform other modules that this item has changed
+                        dbModel.updateSource(sourceList[position]) {
+                            adapter.notifyItemChanged(position)
+                        }
                     }
                 })
                 dialog.show()
@@ -103,10 +103,10 @@ class SourceManagerFragment: NavigationFragment() {
                         .setMessage(ctx.getString(R.string.del_item_confirm))
                         .setNegativeButton(R.string.no) { _, _ -> /* nothing */ }
                         .setPositiveButton(R.string.ok) { _, _ ->
-                            sourceList.removeAt(position)
-                            this.notifyItemRemoved(position)
-                            this.notifyItemRangeChanged(position, sourceList.size)
-                            // TODO: delete data from database
+                            dbModel.deleteSourceByID(sourceList[position].ID!!) {
+                                this.notifyItemRemoved(position)
+                                this.notifyItemRangeChanged(position, sourceList.size)
+                            }
                         }
                 dialog.show()
                 true
@@ -120,16 +120,16 @@ class SourceManagerFragment: NavigationFragment() {
         override fun getItemCount(): Int {
             return sourceList.size
         }
+
     }
 }
 
 /**
  * 创建一个对话，用来提交修改或新增source条目。
- * @param contentView: 当前对话的contentView
  * @param sourceName: 已有source的名称。如果为空，表明是正在新建一个source
  * @param onSubmitListener: 提交时的回调接口
  */
-private fun createSourceDialog(ctx: Context, sourceName: CharSequence?,
+private fun createSourceDialog(ctx: Context, sourceName: CharSequence?, dbModel: DatabaseModel,
                                onSubmitListener: OnSourceSubmitListener): Dialog {
     val inflater = LayoutInflater.from(ctx)
     val contentView  = inflater.inflate(R.layout.dialog_text_input, null).apply {
@@ -152,17 +152,17 @@ private fun createSourceDialog(ctx: Context, sourceName: CharSequence?,
         .setView(contentView)
         .setNegativeButton(R.string.no) { _, _ -> /**/ }
         .setPositiveButton(R.string.ok) { _, _ ->
-            // Check if it's empty or duplicate
             val stringToSubmit = contentView.string_input_edittext.text.toString()
-            if (stringToSubmit.isBlank()) {
+
+            // Check if it's empty or duplicate
+            if (checkNewSourceName(dbModel, stringToSubmit)) {
+                onSubmitListener.onSourceSubmit(stringToSubmit)
+            } else {
                 val emptyCheckFailureDialog = MaterialAlertDialogBuilder(ctx)
                     .setPositiveButton(R.string.ok) { _, _ -> }
                     .setTitle(ctx.getString(R.string.changes_not_saved))
-                    .setMessage(ctx.getString(R.string.source_name_empty_prompt))
+                    .setMessage(ctx.getString(R.string.source_name_invalid_prompt))
                 emptyCheckFailureDialog.show()
-            } else {
-                // TODO: Check source name duplication
-                onSubmitListener.onSourceSubmit(stringToSubmit)
             }
         }
         .setTitle(if (sourceName != null) {
@@ -179,6 +179,10 @@ private fun createSourceDialog(ctx: Context, sourceName: CharSequence?,
         contentView.string_input_edittext.requestFocus()
     }
     return dialog
+}
+
+private fun checkNewSourceName(dbModel: DatabaseModel, name: String?): Boolean {
+    return (!name.isNullOrBlank()) && (dbModel.findSource(name) == null)
 }
 
 private interface OnSourceSubmitListener {

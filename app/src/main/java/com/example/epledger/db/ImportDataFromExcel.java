@@ -360,13 +360,13 @@ public class ImportDataFromExcel {
 
             while (cursor.moveToNext()) {
                 Record b = new Record();
-                b.setID(cursor.getLong(cursor.getColumnIndex(MySQLiteOpenHelper.record_id)));
+                b.setId(cursor.getLong(cursor.getColumnIndex(MySQLiteOpenHelper.record_id)));
                 Date tmp=simpleFormat.parse(cursor.getString(cursor.getColumnIndex(MySQLiteOpenHelper.date1)));
-                b.setMDate(tmp);
-                b.setMoneyAmount(cursor.getDouble(cursor.getColumnIndex(MySQLiteOpenHelper.account)));
+                b.setDate(tmp);
+                b.setMoney(cursor.getDouble(cursor.getColumnIndex(MySQLiteOpenHelper.account)));
                 int type_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.type_id));
                 int from_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.from_id));
-                b.setSource( get_id_from(from_id,db));
+                b.setSourceID( get_id_from(from_id,db));
                 b.setCategory(get_id_type(type_id,db));
                 b.setNote(cursor.getString(cursor.getColumnIndex(MySQLiteOpenHelper.memo)));
                 int isstar=cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.star));
