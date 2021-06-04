@@ -73,7 +73,7 @@ class RecordDetailFragment:
      * 在创建后必须被调用一次。
      */
     fun bindRecord(record: Record) {
-        editing = (record.ID == null || !record.isComplete())
+        editing = (record.id == null || !record.isComplete())
         recordCopy = record.getCopy()
         bindingRecord = record
     }
@@ -86,8 +86,8 @@ class RecordDetailFragment:
     }
 
     // 种类和来源属性需要绑定在滚轮上面
-    private lateinit var sources: ArrayList<String>
-    private lateinit var categories: ArrayList<String>
+    private lateinit var sourceNames: ArrayList<String>
+    private lateinit var categoryNames: ArrayList<String>
     private lateinit var sourceSpinnerAdapter: ArrayAdapter<String>
     private lateinit var categorySpinnerAdapter: ArrayAdapter<String>
 
@@ -108,20 +108,20 @@ class RecordDetailFragment:
         when (parent.id) {
             R.id.detail_src_spinner -> {
                 Log.d("RecordDetailFragment",
-                        "onItemSelected(): sourceSpinner has (${sources[position]}) selected.")
+                        "onItemSelected(): sourceSpinner has (${sourceNames[position]}) selected.")
                 if (position == UNSPECIFIED_ITEM_POSITION) {
-                    bindingRecord.source = null
+                    bindingRecord.sourceID = null
                 } else {
-                    bindingRecord.source = sources[position]
+                    bindingRecord.sourceID = dbModel.findSource(sourceNames[position])?.ID!!
                 }
             }
             R.id.detail_type_spinner -> {
                 Log.d("RecordDetailFragment",
-                        "onItemSelected(): categorySpinner has (${categories[position]}) selected.")
+                        "onItemSelected(): categorySpinner has (${categoryNames[position]}) selected.")
                 if (position == UNSPECIFIED_ITEM_POSITION) {
-                    bindingRecord.category = null
+                    bindingRecord.categoryID = null
                 } else {
-                    bindingRecord.category = categories[position]
+                    bindingRecord.categoryID = dbModel.findCategory(categoryNames[position])?.ID!!
                 }
             }
         }
@@ -134,7 +134,7 @@ class RecordDetailFragment:
 
         // 如果是新建一个记录，那么就不会有已有的截图（因为截图是快捷操作对话框提供的功能）
         // 因此，和截图有关的组件不必显示出来
-        if (bindingRecord == null || bindingRecord!!.ID == null) {
+        if (bindingRecord == null || bindingRecord!!.id == null) {
             view.apply {
                 detail_screenshot.visibility = View.GONE
                 detail_screenshot_empty_prompt.visibility = View.GONE
@@ -150,16 +150,16 @@ class RecordDetailFragment:
         super.onViewCreated(view, savedInstanceState)
         // Add observers
         dbModel.categories.observe(viewLifecycleOwner) {
-            categories.clear()
-            categories.add(getString(R.string.unspecified))
-            categories.addAll(it.map { category -> category.name })
+            categoryNames.clear()
+            categoryNames.add(getString(R.string.unspecified))
+            categoryNames.addAll(it.map { category -> category.name })
             categorySpinnerAdapter.notifyDataSetChanged()
         }
 
         dbModel.sources.observe(viewLifecycleOwner) {
-            sources.clear()
-            sources.add(getString(R.string.unspecified))
-            sources.addAll(it.map { src -> src.name })
+            sourceNames.clear()
+            sourceNames.add(getString(R.string.unspecified))
+            sourceNames.addAll(it.map { src -> src.name })
             sourceSpinnerAdapter.notifyDataSetChanged()
         }
     }
@@ -169,12 +169,12 @@ class RecordDetailFragment:
 
         // Late Initialization for spinner data
         val initialString = getString(R.string.unspecified)
-        sources = arrayListOf(initialString)
-        categories = arrayListOf(initialString)
+        sourceNames = arrayListOf(initialString)
+        categoryNames = arrayListOf(initialString)
         categorySpinnerAdapter = ArrayAdapter<String>(requireContext(),
-                android.R.layout.simple_spinner_dropdown_item, categories)
+                android.R.layout.simple_spinner_dropdown_item, categoryNames)
         sourceSpinnerAdapter = ArrayAdapter<String>(requireContext(),
-                android.R.layout.simple_spinner_dropdown_item, sources)
+                android.R.layout.simple_spinner_dropdown_item, sourceNames)
     }
 
     override fun onResume() {
@@ -182,7 +182,7 @@ class RecordDetailFragment:
         val view = requireView()
 
         // 设置标题
-        val newTitle =  if (bindingRecord.ID == null) requireContext().getString(R.string.detail_page_title_create)
+        val newTitle =  if (bindingRecord.id == null) requireContext().getString(R.string.detail_page_title_create)
                         else requireContext().getString(R.string.detail_page_title_modify)
         setNavigation(view, newTitle)
 
@@ -208,7 +208,7 @@ class RecordDetailFragment:
         view.detail_star.isChecked = bindingRecord.starred
 
         // 更新日期和时间
-        val date = bindingRecord.mDate
+        val date = bindingRecord.date
         val cal = Calendar.getInstance()
         cal.time = date
 
@@ -226,7 +226,7 @@ class RecordDetailFragment:
         // 更新金额组件显示
         val moneyText = view.findViewById<EditText>(R.id.detail_money_text)
         moneyText.apply {
-            setText(bindingRecord.moneyAmount.toString())
+            setText(bindingRecord.money.toString())
             setSelection(text.length)
         }
 
@@ -240,28 +240,20 @@ class RecordDetailFragment:
 
         // 更新来源组件
         val sourceSpinner = view.findViewById<Spinner>(R.id.detail_src_spinner)
-        if (bindingRecord.source == null) {
+        try {
+            val index = sourceNames.indexOf(dbModel.findSource(bindingRecord.sourceID!!)!!.name)
+            sourceSpinner.setSelection(if (index < 0) UNSPECIFIED_ITEM_POSITION else index)
+        } catch (e: NullPointerException) {
             sourceSpinner.setSelection(UNSPECIFIED_ITEM_POSITION)
-        } else {
-            val index = sources.indexOf(bindingRecord.source!!)
-            if (index < 0) {
-                sourceSpinner.setSelection(UNSPECIFIED_ITEM_POSITION)
-            } else {
-                sourceSpinner.setSelection(index)
-            }
         }
 
         // 更新种类组件
         val categorySpinner = view.findViewById<Spinner>(R.id.detail_type_spinner)
-        if (bindingRecord.category == null) {
+        try {
+            val index = categoryNames.indexOf(dbModel.findCategory(bindingRecord.categoryID!!)!!.name)
+            categorySpinner.setSelection(if (index < 0) UNSPECIFIED_ITEM_POSITION else index)
+        } catch (e: NullPointerException) {
             categorySpinner.setSelection(UNSPECIFIED_ITEM_POSITION)
-        } else {
-            val index = categories.indexOf(bindingRecord.category!!)
-            if (index < 0) {
-                categorySpinner.setSelection(UNSPECIFIED_ITEM_POSITION)
-            } else {
-                categorySpinner.setSelection(index)
-            }
         }
     }
 
@@ -367,7 +359,7 @@ class RecordDetailFragment:
         // Add new options
         val bindingRecord = bindingRecord!!
         if (editing) {
-            if (bindingRecord.ID == null) {
+            if (bindingRecord.id == null) {
                 inflater.inflate(R.menu.detail_menu_creating, menu)
             } else {
                 inflater.inflate(R.menu.detail_menu_editing, menu)
@@ -460,7 +452,7 @@ class RecordDetailFragment:
     private fun setTime(view: View, hourOfDay: Int, minuteOfHour: Int) {
         // 保存记录
         val bindingRecord = getBindingRecord()
-        bindingRecord.mDate.let { date ->
+        bindingRecord.date.let { date ->
             val cal = Calendar.getInstance()
             // 和设置timeInMills是等效的，可以点进去看jdk的实现。不会影响到date这个参数
             cal.time = date
@@ -482,13 +474,13 @@ class RecordDetailFragment:
         val bindingRecord = getBindingRecord()
         // 生成日期数据
         val cal = Calendar.getInstance()
-        cal.timeInMillis = bindingRecord.mDate.time
+        cal.timeInMillis = bindingRecord.date.time
         cal.set(year, month, dayOfMonth)
         // 保存记录
-        bindingRecord.mDate.time = cal.timeInMillis
+        bindingRecord.date.time = cal.timeInMillis
         // 更新视图
         val dateText = view.findViewById<EditText>(R.id.detail_date_text)
-        dateText.setText(Fmt.date.format(bindingRecord.mDate))
+        dateText.setText(Fmt.date.format(bindingRecord.date))
     }
 
     /**
@@ -549,7 +541,7 @@ class RecordDetailFragment:
         val bindingRecord = getBindingRecord()
 
         // 拉取金额
-        bindingRecord.moneyAmount = try {
+        bindingRecord.money = try {
             val money = detail_money_text.text.toString().toDouble()
             // 格式化金额
             val format = DecimalFormat("0.##")

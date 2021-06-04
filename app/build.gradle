@@ -3,6 +3,11 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-android-extensions'
 }
+apply plugin: 'kotlin-android'
+
+//aspectjx {
+//    exclude 'android.support'
+//}
 
 android {
     compileSdkVersion 30
@@ -38,6 +43,7 @@ android {
 }
 
 dependencies {
+
     implementation files('libs/poi-5.0.0.jar')
     implementation files('libs\\poi-ooxml-5.0.0.jar')
     implementation files('libs\\poi-ooxml-full-5.0.0.jar')
@@ -92,4 +98,9 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.0-alpha2'
     implementation 'androidx.preference:preference-ktx:1.1.1'
     implementation 'com.github.lisawray.groupie:groupie:2.9.0'
+    implementation "androidx.core:core-ktx:+"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+repositories {
+    mavenCentral()
 }

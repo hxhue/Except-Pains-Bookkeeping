@@ -87,7 +87,7 @@ fun loadQuickActionModule(ctx: Context) {
     // Decide whether to turn on quick actions-in-notification-center feature
     val perf = PreferenceManager.getDefaultSharedPreferences(ctx)
 
-    val quickActionInNotification = perf.getBoolean("qa_notification", false)
+    val quickActionInNotification = perf.getBoolean("qa_notification", true)
 
     if (quickActionInNotification) {
         CKForeground.launch(ctx)
