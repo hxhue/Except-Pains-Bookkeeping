@@ -158,11 +158,6 @@ class DatabaseModel: ViewModel() {
      * @return Pair<index_of_section, position_in_section>
      */
     private fun requireRecordIndex(record: Record, list: MutableList<RecordGroup>): Pair<Int, Int> {
-//        val roundedDateOfRecord = roundToDay(record.date)
-//        val index = list.binarySearch(
-//            RecordGroup(roundedDateOfRecord, ArrayList(0)),
-//            RecordGroup.dateReverseComparator
-//        )
         val index = findRecordGroupIndex(record, list)
         if (index < 0) {
             throw RuntimeException("The record to be deleted is not in the list.")
@@ -284,56 +279,6 @@ class DatabaseModel: ViewModel() {
     }
 
     /**
-     * 更新一个不完整的记录。
-     * 由于记录之前不在home界面，所以去查找更新会导致requireRecordIndex设计的运行时异常。
-     */
-//    fun updateIncompleteRecord(record: Record, sectionAdapter: SectionAdapter) {
-//        GlobalScope.launch(Dispatchers.IO) {
-//            // Update database
-//            AppDatabase.updateRecord(record)
-//
-//            if (record.isComplete()) {
-//                val list = requireGroupedRecords()
-//                val roundedDate = roundToDay(record.date)
-//                val index = list.binarySearch(
-//                    RecordGroup(roundedDate, ArrayList(0)),
-//                    RecordGroup.dateReverseComparator
-//                )
-//
-//                // 2021-06-01 22:58:19
-//                // A little bit in hurry
-//                // God bless me!!!!
-//                if (index < 0) {
-//                    // Time to insert a new group
-//                    val newGroup = RecordGroup(roundedDate, arrayListOf(record.getCopy()))
-//                    val i = -(index + 1)
-//                    list.add(i, newGroup)
-//                    withContext(Dispatchers.Main) {
-//                        sectionAdapter.notifyItemInserted(i)
-//                        sectionAdapter.notifyItemRangeChanged(i, list.size)
-//                    }
-//                } else {
-//                    // insert into the group
-//                    val group = list[index]
-//                    var indexToInsert = group.records.binarySearch(record, Record.dateReverseComparator)
-//                    if (indexToInsert < 0) {
-//                        indexToInsert = -(indexToInsert + 1)
-//                    }
-//                    group.records.add(indexToInsert, record.getCopy())
-//                    withContext(Dispatchers.Main) {
-//                        sectionAdapter.notifyItemChanged(index)
-//                    }
-//                }
-//            }
-//
-//            // Update view
-//            withContext(Dispatchers.Main) {
-//                checkModificationEffectsOnInboxSections(record, DataModificationMethod.UPDATE)
-//            }
-//        }
-//    }
-
-    /**
      * @param viewRefreshMethod 是更新视图的方式，如果不提供则会用默认方式更新视图
      */
     fun deleteCategoryByID(id: Int, viewRefreshMethod: (()->Unit)? = null) {
@@ -356,7 +301,6 @@ class DatabaseModel: ViewModel() {
                 } else {
                     viewRefreshMethod()
                 }
-//                categories.postValue(categories.value)
 
                 // outlet a notification
                 onCategoriesChanged()

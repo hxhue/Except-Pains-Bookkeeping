@@ -1,8 +1,10 @@
 package com.example.epledger.model
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.os.Parcel
 import android.os.Parcelable
+import com.example.epledger.qaction.screenshot.ScreenshotUtils
 import java.util.Date
 
 class Record() : Parcelable {
@@ -71,6 +73,20 @@ class Record() : Parcelable {
      */
     fun isComplete(): Boolean {
         return (money != 0.0 && money != -0.0) && (categoryID != null)
+    }
+
+    /**
+     * You may want to call this method when an incomplete becomes complete.
+     * If screenshotPath == null, nothing happens.
+     */
+    fun eraseScreenShot(context: Context) {
+        if (screenshotPath == null) {
+            return
+        }
+
+        ScreenshotUtils.removeFromSandbox(context, this.screenshotPath!!)
+        screenshotPath = null
+        screenshot = null
     }
 
     companion object CREATOR : Parcelable.Creator<Record> {
