@@ -313,7 +313,8 @@ class ChartsFragment: Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.top_app_bar, menu)
+//        inflater.inflate(R.menu.top_app_bar, menu)
+        menu.clear()
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -613,37 +614,37 @@ class ChartsFragment: Fragment() {
     /**
      * 实现top app bar功能，已舍弃
      */
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-//            R.id.sift -> {
-//                dialog.show()
-
-//                animation
-//                if(!dragged){
-//                    siftLayout.animate().translationY(800f).setDuration(300).start()
-//                    pieChart.animate().translationY(800f).setDuration(300).start()
-////                    lineChart.animate().translationY(800f).setDuration(300).start()
-//                    barChart.animate().translationY(800f).setDuration(300).start()
-//                    dragged=true
-//                }else{
-//                    siftLayout.animate().translationY(0f).setDuration(300).start()
-//                    pieChart.animate().translationY(0f).setDuration(300).start()
-////                    lineChart.animate().translationY(0f).setDuration(300).start()
-//                    barChart.animate().translationY(0f).setDuration(300).start()
-//                    dragged=false
-//                }
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        when (item.itemId) {
+////            R.id.sift -> {
+////                dialog.show()
+//
+////                animation
+////                if(!dragged){
+////                    siftLayout.animate().translationY(800f).setDuration(300).start()
+////                    pieChart.animate().translationY(800f).setDuration(300).start()
+//////                    lineChart.animate().translationY(800f).setDuration(300).start()
+////                    barChart.animate().translationY(800f).setDuration(300).start()
+////                    dragged=true
+////                }else{
+////                    siftLayout.animate().translationY(0f).setDuration(300).start()
+////                    pieChart.animate().translationY(0f).setDuration(300).start()
+//////                    lineChart.animate().translationY(0f).setDuration(300).start()
+////                    barChart.animate().translationY(0f).setDuration(300).start()
+////                    dragged=false
+////                }
+////            }
+////            R.id.reset -> {
+////                if(!dateRangeIsSet) autoComplete.setText(getString(R.string.recent_14_days),false)
+////                refresh()
+////                Toast.makeText(context,"Charts refreshed!",Toast.LENGTH_SHORT).show()
+////            }
+//            R.id.more -> {
+//                // Handle more item (inside overflow menu) press
 //            }
-//            R.id.reset -> {
-//                if(!dateRangeIsSet) autoComplete.setText(getString(R.string.recent_14_days),false)
-//                refresh()
-//                Toast.makeText(context,"Charts refreshed!",Toast.LENGTH_SHORT).show()
-//            }
-            R.id.more -> {
-                // Handle more item (inside overflow menu) press
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
+//        }
+//        return super.onOptionsItemSelected(item)
+//    }
 
     /**
      * 利用数据库操作筛选出默认记录或满足用户筛选条件的记录
