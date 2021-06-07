@@ -215,12 +215,12 @@ public class ImportDataFromExcel {
                 if(state.equals("支出"))
                 {
                     System.out.println(-m);
-                    ContentValues contentValues1 = getContentValues(date,-m, Category.UNKNOWN_ID,1,null,null,0);
+                    ContentValues contentValues1 = getContentValues(date,-m, Category.IMPORTED_ID,1,null,null,0);
                     sqLiteDatabase.insert(MySQLiteOpenHelper.TABLE_NAME, null, contentValues1);
                 }
                 else
                 {
-                    ContentValues contentValues1 = getContentValues(date,m,Category.UNKNOWN_ID,1,null,null,0);
+                    ContentValues contentValues1 = getContentValues(date,m, Category.IMPORTED_ID,1,null,null,0);
                     sqLiteDatabase.insert(MySQLiteOpenHelper.TABLE_NAME, null, contentValues1);
 
                 }
@@ -274,12 +274,12 @@ public class ImportDataFromExcel {
                 if(state.equals("支出"))
                 {
                     System.out.println(-m);
-                    ContentValues contentValues1 = getContentValues(date,-m, Category.UNKNOWN_ID,2,note,null,0);
+                    ContentValues contentValues1 = getContentValues(date,-m, Category.IMPORTED_ID,2,note,null,0);
                     sqLiteDatabase.insert(MySQLiteOpenHelper.TABLE_NAME, null, contentValues1);
                 }
                 else
                 {
-                    ContentValues contentValues1 = getContentValues(date,m,Category.UNKNOWN_ID,2,note,null,0);
+                    ContentValues contentValues1 = getContentValues(date,m, Category.IMPORTED_ID,2,note,null,0);
                     sqLiteDatabase.insert(MySQLiteOpenHelper.TABLE_NAME, null, contentValues1);
 
                 }
