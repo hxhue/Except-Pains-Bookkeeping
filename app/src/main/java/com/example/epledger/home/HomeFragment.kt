@@ -156,14 +156,14 @@ class HomeFragment : Fragment() {
                 dialog.show(requireActivity().supportFragmentManager, null)
                 true
             }
-            R.id.reset -> {
-                filterCategoriesViewModel.reset()
-                filterSourcesViewModel.reset()
-                true
-            }
-            R.id.more -> {
-                true
-            }
+//            R.id.reset -> {
+//                filterCategoriesViewModel.reset()
+//                filterSourcesViewModel.reset()
+//                true
+//            }
+//            R.id.more -> {
+//                true
+//            }
             else -> false
         }
     }

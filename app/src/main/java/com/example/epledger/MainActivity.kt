@@ -2,6 +2,7 @@ package com.example.epledger
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.pm.PackageManager
 import android.database.sqlite.SQLiteDatabase
 import android.os.Build
@@ -48,31 +49,12 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // init AppDatabase
-        AppDatabase = SqliteDatabase(this.applicationContext)
-        if (Build.VERSION.SDK_INT >= 23) {
-            val REQUEST_CODE_CONTACT = 101;
-            val permissions =  Manifest.permission.WRITE_EXTERNAL_STORAGE;
-            //验证是否许可权限
-            val p= Array<String>(1){permissions}
-            if (this.checkSelfPermission(permissions) != PackageManager.PERMISSION_GRANTED) {
-                    this.requestPermissions(p, REQUEST_CODE_CONTACT);
-                    //return;
-                }
-            }
-
-
         // 禁用黑暗模式
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-
-        // 界面初始化
-        // Handler.post may fix the problem of frame skipping?
-        // Not for ChartsFragment though.
-        setupViews()
-
         // 加载其他模块
         loadModules()
+        // 界面初始化
+        setupViews()
     }
 
     private fun setupViews() {
@@ -141,8 +123,22 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         val ctx = this.applicationContext
         loadNotificationModule(ctx)
         loadQuickActionModule(ctx)
-        // 创建cache的视图
         createViewCache()
+        loadDatabaseModule(ctx)
+    }
+
+    private fun loadDatabaseModule(context: Context) {
+        AppDatabase = SqliteDatabase(this.applicationContext)
+        if (Build.VERSION.SDK_INT >= 23) {
+            val REQUEST_CODE_CONTACT = 101;
+            val permissions =  Manifest.permission.WRITE_EXTERNAL_STORAGE;
+            //验证是否许可权限
+            val p= Array<String>(1){permissions}
+            if (this.checkSelfPermission(permissions) != PackageManager.PERMISSION_GRANTED) {
+                this.requestPermissions(p, REQUEST_CODE_CONTACT);
+                //return;
+            }
+        }
     }
 
     private fun createViewCache() {

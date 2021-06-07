@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 import android.util.Log;
 //import android.support.v7.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
+
 import com.example.epledger.R;
 import com.example.epledger.model.Category;
 import com.example.epledger.model.Record;
@@ -63,28 +65,20 @@ public class ImportDataFromExcel {
         dbHelper = new MySQLiteOpenHelper(c,"test");
         SQLiteDatabase db=dbHelper.getWritableDatabase();
 
-        Category[] categoriesToAdd = new Category[] {
-                new Category("Emergency", R.drawable.ic_fas_asterisk, 2),
-                new Category("Study", R.drawable.ic_fas_pencil_alt,3),
-                new Category("Food", R.drawable.ic_fas_utensils, 4),
-                new Category("Shopping", R.drawable.ic_fas_shopping_cart, 5),
-                new Category("Transportation", R.drawable.ic_fas_bus, 6),
-                new Category("Digital", R.drawable.ic_fas_mobile_alt, 7),
-                new Category("Coffee", R.drawable.ic_fas_coffee, 8),
-                new Category("Present", R.drawable.ic_fas_gift, 9),
-        };
-        for (Category item: categoriesToAdd) {
-            AddNewType(db, item.getName(), item.getIconResID());
-        }
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(c);
 
-        Source[] sourcesToAdd = new Source[] {
-                new Source("Alipay", 1),
-                new Source("Wechat", 2),
-                new Source("Cash", 3),
-        };
-        for (Source item: sourcesToAdd) {
-            AddNewFrom(db, item.getName());
+        if (!preferences.getBoolean("db_init_finished", false)) {
+            List<Category> categoriesToAdd = Category.Companion.getDefaultCategories(c);
+            for (Category item: categoriesToAdd) {
+                AddNewType(db, item.getName(), item.getIconResID());
+            }
+
+            List<Source> sourcesToAdd = Source.Companion.getDefaultSources(c);
+            for (Source item: sourcesToAdd) {
+                AddNewFrom(db, item.getName());
+            }
         }
+        preferences.edit().putBoolean("db_init_finished", true).apply();
 
         db.close();
     }
@@ -94,6 +88,7 @@ public class ImportDataFromExcel {
         /*ContentValues contentValues=getContentValues(b.date1,b.account,b.type1,b.from1,b.beizhu);
         db.insert(MySQLiteOpenHelper.TABLE_NAME, null, contentValues);*/
     }
+
     public void AddNewType(SQLiteDatabase db,String type,int resID)
     {
         ContentValues contentValues = new ContentValues();
