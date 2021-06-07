@@ -15,7 +15,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import com.example.epledger.R
 import com.example.epledger.db.DatabaseModel
+import com.example.epledger.model.Category
 import com.example.epledger.model.Record
+import com.example.epledger.model.Source
 import com.example.epledger.nav.NavigationFragment
 import com.example.epledger.qaction.screenshot.ScreenshotUtils
 import com.example.epledger.util.Fmt
@@ -47,10 +49,10 @@ class RecordDetailFragment:
     NavigationFragment(), AdapterView.OnItemSelectedListener {
     private val dbModel: DatabaseModel by activityViewModels()
 
-    companion object {
-        // 没有被注明的来源或种类始终放在0号位
-        const val UNSPECIFIED_ITEM_POSITION = 0
-    }
+//    companion object {
+//        // 没有被注明的来源或种类始终放在0号位
+//        const val UNSPECIFIED_ITEM_POSITION = 0
+//    }
 
     // 创建一个空记录
     private var bindingRecord: Record? = null
@@ -109,20 +111,22 @@ class RecordDetailFragment:
             R.id.detail_src_spinner -> {
                 Log.d("RecordDetailFragment",
                         "onItemSelected(): sourceSpinner has (${sourceNames[position]}) selected.")
-                if (position == UNSPECIFIED_ITEM_POSITION) {
-                    bindingRecord.sourceID = null
-                } else {
-                    bindingRecord.sourceID = dbModel.findSource(sourceNames[position])?.ID!!
-                }
+//                if (position == Source.UNKNOWN_ID) {
+//                    bindingRecord.sourceID = null
+//                } else {
+//                    bindingRecord.sourceID = dbModel.findSource(sourceNames[position])?.ID!!
+//                }
+                bindingRecord.sourceID = dbModel.findSource(sourceNames[position])?.ID ?: Source.UNKNOWN_ID
             }
             R.id.detail_type_spinner -> {
                 Log.d("RecordDetailFragment",
                         "onItemSelected(): categorySpinner has (${categoryNames[position]}) selected.")
-                if (position == UNSPECIFIED_ITEM_POSITION) {
-                    bindingRecord.categoryID = null
-                } else {
-                    bindingRecord.categoryID = dbModel.findCategory(categoryNames[position])?.ID!!
-                }
+//                if (position == Category.UNKNOWN_ID) {
+//                    bindingRecord.categoryID = null
+//                } else {
+//                    bindingRecord.categoryID = dbModel.findCategory(categoryNames[position])?.ID!!
+//                }
+                bindingRecord.categoryID = dbModel.findCategory(categoryNames[position])?.ID ?: Category.UNKNOWN_ID
             }
         }
     }
@@ -151,14 +155,14 @@ class RecordDetailFragment:
         // Add observers
         dbModel.categories.observe(viewLifecycleOwner) {
             categoryNames.clear()
-            categoryNames.add(getString(R.string.unspecified))
+//            categoryNames.add(getString(R.string.unspecified))
             categoryNames.addAll(it.map { category -> category.name })
             categorySpinnerAdapter.notifyDataSetChanged()
         }
 
         dbModel.sources.observe(viewLifecycleOwner) {
             sourceNames.clear()
-            sourceNames.add(getString(R.string.unspecified))
+//            sourceNames.add(getString(R.string.unspecified))
             sourceNames.addAll(it.map { src -> src.name })
             sourceSpinnerAdapter.notifyDataSetChanged()
         }
@@ -242,18 +246,18 @@ class RecordDetailFragment:
         val sourceSpinner = view.findViewById<Spinner>(R.id.detail_src_spinner)
         try {
             val index = sourceNames.indexOf(dbModel.findSource(bindingRecord.sourceID!!)!!.name)
-            sourceSpinner.setSelection(if (index < 0) UNSPECIFIED_ITEM_POSITION else index)
+            sourceSpinner.setSelection(if (index < 0) Source.UNKNOWN_ID else index)
         } catch (e: NullPointerException) {
-            sourceSpinner.setSelection(UNSPECIFIED_ITEM_POSITION)
+            sourceSpinner.setSelection(Source.UNKNOWN_ID)
         }
 
         // 更新种类组件
         val categorySpinner = view.findViewById<Spinner>(R.id.detail_type_spinner)
         try {
             val index = categoryNames.indexOf(dbModel.findCategory(bindingRecord.categoryID!!)!!.name)
-            categorySpinner.setSelection(if (index < 0) UNSPECIFIED_ITEM_POSITION else index)
+            categorySpinner.setSelection(if (index < 0) Category.UNKNOWN_ID else index)
         } catch (e: NullPointerException) {
-            categorySpinner.setSelection(UNSPECIFIED_ITEM_POSITION)
+            categorySpinner.setSelection(Category.UNKNOWN_ID)
         }
     }
 

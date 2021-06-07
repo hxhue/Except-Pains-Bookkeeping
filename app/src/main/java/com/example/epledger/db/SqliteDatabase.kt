@@ -7,7 +7,6 @@ import com.example.epledger.model.Category
 import com.example.epledger.model.Filter
 import com.example.epledger.model.Record
 import com.example.epledger.model.Source
-import com.example.epledger.chart.ChartsFragment
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -15,6 +14,7 @@ import kotlin.collections.ArrayList
 class SqliteDatabase(context: Context) : LedgerDatabase() {
     val im = ImportDataFromExcel(context)
     val simpleFormat = SimpleDateFormat("yyyy/MM/dd hh:mm")
+
     override fun getRecordsOrderByDate(): List<Record> {
         val sqLiteDatabase: SQLiteDatabase = im.dbHelper.getReadableDatabase()
         val cursor: Cursor = sqLiteDatabase.rawQuery(
@@ -38,8 +38,8 @@ class SqliteDatabase(context: Context) : LedgerDatabase() {
 
                     // 2021-06-02 17:39:24
                     // We use int for these fields now
-                    sourceID = if (from_id <= 0) null else from_id
-                    categoryID = if (type_id <= 0) null else type_id
+                    sourceID = if (from_id <= 0) Source.UNKNOWN_ID else from_id
+                    categoryID = if (type_id <= 0) Category.UNKNOWN_ID else type_id
                     date = simpleFormat.parse(date1)
                     starred = s
                     //screenshot: Bitmap? = null
@@ -76,8 +76,8 @@ class SqliteDatabase(context: Context) : LedgerDatabase() {
 
                     // 2021-06-02 17:40:41
                     // We use int for these fields now
-                    sourceID = if (from_id <= 0) null else from_id
-                    categoryID = if (type_id <= 0) null else type_id
+                    sourceID = if (from_id <= 0) Source.UNKNOWN_ID else from_id
+                    categoryID = if (type_id <= 0) Category.UNKNOWN_ID else type_id
 
                     date = simpleFormat.parse(cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.date1)))
                     starred = s
@@ -116,8 +116,8 @@ class SqliteDatabase(context: Context) : LedgerDatabase() {
 
                     // 2021-06-02 17:40:56
                     // We use int for these fields now
-                    sourceID = if (from_id < 0) null else from_id
-                    categoryID = if (type_id < 0) null else type_id
+                    sourceID = if (from_id < 0) Source.UNKNOWN_ID else from_id
+                    categoryID = if (type_id < 0) Category.UNKNOWN_ID else type_id
 
                     date =simpleFormat.parse(cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.date1)))
                     starred = s
@@ -154,8 +154,8 @@ class SqliteDatabase(context: Context) : LedgerDatabase() {
 
         // 2021-06-02 17:42:38
         // We use int for these fields now
-        val typeid = record.categoryID ?: -1
-        val fromid = record.sourceID ?: -1
+        val typeid = record.categoryID
+        val fromid = record.sourceID
 
         val simpleFormat = SimpleDateFormat("yyyy/MM/dd hh:mm", Locale.US)
         val s = if (record.starred) 1 else 0
@@ -274,7 +274,9 @@ class SqliteDatabase(context: Context) : LedgerDatabase() {
         val sqLiteDatabase: SQLiteDatabase = im.dbHelper.getWritableDatabase()
         im.AddNewType(sqLiteDatabase,category.name,category.iconResID)
         val res=im.SelectTypeId(category.name,sqLiteDatabase)
-        print("我被插入了类型，")
+
+        print("insertCategory() in SqliteDatabase is called.")
+
         /*val chart=ChartsFragment()
         chart.addCategory(category.name)*/
         println(category.name)

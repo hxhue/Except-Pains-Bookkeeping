@@ -230,4 +230,6 @@
     <string name="from">从</string>
     <string name="filter_result">筛选结果</string>
     <string name="category_imported">被导入</string>
+    <string name="default_category">未知</string>
+    <string name="default_source">未知</string>
 </resources>

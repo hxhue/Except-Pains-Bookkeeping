@@ -22,7 +22,8 @@ import androidx.preference.PreferenceManager
 import com.example.epledger.R
 import com.example.epledger.db.AppDatabase
 import com.example.epledger.model.Record
-import com.example.epledger.detail.RecordDetailFragment
+import com.example.epledger.model.Category
+import com.example.epledger.model.Source
 import com.example.epledger.qaction.tool.PairTask
 import com.example.epledger.qaction.tool.Store
 import com.example.epledger.qaction.screenshot.ScreenshotUtils
@@ -87,14 +88,14 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
     private fun registerObservers() {
         qaModel.categories.observeForever {
             categoryNames.clear()
-            categoryNames.add(getString(R.string.unspecified))
+//            categoryNames.add(getString(R.string.unspecified))
             categoryNames.addAll(it.map { category -> category.name })
             typesSpinnerAdapter.notifyDataSetChanged()
         }
 
         qaModel.sources.observeForever {
             sourceNames.clear()
-            sourceNames.add(getString(R.string.unspecified))
+//            sourceNames.add(getString(R.string.unspecified))
             sourceNames.addAll(it.map { source -> source.name })
             sourcesSpinnerAdapter.notifyDataSetChanged()
         }
@@ -287,20 +288,26 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
         if (parent.id == R.id.qa_src_spinner) {
             Log.d("qaction.PopupActivity",
                     "onItemSelected(): sourceSpinner has (${sourceNames[position]}) selected.")
-            if (position == RecordDetailFragment.UNSPECIFIED_ITEM_POSITION) {
-                ledgerRecord.sourceID = null
-            } else {
-                ledgerRecord.sourceID = qaModel.requireSource(sourceNames[position]).ID
-            }
+
+//            if (position == Source.SOURCE_UNKNOWN_ID) {
+//                ledgerRecord.sourceID = null
+//            } else {
+//                ledgerRecord.sourceID = qaModel.requireSource(sourceNames[position]).ID
+//            }
+
+            ledgerRecord.sourceID = qaModel.requireSource(sourceNames[position]).ID ?: Source.UNKNOWN_ID
+
         } else if (parent.id == R.id.qa_type_spinner) {
             Log.d("qaction.PopupActivity",
                     "onItemSelected(): typeSpinner has (${categoryNames[position]}) selected.")
 
-            if (position == RecordDetailFragment.UNSPECIFIED_ITEM_POSITION) {
-                ledgerRecord.categoryID = null
-            } else {
-                ledgerRecord.categoryID = qaModel.requireCategories(categoryNames[position]).ID
-            }
+//            if (position == Category.CATEGORY_UNKNOWN_ID) {
+//                ledgerRecord.categoryID = null
+//            } else {
+//                ledgerRecord.categoryID = qaModel.requireCategories(categoryNames[position]).ID
+//            }
+
+            ledgerRecord.categoryID = qaModel.requireCategories(categoryNames[position]).ID ?: Category.UNKNOWN_ID
         }
     }
 

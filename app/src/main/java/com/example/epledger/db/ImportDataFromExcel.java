@@ -9,16 +9,13 @@ import android.util.Log;
 //import android.support.v7.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
-import com.example.epledger.R;
 import com.example.epledger.model.Category;
 import com.example.epledger.model.Record;
 import com.example.epledger.model.Source;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 
-import org.apache.poi.ss.usermodel.Row;
 //import org.apache.poi.ss.usermodel.Sheet;
 //import org.apache.poi.ss.usermodel.Workbook;
 //import org.apache.poi.ss.usermodel.WorkbookFactory;
@@ -26,14 +23,11 @@ import org.apache.poi.ss.usermodel.Row;
 
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -42,8 +36,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
-import jxl.Sheet;
-import jxl.Workbook;
 import jxl.read.biff.BiffException;
 
 
@@ -223,12 +215,12 @@ public class ImportDataFromExcel {
                 if(state.equals("支出"))
                 {
                     System.out.println(-m);
-                    ContentValues contentValues1 = getContentValues(date,-m, 10,1,null,null,0);
+                    ContentValues contentValues1 = getContentValues(date,-m, Category.UNKNOWN_ID,1,null,null,0);
                     sqLiteDatabase.insert(MySQLiteOpenHelper.TABLE_NAME, null, contentValues1);
                 }
                 else
                 {
-                    ContentValues contentValues1 = getContentValues(date,m,10,1,null,null,0);
+                    ContentValues contentValues1 = getContentValues(date,m,Category.UNKNOWN_ID,1,null,null,0);
                     sqLiteDatabase.insert(MySQLiteOpenHelper.TABLE_NAME, null, contentValues1);
 
                 }
@@ -282,12 +274,12 @@ public class ImportDataFromExcel {
                 if(state.equals("支出"))
                 {
                     System.out.println(-m);
-                    ContentValues contentValues1 = getContentValues(date,-m, 10,2,note,null,0);
+                    ContentValues contentValues1 = getContentValues(date,-m, Category.UNKNOWN_ID,2,note,null,0);
                     sqLiteDatabase.insert(MySQLiteOpenHelper.TABLE_NAME, null, contentValues1);
                 }
                 else
                 {
-                    ContentValues contentValues1 = getContentValues(date,m,10,2,note,null,0);
+                    ContentValues contentValues1 = getContentValues(date,m,Category.UNKNOWN_ID,2,note,null,0);
                     sqLiteDatabase.insert(MySQLiteOpenHelper.TABLE_NAME, null, contentValues1);
 
                 }

@@ -250,6 +250,8 @@
     <string name="please_set_date_range">请设置日期范围</string>
     <string name="visit">cancel</string>
     <string name="category_imported">Imported</string>
+    <string name="default_category">Unknown</string>
+    <string name="default_source">Unknown</string>
 
 
 </resources>

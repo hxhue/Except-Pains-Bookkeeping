@@ -12,11 +12,14 @@ data class Source(
     }
 
     companion object {
+        const val UNKNOWN_ID = 1
+
         fun getDefaultSources(context: Context): MutableList<Source> {
             return arrayListOf(
-                Source(context.getString(R.string.alipay), 1),
-                Source(context.getString(R.string.wechat), 2),
-                Source(context.getString(R.string.cash), 3)
+                Source(context.getString(R.string.default_source), UNKNOWN_ID),
+                Source(context.getString(R.string.alipay), 2),
+                Source(context.getString(R.string.wechat), 3),
+                Source(context.getString(R.string.cash), 4)
             )
         }
     }
