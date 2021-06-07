@@ -11,8 +11,8 @@ class Record() : Parcelable {
     var id: Long? = null
     var date: Date = Date()
     var money: Double = -0.0
-    var categoryID: Int? = null
-    var sourceID: Int? = null
+    var categoryID: Int = Category.UNKNOWN_ID
+    var sourceID: Int = Source.UNKNOWN_ID
     var screenshot: Bitmap? = null
     var screenshotPath: String? = null
     var note: String? = null
@@ -21,8 +21,8 @@ class Record() : Parcelable {
     constructor(parcel: Parcel) : this() {
         id = parcel.readValue(Long::class.java.classLoader) as? Long
         money = parcel.readValue(Double::class.java.classLoader) as Double
-        categoryID = parcel.readValue(Int::class.java.classLoader) as? Int
-        sourceID = parcel.readValue(Int::class.java.classLoader) as? Int
+        categoryID = parcel.readValue(Int::class.java.classLoader) as Int
+        sourceID = parcel.readValue(Int::class.java.classLoader) as Int
         screenshotPath = parcel.readString()
         note = parcel.readString()
         starred = parcel.readByte() != 0.toByte()
@@ -72,7 +72,7 @@ class Record() : Parcelable {
      * 判断一个记录是否不完整。
      */
     fun isComplete(): Boolean {
-        return (money != 0.0 && money != -0.0) && (categoryID != null)
+        return (money != 0.0 && money != -0.0) && (categoryID != Category.UNKNOWN_ID)
     }
 
     /**

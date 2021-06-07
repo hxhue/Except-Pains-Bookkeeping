@@ -16,9 +16,11 @@ data class Category(
     }
 
     companion object {
+        const val UNKNOWN_ID = 1
+
         fun getDefaultCategories(context: Context): MutableList<Category> {
             return arrayListOf(
-                Category(context.getString(R.string.sports), R.drawable.ic_far_futbol, 1),
+                Category(context.getString(R.string.default_category), R.drawable.ic_far_bookmark, UNKNOWN_ID),
                 Category(context.getString(R.string.emergency), R.drawable.ic_fas_asterisk, 2),
                 Category(context.getString(R.string.study), R.drawable.ic_fas_pencil_alt, 3),
                 Category(context.getString(R.string.food), R.drawable.ic_fas_utensils, 4),
@@ -27,7 +29,7 @@ data class Category(
                 Category(context.getString(R.string.digital), R.drawable.ic_fas_mobile_alt, 7),
                 Category(context.getString(R.string.coffee), R.drawable.ic_fas_coffee, 8),
                 Category(context.getString(R.string.present), R.drawable.ic_fas_gift, 9),
-                Category(context.getString(R.string.category_imported), R.drawable.ic_far_bookmark, 10)
+                Category(context.getString(R.string.sports), R.drawable.ic_far_futbol, 10),
             )
         }
     }
