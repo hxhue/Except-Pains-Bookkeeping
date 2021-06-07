@@ -163,6 +163,29 @@ public class ImportDataFromExcel {
         sqLiteDatabase.close();
         return sum;
     }
+    public ArrayList<Record> filterRecords(SQLiteDatabase sqLiteDatabase, String start, String end, List<Integer>s, List<Integer>c,double mincount,double maxcount) throws ParseException {
+        //SQLiteDatabase sqLiteDatabase=dbHelper.getReadableDatabase();
+        ArrayList<Record> sum=new ArrayList<>();
+        if(s.size()==0)
+        {
+            for(int j=0;j<c.size();j++)
+            {
+                ArrayList<Record> h=query_date2(sqLiteDatabase,start,end,-1,c.get(j),mincount,maxcount);
+                if(h!=null) sum.addAll(h);
+            }
+            return sum;
+        }
+        for(int i=0;i<s.size();i++)
+        {
+            for(int j=0;j<c.size();j++)
+            {
+                ArrayList<Record> h=query_date2(sqLiteDatabase,start,end,s.get(i),c.get(j),mincount,maxcount);
+                if(h!=null) sum.addAll(h);
+            }
+        }
+        sqLiteDatabase.close();
+        return sum;
+    }
 
     public void alia_base(String s) throws IOException, BiffException {
         SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm");
@@ -289,7 +312,9 @@ public class ImportDataFromExcel {
         colCount = 7;
         //File sdCardDir = Environment.getExternalStorageDirectory();
         //File savefile = new File(sdCardDir+"/SqliteDatabase.csv");
-        File savefile=new File("data/data/com.example.epledger/excel.csv");
+        //File savefile=new File("data/data/com.example.epledger/excel.csv");
+        System.out.println(Environment.getExternalStorageDirectory()+"/excel.csv");
+        File savefile=new File(Environment.getExternalStorageDirectory()+"/excel.csv");
         //System.out.println(sdCardDir+"/SqliteDatabase.csv");
         //File fileParent = savefile.getParentFile();
         if(!savefile.exists()){
@@ -355,6 +380,43 @@ public class ImportDataFromExcel {
     }
 
 
+    private java.util.ArrayList<Record> query_date2(SQLiteDatabase db, String start, String end, int from, int type,double min,double max) throws ParseException {
+        java.util.ArrayList<Record> bills =new ArrayList<>();
+        SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm");
+        android.database.Cursor cursor;
+        if(from!=-1)  cursor = db.rawQuery("SELECT * FROM " + MySQLiteOpenHelper.TABLE_NAME+" WHERE "+MySQLiteOpenHelper.from_id+"= ? AND "+MySQLiteOpenHelper.type_id+"= ? AND "+MySQLiteOpenHelper.date1+" <= ? AND "+MySQLiteOpenHelper.date1+" >= ? AND istemplate=0 AND "+MySQLiteOpenHelper.account+">=? AND "+MySQLiteOpenHelper.account+"<=?",new String[]{Integer.toString(from), Integer.toString(type),end,start,Double.toString(min),Double.toString(max)}, null);
+        else  cursor= db.rawQuery("SELECT * FROM " + MySQLiteOpenHelper.TABLE_NAME+" WHERE "+MySQLiteOpenHelper.type_id+"= ? AND "+MySQLiteOpenHelper.date1+" <= ? AND "+MySQLiteOpenHelper.date1+" >= ? AND istemplate=0 AND "+MySQLiteOpenHelper.account+">=? AND "+MySQLiteOpenHelper.account+"<=?",new String[]{Integer.toString(type),end,start,Double.toString(min),Double.toString(max)}, null);
+        if (cursor != null && cursor.getCount() > 0) {
+
+
+            while (cursor.moveToNext()) {
+                Record b = new Record();
+                b.setId(cursor.getLong(cursor.getColumnIndex(MySQLiteOpenHelper.record_id)));
+                Date tmp=simpleFormat.parse(cursor.getString(cursor.getColumnIndex(MySQLiteOpenHelper.date1)));
+                b.setDate(tmp);
+                b.setMoney(cursor.getDouble(cursor.getColumnIndex(MySQLiteOpenHelper.account)));
+                int type_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.type_id));
+                int from_id = cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.from_id));
+//                b.setSource( get_id_from(from_id,db));
+//                b.setCategory(get_id_type(type_id,db));
+
+                // 2021-06-02 18:08:45
+                // Now these fields are of type (Int?)
+                b.setSourceID(from_id);
+                b.setCategoryID(type_id);
+
+                b.setNote(cursor.getString(cursor.getColumnIndex(MySQLiteOpenHelper.memo)));
+                int isstar=cursor.getInt(cursor.getColumnIndex(MySQLiteOpenHelper.star));
+                b.setStarred(isstar==1);
+                b.setScreenshotPath(cursor.getString(cursor.getColumnIndex(MySQLiteOpenHelper.bitmap)));
+                bills.add(b);
+            }
+
+            cursor.close();
+        }
+
+        return bills;
+    }
     private java.util.ArrayList<Record> query_date(SQLiteDatabase db, String start, String end, int from, int type) throws ParseException {
         java.util.ArrayList<Record> bills =new ArrayList<>();
         SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm");
