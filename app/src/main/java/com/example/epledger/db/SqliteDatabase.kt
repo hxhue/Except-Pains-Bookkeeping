@@ -157,8 +157,9 @@ class SqliteDatabase(context: Context) : LedgerDatabase() {
         val typeid = record.categoryID
         val fromid = record.sourceID
 
-        val simpleFormat = SimpleDateFormat("yyyy/MM/dd hh:mm", Locale.US)
+        val simpleFormat = SimpleDateFormat("yyyy/MM/dd HH:mm")
         val s = if (record.starred) 1 else 0
+        println(record.date)
         val c=im.getContentValues(simpleFormat.format(record.date),record.money,typeid,fromid,record.note,record.screenshotPath,s)
         sqLiteDatabase.insert(MySQLiteOpenHelper.TABLE_NAME, null, c)
         val id=im.FindRecordID(fromid,typeid,record.money,sqLiteDatabase)
