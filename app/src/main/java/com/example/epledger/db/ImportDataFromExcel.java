@@ -223,12 +223,12 @@ public class ImportDataFromExcel {
                 if(state.equals("支出"))
                 {
                     System.out.println(-m);
-                    ContentValues contentValues1 = getContentValues(date,-m, -1,1,null,null,0);
+                    ContentValues contentValues1 = getContentValues(date,-m, 10,1,null,null,0);
                     sqLiteDatabase.insert(MySQLiteOpenHelper.TABLE_NAME, null, contentValues1);
                 }
                 else
                 {
-                    ContentValues contentValues1 = getContentValues(date,m,-1,1,null,null,0);
+                    ContentValues contentValues1 = getContentValues(date,m,10,1,null,null,0);
                     sqLiteDatabase.insert(MySQLiteOpenHelper.TABLE_NAME, null, contentValues1);
 
                 }
@@ -236,6 +236,7 @@ public class ImportDataFromExcel {
         }
         sqLiteDatabase.close();
     }
+
     public void weixin_base(String s) throws IOException {
         SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm");
         SQLiteDatabase sqLiteDatabase=dbHelper.getWritableDatabase();
@@ -281,12 +282,12 @@ public class ImportDataFromExcel {
                 if(state.equals("支出"))
                 {
                     System.out.println(-m);
-                    ContentValues contentValues1 = getContentValues(date,-m, -1,2,note,null,0);
+                    ContentValues contentValues1 = getContentValues(date,-m, 10,2,note,null,0);
                     sqLiteDatabase.insert(MySQLiteOpenHelper.TABLE_NAME, null, contentValues1);
                 }
                 else
                 {
-                    ContentValues contentValues1 = getContentValues(date,m,-1,2,note,null,0);
+                    ContentValues contentValues1 = getContentValues(date,m,10,2,note,null,0);
                     sqLiteDatabase.insert(MySQLiteOpenHelper.TABLE_NAME, null, contentValues1);
 
                 }
