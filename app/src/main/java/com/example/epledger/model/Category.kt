@@ -26,7 +26,8 @@ data class Category(
                 Category(context.getString(R.string.transportation), R.drawable.ic_fas_bus, 6),
                 Category(context.getString(R.string.digital), R.drawable.ic_fas_mobile_alt, 7),
                 Category(context.getString(R.string.coffee), R.drawable.ic_fas_coffee, 8),
-                Category(context.getString(R.string.present), R.drawable.ic_fas_gift, 9)
+                Category(context.getString(R.string.present), R.drawable.ic_fas_gift, 9),
+                Category(context.getString(R.string.category_imported), R.drawable.ic_far_bookmark, 10)
             )
         }
     }
