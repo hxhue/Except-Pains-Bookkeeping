@@ -229,4 +229,5 @@
     <string name="please_select_data_range">请选择日期范围</string>
     <string name="from">从</string>
     <string name="filter_result">筛选结果</string>
+    <string name="category_imported">被导入</string>
 </resources>
