@@ -15,7 +15,6 @@ import kotlin.collections.ArrayList
 class SqliteDatabase(context: Context) : LedgerDatabase() {
     val im = ImportDataFromExcel(context)
     val simpleFormat = SimpleDateFormat("yyyy/MM/dd hh:mm")
-
     override fun getRecordsOrderByDate(): List<Record> {
         val sqLiteDatabase: SQLiteDatabase = im.dbHelper.getReadableDatabase()
         val cursor: Cursor = sqLiteDatabase.rawQuery(
@@ -86,11 +85,8 @@ class SqliteDatabase(context: Context) : LedgerDatabase() {
                     screenshotPath=cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.bitmap))
                     note = cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.memo))
                 }
-                System.out.println(type_id)
                 if(!r.isComplete()) res.add(r)
             }
-            System.out.print("一共有：")
-            System.out.print(res.size)
             cursor.close()
         }
         return res
@@ -315,7 +311,13 @@ class SqliteDatabase(context: Context) : LedgerDatabase() {
     }
 
     override fun filterRecords(filter: Filter): List<Record> {
-        TODO("Not yet implemented")
+        val sqLiteDatabase: SQLiteDatabase = im.dbHelper.getReadableDatabase()
+        val simpleFormat = SimpleDateFormat("yyyy/MM/dd")
+        val start=simpleFormat.format(filter.startDate)
+        val rectifiedDateEnd=Date(filter.endDate.time+24*60*60*1000)
+        val end=simpleFormat.format(rectifiedDateEnd)
+        val res=im.filterRecords(sqLiteDatabase,start,end,filter.sources, filter.categories,filter.minAmount,filter.maxAmount)
+        return res
     }
 
     override fun siftRecords(

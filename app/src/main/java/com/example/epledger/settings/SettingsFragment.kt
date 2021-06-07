@@ -1,5 +1,6 @@
 package com.example.epledger.settings
 
+import android.content.DialogInterface
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
@@ -43,9 +44,11 @@ class SettingsFragment: PreferenceFragmentCompat(), SharedPreferences.OnSharedPr
         {
             val f=FileManager(this.context)
             f.reloadDb(path)
+
         }
 
     }
+
     /*rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument()) { activityResult ->
             /*if(activityResult.path == Activity.RESULT_OK){
                 val result = activityResult.data?.getStringExtra("result")
@@ -80,9 +83,21 @@ class SettingsFragment: PreferenceFragmentCompat(), SharedPreferences.OnSharedPr
         // Data
         val eJSON = preferenceScreen.findPreference<Preference>("data_export_json")
         eJSON?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-            Toast.makeText(requireContext(), "数据库文件已保存在Andriod/data/data/com.example.epledger/files/Database中", Toast.LENGTH_SHORT).show()
+            //Toast.makeText(requireContext(), "数据库文件已保存在/storage/emulated/0/Database中", Toast.LENGTH_SHORT).show()
             val file=FileManager(this.context)
             file.writeDb()
+            val info = this.context?.let { it1 -> AlertDialog.Builder(it1) }
+            //info.setIcon(R.drawable.dnn_rnd)
+            if (info != null) {
+                info.setTitle("提示")
+                info.setMessage("数据库文件已保存在/storage/emulated/0/Database")
+                info.setPositiveButton(getString(R.string.ok)) {_, _->}
+                info.setNegativeButton(getString(R.string.cancel)) {_, _->}
+                //info.setNeutralButton(getString(R.string.more)) {_, _->}
+                info.show()
+            }
+
+
             true
         }
 
@@ -90,13 +105,23 @@ class SettingsFragment: PreferenceFragmentCompat(), SharedPreferences.OnSharedPr
         eCSV?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             val tmp=ImportDataFromExcel(this.context)
             tmp.exportToCSV()
-            Toast.makeText(requireContext(), "数据已保存在Andriod/data/data/com.example.epledger/excel.csv", Toast.LENGTH_SHORT).show()
+            val info = this.context?.let { it1 -> AlertDialog.Builder(it1) }
+            //info.setIcon(R.drawable.dnn_rnd)
+            if (info != null) {
+                info.setTitle("提示")
+                info.setMessage("数据已保存在/storage/emulated/0/excel.csv")
+                info.setPositiveButton(getString(R.string.ok)) {_, _->}
+                info.setNegativeButton(getString(R.string.cancel)) {_, _->}
+                //info.setNeutralButton(getString(R.string.more)) {_, _->}
+                info.show()
+            }
+            //Toast.makeText(requireContext(), "数据已保存在/storage/emulated/0/excel.csv", Toast.LENGTH_SHORT).show()
             true
         }
 
         val iJSON = preferenceScreen.findPreference<Preference>("data_import_json")
         iJSON?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-            Toast.makeText(requireContext(), "data_import_json", Toast.LENGTH_SHORT).show()
+            //Toast.makeText(requireContext(), "data_import_json", Toast.LENGTH_SHORT).show()
             mode=3
             var string_array:Array<String> = arrayOf("*/*")
             myActivityLauncher.launch(string_array)
