@@ -9,18 +9,18 @@
         android:title="@string/sift"
         app:showAsAction="ifRoom" />
 
-    <item
-        android:id="@+id/reset"
-        android:contentDescription="@string/content_description_reset"
-        android:icon="@drawable/ic_baseline_refresh"
-        android:title="@string/reset"
-        app:showAsAction="ifRoom" />
+<!--    <item-->
+<!--        android:id="@+id/reset"-->
+<!--        android:contentDescription="@string/content_description_reset"-->
+<!--        android:icon="@drawable/ic_baseline_refresh"-->
+<!--        android:title="@string/reset"-->
+<!--        app:showAsAction="never" />-->
 
-    <item
-        android:id="@+id/more"
-        android:title="@string/more"
-        android:contentDescription="@string/content_description_more"
-        app:showAsAction="never" />
+<!--    <item-->
+<!--        android:id="@+id/more"-->
+<!--        android:title="@string/more"-->
+<!--        android:contentDescription="@string/content_description_more"-->
+<!--        app:showAsAction="never" />-->
 
 
 </menu>
