@@ -24,7 +24,7 @@ import com.example.epledger.R
 import com.example.epledger.inbox.event.item.IconItemAdapter
 import com.example.epledger.inbox.event.item.SpaceItemDecoration
 import com.example.epledger.db.DatabaseModel
-import com.example.epledger.model.CATEGORY_MAX_SIZE
+import com.example.epledger.model.CATEGORY_SUGGESTED_MAX_SIZE
 import com.example.epledger.model.Category
 import com.example.epledger.util.IconAsset
 import com.example.epledger.util.ScreenMetrics
@@ -231,7 +231,7 @@ class CategoryItemDialogFragment: DialogFragment(), IconItemAdapter.OnPositionCl
 
     private fun checkMaxCategoryNumber(): Boolean {
         val categories = dbModel.requireCategories()
-        return categories.size < CATEGORY_MAX_SIZE
+        return categories.size < CATEGORY_SUGGESTED_MAX_SIZE
     }
 
     private fun setIconRecyclerViewVisibility(visible: Boolean) {

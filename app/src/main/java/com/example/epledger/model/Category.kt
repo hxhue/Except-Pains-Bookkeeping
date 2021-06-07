@@ -3,7 +3,7 @@ package com.example.epledger.model
 import android.content.Context
 import com.example.epledger.R
 
-const val CATEGORY_MAX_SIZE = 36
+const val CATEGORY_SUGGESTED_MAX_SIZE = 36
 
 data class Category(
     var name: String = "",
@@ -17,6 +17,7 @@ data class Category(
 
     companion object {
         const val UNKNOWN_ID = 1
+        const val IMPORTED_ID = 11
 
         fun getDefaultCategories(context: Context): MutableList<Category> {
             return arrayListOf(
@@ -30,6 +31,7 @@ data class Category(
                 Category(context.getString(R.string.coffee), R.drawable.ic_fas_coffee, 8),
                 Category(context.getString(R.string.present), R.drawable.ic_fas_gift, 9),
                 Category(context.getString(R.string.sports), R.drawable.ic_far_futbol, 10),
+                Category(context.getString(R.string.category_imported), R.drawable.u_account_balance_wallet, IMPORTED_ID)
             )
         }
     }
