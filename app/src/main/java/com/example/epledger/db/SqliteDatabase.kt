@@ -125,7 +125,13 @@ class SqliteDatabase(context: Context) : LedgerDatabase() {
                     screenshotPath=cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.bitmap))
                     note = cursor.getStringOrNull(cursor.getColumnIndex(MySQLiteOpenHelper.memo))
                 }
-                res.add(r)
+
+                /**
+                 * 2021-6-7 18:06:17 Now we only consider complete records
+                 */
+                if (r.isComplete()) {
+                    res.add(r)
+                }
             }
             cursor.close()
         }
