@@ -38,6 +38,11 @@ android {
         preDexLibraries = false
         javaMaxHeapSize "4g"
     }
+
+    dexOptions {
+        preDexLibraries = false
+        javaMaxHeapSize "4g"
+    }
 }
 
 dependencies {
