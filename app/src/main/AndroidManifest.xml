@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.epledger">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -19,10 +18,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ExceptPains">
 
-        <activity android:name=".chart.ShowChartActivity" />
+<!--        <activity android:name=".chart.ShowChartActivity" />-->
 
 <!--        android:windowSoftInputMode="adjustPan"-->
         <activity
+            android:exported="true"
+            tools:node="merge"
             android:name=".MainActivity"
             android:windowSoftInputMode="adjustPan"
             android:launchMode="singleInstance">
@@ -39,6 +40,8 @@
 
         <!-- 需要使用taskAffinity标识，标识和主应用属于不同的任务。防止被清理时影响到主应用。 -->
         <activity
+            android:exported="true"
+            tools:node="merge"
             android:name=".qaction.PopupActivity"
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
@@ -52,6 +55,7 @@
 
         <!-- TODO: icon需要修改 -->
         <service
+            android:exported="true"
             android:name=".qaction.NewRecordTileService"
             android:icon="@drawable/nic_service"
             android:label="@string/tile_service_label"

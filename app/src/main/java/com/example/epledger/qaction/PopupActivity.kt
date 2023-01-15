@@ -150,13 +150,15 @@ class PopupActivity : AppCompatActivity(), PairTask.Noticeable, AdapterView.OnIt
     override fun onReceiveTaskResult(eid: Int, extra: Any?) {
         if (eid == waitingEvent) {
             show()
-            val screenshot = extra as Bitmap
-            Log.d("qaction.PopupActivity", "screenshot received as Bitmap")
-            // Save the screenshot to ledgerRecord
-            ledgerRecord.screenshot = screenshot
-            // reset the toggle state
-            handler.post {
-                screenshotSwitch.isChecked = true
+            if (extra != null) {
+                val screenshot = extra as Bitmap
+                Log.d("qaction.PopupActivity", "screenshot received as Bitmap")
+                // Save the screenshot to ledgerRecord
+                ledgerRecord.screenshot = screenshot
+                // reset the toggle state
+                handler.post {
+                    screenshotSwitch.isChecked = true
+                }
             }
         }
     }

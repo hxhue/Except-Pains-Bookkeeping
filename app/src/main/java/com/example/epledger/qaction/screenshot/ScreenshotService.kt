@@ -115,8 +115,12 @@ class ScreenshotService : Service() {
 
             // 处理图像
             val img = mImageReader.acquireLatestImage()
-            val bitmap = ScreenshotUtils.argb8888ToBitmap(img)
-            PairTask.finish(callbackId, bitmap)
+            if (img != null) {
+                val bitmap = ScreenshotUtils.argb8888ToBitmap(img)
+                PairTask.finish(callbackId, bitmap)
+            } else {
+                PairTask.finish(callbackId, null)
+            }
 
             // 结束服务和释放资源
             vDisplay.release()
